@@ -6,26 +6,26 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class R_vari {
+public class R_valm {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
-
-	private String vari;
+	
+	private String valmistaja;
 
 	public Integer getId() {
-		return this.id;
+		return id;
 	}
 
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public String getVari() {
-		return this.vari;
+	public String getValmistaja() {
+		return valmistaja;
 	}
 
-	public void setVari(String vari) {
-		this.vari = vari;
+	public void setValmistaja(String valmistaja) {
+		this.valmistaja = valmistaja;
 	}
 }
