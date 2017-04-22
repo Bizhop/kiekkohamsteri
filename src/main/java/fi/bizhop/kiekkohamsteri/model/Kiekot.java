@@ -32,17 +32,16 @@ public class Kiekot {
 	private String kuva;
 	private Integer paino;
 	private Integer kunto;
-	private Boolean hohto;
-	private Boolean spessu;
-	private Boolean dyed;
-	private Boolean swirly;
-	private Boolean tussit;
-	private Boolean myynnissa;
+	private Integer hohto;
+	private Integer spessu;
+	private Integer dyed;
+	private Integer swirly;
+	private Integer tussit;
+	private Integer myynnissa;
 	private Integer hinta;
 	private String muuta;
-	private Boolean loytokiekko;
-	private Boolean itb;
-	
+	private Integer loytokiekko;
+	private Integer itb;
 	public Integer getId() {
 		return id;
 	}
@@ -91,40 +90,40 @@ public class Kiekot {
 	public void setKunto(Integer kunto) {
 		this.kunto = kunto;
 	}
-	public Boolean getHohto() {
+	public Integer getHohto() {
 		return hohto;
 	}
-	public void setHohto(Boolean hohto) {
+	public void setHohto(Integer hohto) {
 		this.hohto = hohto;
 	}
-	public Boolean getSpessu() {
+	public Integer getSpessu() {
 		return spessu;
 	}
-	public void setSpessu(Boolean spessu) {
+	public void setSpessu(Integer spessu) {
 		this.spessu = spessu;
 	}
-	public Boolean getDyed() {
+	public Integer getDyed() {
 		return dyed;
 	}
-	public void setDyed(Boolean dyed) {
+	public void setDyed(Integer dyed) {
 		this.dyed = dyed;
 	}
-	public Boolean getSwirly() {
+	public Integer getSwirly() {
 		return swirly;
 	}
-	public void setSwirly(Boolean swirly) {
+	public void setSwirly(Integer swirly) {
 		this.swirly = swirly;
 	}
-	public Boolean getTussit() {
+	public Integer getTussit() {
 		return tussit;
 	}
-	public void setTussit(Boolean tussit) {
+	public void setTussit(Integer tussit) {
 		this.tussit = tussit;
 	}
-	public Boolean getMyynnissa() {
+	public Integer getMyynnissa() {
 		return myynnissa;
 	}
-	public void setMyynnissa(Boolean myynnissa) {
+	public void setMyynnissa(Integer myynnissa) {
 		this.myynnissa = myynnissa;
 	}
 	public Integer getHinta() {
@@ -139,16 +138,16 @@ public class Kiekot {
 	public void setMuuta(String muuta) {
 		this.muuta = muuta;
 	}
-	public Boolean getLoytokiekko() {
+	public Integer getLoytokiekko() {
 		return loytokiekko;
 	}
-	public void setLoytokiekko(Boolean loytokiekko) {
+	public void setLoytokiekko(Integer loytokiekko) {
 		this.loytokiekko = loytokiekko;
 	}
-	public Boolean getItb() {
+	public Integer getItb() {
 		return itb;
 	}
-	public void setItb(Boolean itb) {
+	public void setItb(Integer itb) {
 		this.itb = itb;
 	}
 }
