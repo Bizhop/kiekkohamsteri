@@ -18,6 +18,7 @@ public class MainController {
 	@Autowired
 	private VariRepository variRepo;
 	
+	@Autowired
 	private KiekkoRepository kiekkoRepo;
 
 	@GetMapping(path="/varit")
