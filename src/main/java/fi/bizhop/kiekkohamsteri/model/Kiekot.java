@@ -11,7 +11,7 @@ import javax.persistence.ManyToOne;
 public class Kiekot {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Integer id;
+	private Long id;
 	
 	@ManyToOne
 	@JoinColumn(name="member_id")
@@ -42,10 +42,10 @@ public class Kiekot {
 	private String muuta;
 	private Integer loytokiekko;
 	private Integer itb;
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	public Members getMember() {
