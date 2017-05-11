@@ -6,6 +6,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class Kiekot {
@@ -13,35 +14,61 @@ public class Kiekot {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
+	@NotNull
 	@ManyToOne
 	@JoinColumn(name="member_id")
 	private Members member;
 	
+	@NotNull
 	@ManyToOne
 	@JoinColumn(name="mold_id")
 	private R_mold mold;
 	
+	@NotNull
 	@ManyToOne
 	@JoinColumn(name="muovi_id")
 	private R_muovi muovi;
 	
+	@NotNull
 	@ManyToOne
 	@JoinColumn(name="vari_id")
 	private R_vari vari;
 	
 	private String kuva;
 	private Integer paino;
+	@NotNull
 	private Integer kunto;
 	private Integer hohto;
 	private Integer spessu;
+	@NotNull
 	private Integer dyed;
+	@NotNull
 	private Integer swirly;
+	@NotNull
 	private Integer tussit;
 	private Integer myynnissa;
+	@NotNull
 	private Integer hinta;
 	private String muuta;
 	private Integer loytokiekko;
-	private Integer itb;
+	@NotNull
+	private Boolean itb;
+	
+	public Kiekot() {} //default constructor
+	
+	public Kiekot(Members user, R_mold defaultMold, R_muovi defaultMuovi, R_vari defaultVari) {
+		this.member = user;
+		this.mold = defaultMold;
+		this.muovi = defaultMuovi;
+		this.vari = defaultVari;
+		this.kunto = 10;
+		this.dyed = 0;
+		this.swirly = 0;
+		this.tussit = 0;
+		this.hinta = 0;
+		this.itb = false;
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -144,10 +171,10 @@ public class Kiekot {
 	public void setLoytokiekko(Integer loytokiekko) {
 		this.loytokiekko = loytokiekko;
 	}
-	public Integer getItb() {
+	public Boolean getItb() {
 		return itb;
 	}
-	public void setItb(Integer itb) {
+	public void setItb(Boolean itb) {
 		this.itb = itb;
 	}
 }

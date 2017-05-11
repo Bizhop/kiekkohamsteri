@@ -11,7 +11,7 @@ import javax.persistence.ManyToOne;
 public class R_mold {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Integer id;
+	private Long id;
 	
 	@ManyToOne
 	@JoinColumn(name="valmistaja_id")
@@ -23,10 +23,10 @@ public class R_mold {
 	private Integer vakaus;
 	private Integer feidi;
 	
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	public R_valm getValmistaja() {
