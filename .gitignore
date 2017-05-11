@@ -3,3 +3,4 @@ application.properties
 .settings/
 .classpath
 .project
+*.log

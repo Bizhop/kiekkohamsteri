@@ -1,0 +1,1 @@
+mvn clean package && screen java -jar target/kiekkohamsteri-0.1.0.jar
