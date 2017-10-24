@@ -1,0 +1,1 @@
+GET http://localhost:8181/hamsteri/kiekot HTTP/1.1

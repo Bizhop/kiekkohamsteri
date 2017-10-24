@@ -13,8 +13,6 @@ public class Members {
 	
 	private String username;
 	private String email;
-	private String password;
-	private String salt;
 	private Integer level;
 	private String etunimi;
 	private String sukunimi;
@@ -37,18 +35,6 @@ public class Members {
 	}
 	public void setEmail(String email) {
 		this.email = email;
-	}
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	public String getSalt() {
-		return salt;
-	}
-	public void setSalt(String salt) {
-		this.salt = salt;
 	}
 	public Integer getLevel() {
 		return level;
