@@ -1,7 +1,5 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,8 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import fi.bizhop.kiekkohamsteri.dto.ListausDto;
 import fi.bizhop.kiekkohamsteri.model.Members;
-import fi.bizhop.kiekkohamsteri.projection.KiekotListausProjection;
+import fi.bizhop.kiekkohamsteri.projection.KiekkoProjection;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.KiekkoService;
 
@@ -25,7 +24,7 @@ public class KiekotController extends BaseController {
 	AuthService authService;
 	
 	@RequestMapping(value = "/kiekot", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody List<KiekotListausProjection> haeKiekot(HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody ListausDto haeKiekot(HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug("KiekotController.haeKiekot()...");
 		
 		Members owner = authService.getUser(request);
@@ -35,12 +34,12 @@ public class KiekotController extends BaseController {
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_OK);
-			return kiekkoService.haeKiekot(owner);
+			return new ListausDto(kiekkoService.haeKiekot(owner));
 		}
 	}
 	
 	@RequestMapping(value = "/kiekot/email", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody List<KiekotListausProjection> haeKiekotEmail(@RequestParam(value = "email") String email, HttpServletResponse response) {
+	public @ResponseBody ListausDto haeKiekotEmail(@RequestParam(value = "email") String email, HttpServletResponse response) {
 		LOG.debug("KiekotController.haeKiekotEmail()...");
 		
 		Members owner = authService.getUser(email);
@@ -50,12 +49,12 @@ public class KiekotController extends BaseController {
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_OK);
-			return kiekkoService.haeKiekot(owner);
+			return new ListausDto(kiekkoService.haeKiekot(owner));
 		}
 	}
 	
 	@RequestMapping(value = "/kiekot", method = RequestMethod.POST, produces = "application/json")
-	public @ResponseBody KiekotListausProjection uusiKiekko(HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody KiekkoProjection uusiKiekko(HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug("KiekotController.uusiKiekko()...");
 		
 		Members owner = authService.getUser(request);

@@ -14,7 +14,7 @@ import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.model.R_mold;
 import fi.bizhop.kiekkohamsteri.model.R_muovi;
 import fi.bizhop.kiekkohamsteri.model.R_vari;
-import fi.bizhop.kiekkohamsteri.projection.KiekotListausProjection;
+import fi.bizhop.kiekkohamsteri.projection.KiekkoProjection;
 
 @Service
 public class KiekkoService {
@@ -28,11 +28,11 @@ public class KiekkoService {
 	@Autowired
 	private VariRepository variRepo;
 
-	public List<KiekotListausProjection> haeKiekot(Members owner) {
+	public List<KiekkoProjection> haeKiekot(Members owner) {
 		return kiekkoRepo.findByMember(owner);
 	}
 	
-	public KiekotListausProjection uusiKiekko(Members owner) {
+	public KiekkoProjection uusiKiekko(Members owner) {
 		R_mold defaultMold = moldRepo.findOne(568L);
 		R_muovi defaultMuovi = muoviRepo.findOne(109L);
 		R_vari defaultVari = variRepo.findOne(1L);

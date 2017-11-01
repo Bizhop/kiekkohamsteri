@@ -2,7 +2,7 @@ package fi.bizhop.kiekkohamsteri.projection;
 
 import org.springframework.beans.factory.annotation.Value;
 
-public interface KiekotListausProjection {
+public interface KiekkoProjection {
 	Integer getId();	
 	@Value("#{target.getMember().getUsername()}")
 	String getOmistaja();

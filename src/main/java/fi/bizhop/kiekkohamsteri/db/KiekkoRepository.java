@@ -6,10 +6,10 @@ import org.springframework.data.repository.CrudRepository;
 
 import fi.bizhop.kiekkohamsteri.model.Kiekot;
 import fi.bizhop.kiekkohamsteri.model.Members;
-import fi.bizhop.kiekkohamsteri.projection.KiekotListausProjection;
+import fi.bizhop.kiekkohamsteri.projection.KiekkoProjection;
 
 public interface KiekkoRepository extends CrudRepository<Kiekot, Long> {
-	List<KiekotListausProjection> findByMember(Members member);
+	List<KiekkoProjection> findByMember(Members member);
 
-	KiekotListausProjection findById(Long id);
+	KiekkoProjection findById(Long id);
 }
