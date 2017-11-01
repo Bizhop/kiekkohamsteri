@@ -4,11 +4,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "members")
 public class Members {
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
 	private String username;
@@ -18,6 +20,16 @@ public class Members {
 	private String sukunimi;
 	private Integer pdga_num;
 	
+	public Members() {}
+	
+	public Members(String userEmail) {
+		this.username = "Uusi käyttäjä";
+		this.email = userEmail;
+		this.level = 1;
+		this.etunimi = "Uusi";
+		this.sukunimi = "Käyttäjä";
+		this.pdga_num = 0;
+	}
 	public Long getId() {
 		return id;
 	}

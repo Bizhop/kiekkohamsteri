@@ -1,1 +1,4 @@
-GET http://localhost:8181/hamsteri/kiekot HTTP/1.1
+GET http://localhost:8181/api/kiekot/email?email=pekka.nykanen@outlook.com HTTP/1.1
+
+###
+GET http://localhost:8181/api/ping HTTP/1.1

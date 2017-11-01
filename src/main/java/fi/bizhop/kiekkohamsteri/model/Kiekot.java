@@ -6,12 +6,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Entity
+@Table(name = "kiekot")
 public class Kiekot {
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
 	@NotNull
@@ -52,7 +54,7 @@ public class Kiekot {
 	private String muuta;
 	private Integer loytokiekko;
 	@NotNull
-	private Boolean itb;
+	private Integer itb;
 	
 	public Kiekot() {} //default constructor
 	
@@ -61,12 +63,13 @@ public class Kiekot {
 		this.mold = defaultMold;
 		this.muovi = defaultMuovi;
 		this.vari = defaultVari;
+		this.kuva = "";
 		this.kunto = 10;
 		this.dyed = 0;
 		this.swirly = 0;
 		this.tussit = 0;
 		this.hinta = 0;
-		this.itb = false;
+		this.itb = 0;
 	}
 	
 	public Long getId() {
@@ -171,10 +174,10 @@ public class Kiekot {
 	public void setLoytokiekko(Integer loytokiekko) {
 		this.loytokiekko = loytokiekko;
 	}
-	public Boolean getItb() {
+	public Integer getItb() {
 		return itb;
 	}
-	public void setItb(Boolean itb) {
+	public void setItb(Integer itb) {
 		this.itb = itb;
 	}
 }
