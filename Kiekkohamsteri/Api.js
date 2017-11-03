@@ -11,8 +11,8 @@ const Api = {
                 'Content-Type': 'application-json',
             }
         })
-        const responseJson = await response.json()
-        return responseJson
+        const json = await response.json()
+        return json
     }
 }
 

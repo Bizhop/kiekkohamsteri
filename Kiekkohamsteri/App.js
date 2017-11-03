@@ -18,7 +18,7 @@ export default class App extends Component {
     super(props);
     this.state = {
       app: undefined,
-      kiekot: [{id: 1, mold: "testi"}]
+      kiekot: []
     };
   }
 
@@ -52,11 +52,12 @@ export default class App extends Component {
   }
   getDiscs() {
     try {
-      const response = Api.getRaw('kiekot/email?email=ville.piispa@gmail.com')
-      Alert.alert('Villen kiekot:', `${response.kiekot}`)
-      this.setState({
-        app: undefined, 
-        kiekot: R.pathOr([], ['kiekot'], response)
+      Api.getRaw('kiekot/email?email=ville.piispa@gmail.com')
+      .then((json) => {
+        this.setState({
+          app: undefined, 
+          kiekot: json.kiekot
+        })
       })
     }
     catch (e) {
