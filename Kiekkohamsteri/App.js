@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { CameraKitCamera } from 'react-native-camera-kit';
 import R from 'ramda'
+import {GoogleSignin, GoogleSigninButton} from 'react-native-google-signin';
 
 import CameraScreen from './CameraScreen';
 import Api from './Api'
@@ -18,8 +19,13 @@ export default class App extends Component {
     super(props);
     this.state = {
       app: undefined,
+      email: null,
       kiekot: []
     };
+  }
+
+  componentDidMount() {
+    this._setupGoogleSignin();
   }
 
   render() {
@@ -34,15 +40,16 @@ export default class App extends Component {
             Kiekkohamsteri
           </Text>
         </View>
+        {this.state.email ? this.logout() : this.login()}
         <View style={styles.container}>
           <TouchableOpacity onPress={() => this.setState({app: CameraScreen})}>
             <Text style={styles.buttonText}>
               Ota kuva
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => this.getDiscs()}>
+          <TouchableOpacity onPress={() => this.getDiscs()} disabled={!this.state.email} >
             <Text style={styles.buttonText}>
-              Hae Villen kiekot
+              Hae kiekot
             </Text>
           </TouchableOpacity>
           {this.state.kiekot.map(k => <DiscRow kiekko={k} key={k.id} />)}
@@ -50,13 +57,14 @@ export default class App extends Component {
       </View>
     );
   }
+
   getDiscs() {
     try {
-      Api.getRaw('kiekot/email?email=ville.piispa@gmail.com')
-      .then((json) => {
+      Api.getRaw(`kiekot/email?email=${this.state.email}`)
+      .then((response) => {
         this.setState({
           app: undefined, 
-          kiekot: json.kiekot
+          kiekot: R.pathOr([], ['kiekot'], response)
         })
       })
     }
@@ -64,6 +72,66 @@ export default class App extends Component {
       Alert.alert('Error', e.message)
     }
   }
+
+  async _setupGoogleSignin() {
+    try {
+      await GoogleSignin.hasPlayServices({ autoResolve: true });
+      await GoogleSignin.configure({
+        webClientId: '107543052765-lfgp4lke6h51a0l4kp258anilpeegf8v.apps.googleusercontent.com',
+        offlineAccess: false
+      });
+
+      const user = await GoogleSignin.currentUserAsync();
+      console.log(user);
+      this.setState({...this.state, email: user.email});
+    }
+    catch(err) {
+      console.log("Play services error", err.code, err.message);
+    }
+  }
+
+  _signIn() {
+    GoogleSignin.signIn()
+    .then((user) => {
+      console.log(user);
+      this.setState({...this.state, email: user.email});
+    })
+    .catch((err) => {
+      console.log('WRONG SIGNIN', err);
+    })
+    .done();
+  }
+
+  _signOut() {
+    GoogleSignin.revokeAccess().then(() => GoogleSignin.signOut()).then(() => {
+      this.setState({...this.state, email: null});
+    })
+    .done();
+  }
+
+  login = () => (
+    <View style={styles.container}>
+      <GoogleSigninButton 
+        style={{width: 120, height: 44}}
+        color={GoogleSigninButton.Color.Light}
+        size={GoogleSigninButton.Size.Icon}
+        onPress={() => { this._signIn(); }} 
+      />
+    </View>
+  )
+  
+  logout = () => (
+    <View style={styles.container}>
+      <Text style={styles.text}>
+        {this.state.email}
+      </Text>
+      <TouchableOpacity onPress={() => this._signOut()}>
+        <Text style={styles.buttonText}>
+          Kirjaudu ulos
+        </Text>
+      </TouchableOpacity>
+    </View>
+  )
 }
 
 const DiscRow = props => (
