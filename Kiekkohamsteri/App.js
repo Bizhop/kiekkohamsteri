@@ -65,22 +65,26 @@ export default class App extends Component {
           }
         </View>
         {this.state.user ? this.showLogout() : this.showLogin()}
-        <View style={styles.container}>
-          <TouchableOpacity onPress={() => this.setState({app: CameraScreen})}>
-            <Text style={styles.buttonText}>
-              Ota kuva
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => this.getDiscs()} disabled={!this.state.user} >
-            <Text style={styles.buttonText}>
-              Hae kiekot
-            </Text>
-          </TouchableOpacity>
-          {this.state.kiekot.map(k => <DiscRow kiekko={k} key={k.id} />)}
-        </View>
+        {this.state.loggedIn && this.showButtons()}
       </View>
     );
   }
+
+  showButtons = () => (
+    <View style={styles.container}>
+      <TouchableOpacity onPress={() => this.setState({app: CameraScreen})}>
+        <Text style={styles.buttonText}>
+          Ota kuva
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => this.getDiscs()} >
+        <Text style={styles.buttonText}>
+          Hae kiekot
+        </Text>
+      </TouchableOpacity>
+      {this.state.kiekot.map(k => <DiscRow kiekko={k} key={k.id} />)}
+    </View>
+  )
 
   getDiscs() {
     try {
@@ -164,7 +168,7 @@ export default class App extends Component {
 
 const DiscRow = props => (
   <Text style={styles.text}>
-    {props.kiekko.mold}
+    {props.kiekko.muovi} {props.kiekko.mold} {props.kiekko.paino}g ({props.kiekko.vari}) {props.kiekko.kunto}/10
   </Text>
 )
 
