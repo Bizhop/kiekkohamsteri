@@ -75,109 +75,127 @@ public class Kiekot {
 	public Long getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public Kiekot setId(Long id) {
 		this.id = id;
+		return this;
 	}
 	public Members getMember() {
 		return member;
 	}
-	public void setMember(Members member) {
+	public Kiekot setMember(Members member) {
 		this.member = member;
+		return this;
 	}
 	public R_mold getMold() {
 		return mold;
 	}
-	public void setMold(R_mold mold) {
+	public Kiekot setMold(R_mold mold) {
 		this.mold = mold;
+		return this;
 	}
 	public R_muovi getMuovi() {
 		return muovi;
 	}
-	public void setMuovi(R_muovi muovi) {
+	public Kiekot setMuovi(R_muovi muovi) {
 		this.muovi = muovi;
+		return this;
 	}
 	public R_vari getVari() {
 		return vari;
 	}
-	public void setVari(R_vari vari) {
+	public Kiekot setVari(R_vari vari) {
 		this.vari = vari;
+		return this;
 	}
 	public String getKuva() {
 		return kuva;
 	}
-	public void setKuva(String kuva) {
+	public Kiekot setKuva(String kuva) {
 		this.kuva = kuva;
+		return this;
 	}
 	public Integer getPaino() {
 		return paino;
 	}
-	public void setPaino(Integer paino) {
+	public Kiekot setPaino(Integer paino) {
 		this.paino = paino;
+		return this;
 	}
 	public Integer getKunto() {
 		return kunto;
 	}
-	public void setKunto(Integer kunto) {
+	public Kiekot setKunto(Integer kunto) {
 		this.kunto = kunto;
+		return this;
 	}
 	public Integer getHohto() {
 		return hohto;
 	}
-	public void setHohto(Integer hohto) {
+	public Kiekot setHohto(Integer hohto) {
 		this.hohto = hohto;
+		return this;
 	}
 	public Integer getSpessu() {
 		return spessu;
 	}
-	public void setSpessu(Integer spessu) {
+	public Kiekot setSpessu(Integer spessu) {
 		this.spessu = spessu;
+		return this;
 	}
 	public Integer getDyed() {
 		return dyed;
 	}
-	public void setDyed(Integer dyed) {
+	public Kiekot setDyed(Integer dyed) {
 		this.dyed = dyed;
+		return this;
 	}
 	public Integer getSwirly() {
 		return swirly;
 	}
-	public void setSwirly(Integer swirly) {
+	public Kiekot setSwirly(Integer swirly) {
 		this.swirly = swirly;
+		return this;
 	}
 	public Integer getTussit() {
 		return tussit;
 	}
-	public void setTussit(Integer tussit) {
+	public Kiekot setTussit(Integer tussit) {
 		this.tussit = tussit;
+		return this;
 	}
 	public Integer getMyynnissa() {
 		return myynnissa;
 	}
-	public void setMyynnissa(Integer myynnissa) {
+	public Kiekot setMyynnissa(Integer myynnissa) {
 		this.myynnissa = myynnissa;
+		return this;
 	}
 	public Integer getHinta() {
 		return hinta;
 	}
-	public void setHinta(Integer hinta) {
+	public Kiekot setHinta(Integer hinta) {
 		this.hinta = hinta;
+		return this;
 	}
 	public String getMuuta() {
 		return muuta;
 	}
-	public void setMuuta(String muuta) {
+	public Kiekot setMuuta(String muuta) {
 		this.muuta = muuta;
+		return this;
 	}
 	public Integer getLoytokiekko() {
 		return loytokiekko;
 	}
-	public void setLoytokiekko(Integer loytokiekko) {
+	public Kiekot setLoytokiekko(Integer loytokiekko) {
 		this.loytokiekko = loytokiekko;
+		return this;
 	}
 	public Integer getItb() {
 		return itb;
 	}
-	public void setItb(Integer itb) {
+	public Kiekot setItb(Integer itb) {
 		this.itb = itb;
+		return this;
 	}
 }
