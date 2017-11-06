@@ -56,7 +56,7 @@ public class KiekotController extends BaseController {
 		}
 	}
 	
-	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.PUT, produces = "application/json")
+	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
 	public @ResponseBody KiekkoProjection paivitaKiekko(@PathVariable Long id, @RequestBody KiekkoDto dto, HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug("KiekotController.paivitaKiekko()...");
 		
