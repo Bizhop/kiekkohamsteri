@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,21 +29,6 @@ public class KiekotController extends BaseController {
 		Members owner = authService.getUser(request);
 		if(owner == null) {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			return null;
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_OK);
-			return new ListausDto(kiekkoService.haeKiekot(owner));
-		}
-	}
-	
-	@RequestMapping(value = "/kiekot/email", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody ListausDto haeKiekotEmail(@RequestParam(value = "email") String email, HttpServletResponse response) {
-		LOG.debug("KiekotController.haeKiekotEmail()...");
-		
-		Members owner = authService.getUser(email);
-		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			return null;
 		}
 		else {
