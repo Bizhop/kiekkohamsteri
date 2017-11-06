@@ -13,6 +13,29 @@ const Api = {
         })
         const json = await response.json()
         return json
+    },
+    async ping() {
+        const url = base + 'ping'
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'text-plain',
+            }
+        })
+        return response
+    },
+    async login(user) {
+        const url = base + 'auth/login'
+        await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application-json',
+                'Authorization': user.idToken
+            }
+        })
+        .then((response) => {
+            return response.email === user.email
+        })
     }
 }
 

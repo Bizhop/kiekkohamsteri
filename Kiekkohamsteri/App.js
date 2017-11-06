@@ -4,7 +4,8 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Alert
+  Alert,
+  Image
 } from 'react-native';
 import { CameraKitCamera } from 'react-native-camera-kit';
 import R from 'ramda'
@@ -19,13 +20,32 @@ export default class App extends Component {
     super(props);
     this.state = {
       app: undefined,
-      email: null,
-      kiekot: []
+      user: null,
+      kiekot: [],
+      backendUp: false,
+      loggedIn: false,
     };
   }
 
   componentDidMount() {
     this._setupGoogleSignin();
+    this.pingBackend();
+  }
+
+  pingBackend() {
+    setTimeout(() => this.pingBackend(), 30000)
+    try {
+      Api.ping()
+      .then((response) => {
+        this.setState({
+          ...this.state,
+          backendUp: true
+        })
+      })
+    }
+    catch (e) {
+      Alert.alert('Error', e.message)
+    }
   }
 
   render() {
@@ -39,15 +59,19 @@ export default class App extends Component {
           <Text style={styles.headerText}>
             Kiekkohamsteri
           </Text>
+          {this.state.backendUp ? 
+            <Image source={require('./images/green_light.png')} style={styles.icon} /> :
+            <Image source={require('./images/red_light.png')} style={styles.icon} />
+          }
         </View>
-        {this.state.email ? this.logout() : this.login()}
+        {this.state.user ? this.showLogout() : this.showLogin()}
         <View style={styles.container}>
           <TouchableOpacity onPress={() => this.setState({app: CameraScreen})}>
             <Text style={styles.buttonText}>
               Ota kuva
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => this.getDiscs()} disabled={!this.state.email} >
+          <TouchableOpacity onPress={() => this.getDiscs()} disabled={!this.state.user} >
             <Text style={styles.buttonText}>
               Hae kiekot
             </Text>
@@ -60,9 +84,10 @@ export default class App extends Component {
 
   getDiscs() {
     try {
-      Api.getRaw(`kiekot/email?email=${this.state.email}`)
+      Api.getRaw(`kiekot/email?email=${this.state.user.email}`)
       .then((response) => {
         this.setState({
+          ...this.state,
           app: undefined, 
           kiekot: R.pathOr([], ['kiekot'], response)
         })
@@ -83,7 +108,7 @@ export default class App extends Component {
 
       const user = await GoogleSignin.currentUserAsync();
       console.log(user);
-      this.setState({...this.state, email: user.email});
+      this.setState({...this.state, user: user, loggedIn: Api.login(user)});
     }
     catch(err) {
       console.log("Play services error", err.code, err.message);
@@ -94,7 +119,7 @@ export default class App extends Component {
     GoogleSignin.signIn()
     .then((user) => {
       console.log(user);
-      this.setState({...this.state, email: user.email});
+      this.setState({...this.state, user: user, loggedIn: Api.login(user)});
     })
     .catch((err) => {
       console.log('WRONG SIGNIN', err);
@@ -104,12 +129,12 @@ export default class App extends Component {
 
   _signOut() {
     GoogleSignin.revokeAccess().then(() => GoogleSignin.signOut()).then(() => {
-      this.setState({...this.state, email: null});
+      this.setState({...this.state, user: null, loggedIn: false});
     })
     .done();
   }
 
-  login = () => (
+  showLogin = () => (
     <View style={styles.container}>
       <GoogleSigninButton 
         style={{width: 120, height: 44}}
@@ -120,10 +145,13 @@ export default class App extends Component {
     </View>
   )
   
-  logout = () => (
+  showLogout = () => (
     <View style={styles.container}>
       <Text style={styles.text}>
-        {this.state.email}
+        {this.state.user.givenName} {this.state.user.familyName}: ({this.state.user.email})
+      </Text>
+      <Text style={styles.text}>
+        {this.state.loggedIn ? 'Kirjautunut hamsteriin' : 'Ei kirjautunut hamsteriin'}
       </Text>
       <TouchableOpacity onPress={() => this._signOut()}>
         <Text style={styles.buttonText}>
@@ -148,11 +176,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   headerContainer: {
-    flexDirection: 'column',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     backgroundColor: '#F5FCFF',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 100
+    paddingTop: 50
   },
   headerText: {
     color: 'black',
@@ -166,5 +195,9 @@ const styles = StyleSheet.create({
   text: {
     color: 'black',
     fontSize: 15
+  },
+  icon: {
+    width: 24,
+    height: 24
   }
 });
