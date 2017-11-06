@@ -84,7 +84,7 @@ export default class App extends Component {
 
   getDiscs() {
     try {
-      Api.getRaw(`kiekot/email?email=${this.state.user.email}`)
+      Api.get('kiekot', this.state.user)
       .then((response) => {
         this.setState({
           ...this.state,

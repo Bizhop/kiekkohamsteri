@@ -3,12 +3,13 @@ import { Alert } from 'react-native'
 const base = 'https://kiekkohamsteri-backend.herokuapp.com/api/'
 
 const Api = {
-    async getRaw(endpoint) {
+    async get(endpoint, user) {
         const url = base + endpoint
         const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application-json',
+                'Authorization': user.idToken,
             }
         })
         const json = await response.json()
@@ -30,7 +31,7 @@ const Api = {
             method: 'GET',
             headers: {
                 'Content-Type': 'application-json',
-                'Authorization': user.idToken
+                'Authorization': user.idToken,
             }
         })
         .then((response) => {
