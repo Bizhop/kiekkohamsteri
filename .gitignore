@@ -5,3 +5,5 @@ target/
 .project
 *.log
 fribahamsteri.*.sql
+*.http
+
