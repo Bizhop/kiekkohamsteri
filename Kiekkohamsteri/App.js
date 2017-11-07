@@ -5,7 +5,8 @@ import {
   View,
   TouchableOpacity,
   Alert,
-  Image
+  Image,
+  Modal
 } from 'react-native';
 import { CameraKitCamera } from 'react-native-camera-kit';
 import R from 'ramda'
@@ -13,6 +14,8 @@ import {GoogleSignin, GoogleSigninButton} from 'react-native-google-signin';
 
 import CameraScreen from './CameraScreen';
 import Api from './Api'
+
+const imagesUrl = 'https://res.cloudinary.com/djc4j4dcs/'
 
 export default class App extends Component {
   
@@ -61,9 +64,20 @@ export default class App extends Component {
           animationType="slide"
           transparent={false}
           visible={this.state.modalVisible}
+          onRequestClose={() => {}}
           >
-          <View>
-            <Text>{this.state.selectedDisc.mold}</Text>
+          <View style={styles.container}>
+            {this.state.selectedDisc ? (
+                <View>
+                  <Text>{discBasics(this.state.selectedDisc)}</Text>
+                  <Image 
+                    source={{uri: `${imagesUrl}${this.state.selectedDisc.kuva}`}} 
+                    style={styles.discImage}
+                  />
+                </View>
+            ) : (
+              <Text>Ei valittua kiekkoa</Text>
+            )}
 
             <TouchableOpacity onPress={() => {
               this.setState({
@@ -71,7 +85,7 @@ export default class App extends Component {
                 modalVisible: false,
               })
             }}>
-              <Text>Hide Modal</Text>
+              <Text style={styles.buttonText}>Paluu</Text>
             </TouchableOpacity>
           </View>
         </Modal>
@@ -92,17 +106,12 @@ export default class App extends Component {
 
   showButtons = () => (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => this.setState({app: CameraScreen})}>
-        <Text style={styles.buttonText}>
-          Ota kuva
-        </Text>
-      </TouchableOpacity>
       <TouchableOpacity onPress={() => this.getDiscs()} >
         <Text style={styles.buttonText}>
           Hae kiekot
         </Text>
       </TouchableOpacity>
-      {this.state.kiekot.map(k => <DiscRow kiekko={k} key={k.id} />)}
+      {this.state.kiekot.map(k => this.discRow(k))}
     </View>
   )
 
@@ -184,26 +193,31 @@ export default class App extends Component {
       </TouchableOpacity>
     </View>
   )
+
+  discRow = kiekko => (
+    <View key={kiekko.id}>
+      <TouchableOpacity onPress={() => {
+        this.setState({
+          ...this.state,
+          modalVisible: true,
+          selectedDisc: kiekko
+        })
+      }}>
+        <Text style={styles.text}>
+          {discBasics(kiekko)}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  )
 }
 
-const DiscRow = props => (
-  <View>
-    <Text style={styles.text}>
-      {props.kiekko.muovi} {props.kiekko.mold} {props.kiekko.paino}g ({props.kiekko.vari}) {props.kiekko.kunto}/10
-    </Text>
-    <TouchableOpacity onPress={() => {
-      this.setState({
-        ...this.state,
-        modalVisible: true,
-        selectedDisc: kiekko
-      })
-    }}>
-      <Text style={styles.buttonText}>
-        Edit
-      </Text>
-    </TouchableOpacity>
-  </View>
-)
+discBasics = kiekko => {
+  return `${kiekko.muovi} ${kiekko.mold} ${kiekko.paino}g (${kiekko.vari}) ${kiekko.kunto}/10`
+}
+
+discStats = kiekko => {
+  return `${kiekko.mold} / ${kiekko.mold} / ${kiekko.paino} / ${kiekko.vari} / ${kiekko.kunto}`
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -231,10 +245,15 @@ const styles = StyleSheet.create({
   },
   text: {
     color: 'black',
-    fontSize: 15
+    fontSize: 15,
+    padding: 5
   },
   icon: {
     width: 24,
     height: 24
+  },
+  discImage: {
+    width: 300,
+    height: 300
   }
 });

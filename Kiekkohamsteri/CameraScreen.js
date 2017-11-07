@@ -48,7 +48,6 @@ export default class CameraScreen extends Component {
                 actions={{ leftButtonText: 'Peruuta' }}
                 onBottomButtonPressed={(event) => this.onBottomButtonPressed(event)}
                 captureButtonImage={require('./images/cameraButton.png')}
-                cameraRatioOverlay={['1:1']}
             />
         );
     }
