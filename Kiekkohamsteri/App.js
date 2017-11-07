@@ -26,7 +26,6 @@ export default class App extends Component {
       user: null,
       kiekot: [],
       backendUp: false,
-      loggedIn: false,
       modalVisible: false,
       selectedDisc: null,
     };
@@ -96,7 +95,7 @@ export default class App extends Component {
           }
         </View>
         {this.state.user ? this.showLogout() : this.showLogin()}
-        {this.state.loggedIn && this.showButtons()}
+        {this.state.user && this.showButtons()}
       </View>
     );
   }
@@ -118,13 +117,12 @@ export default class App extends Component {
       .then((response) => {
         this.setState({
           ...this.state,
-          app: undefined, 
           kiekot: R.pathOr([], ['kiekot'], response)
         })
       })
     }
     catch (e) {
-      Alert.alert('Error', e.message)
+      console.log(e.message)
     }
   }
 
@@ -138,7 +136,10 @@ export default class App extends Component {
 
       const user = await GoogleSignin.currentUserAsync();
       console.log(user);
-      this.setState({...this.state, user: user, loggedIn: Api.login(user)});
+      if(user) {
+        Api.login(user)
+        this.setState({...this.state, user: user});
+      }
     }
     catch(err) {
       console.log("Play services error", err.code, err.message);
@@ -149,7 +150,8 @@ export default class App extends Component {
     GoogleSignin.signIn()
     .then((user) => {
       console.log(user);
-      this.setState({...this.state, user: user, loggedIn: Api.login(user)});
+      Api.login(user)
+      this.setState({...this.state, user: user});
     })
     .catch((err) => {
       console.log('WRONG SIGNIN', err);
@@ -159,7 +161,7 @@ export default class App extends Component {
 
   _signOut() {
     GoogleSignin.revokeAccess().then(() => GoogleSignin.signOut()).then(() => {
-      this.setState({...this.state, user: null, loggedIn: false});
+      this.setState({...this.state, user: null});
     })
     .done();
   }
@@ -179,9 +181,6 @@ export default class App extends Component {
     <View style={styles.container}>
       <Text style={styles.text}>
         {this.state.user.givenName} {this.state.user.familyName}: ({this.state.user.email})
-      </Text>
-      <Text style={styles.text}>
-        {this.state.loggedIn ? 'Kirjautunut hamsteriin' : 'Ei kirjautunut hamsteriin'}
       </Text>
       <TouchableOpacity onPress={() => this._signOut()}>
         <Text style={styles.buttonText}>
