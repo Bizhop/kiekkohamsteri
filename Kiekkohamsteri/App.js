@@ -64,30 +64,27 @@ export default class App extends Component {
           animationType="slide"
           transparent={false}
           visible={this.state.modalVisible}
-          onRequestClose={() => {}}
+          onRequestClose={() => {
+            this.setState({
+              ...this.state,
+              modalVisible: false,
+            })
+          }}
           >
-          <View style={styles.container}>
             {this.state.selectedDisc ? (
-                <View>
-                  <Text>{discBasics(this.state.selectedDisc)}</Text>
-                  <Image 
-                    source={{uri: `${imagesUrl}${this.state.selectedDisc.kuva}`}} 
-                    style={styles.discImage}
-                  />
-                </View>
+              <View style={styles.container}>
+                <Text>{discBasics(this.state.selectedDisc)}</Text>
+                <Text>{discStats(this.state.selectedDisc)}</Text>
+                <Image 
+                  source={{uri: `${imagesUrl}${this.state.selectedDisc.kuva}`}} 
+                  style={styles.discImage}
+                />
+              </View>
             ) : (
-              <Text>Ei valittua kiekkoa</Text>
+              <View style={styles.container}>
+                <Text>Ei valittua kiekkoa</Text>
+              </View>
             )}
-
-            <TouchableOpacity onPress={() => {
-              this.setState({
-                ...this.state,
-                modalVisible: false,
-              })
-            }}>
-              <Text style={styles.buttonText}>Paluu</Text>
-            </TouchableOpacity>
-          </View>
         </Modal>
         <View style={styles.headerContainer}>
           <Text style={styles.headerText}>
@@ -216,7 +213,7 @@ discBasics = kiekko => {
 }
 
 discStats = kiekko => {
-  return `${kiekko.mold} / ${kiekko.mold} / ${kiekko.paino} / ${kiekko.vari} / ${kiekko.kunto}`
+  return `${kiekko.nopeus} / ${kiekko.liito} / ${kiekko.vakaus} / ${kiekko.feidi}`
 }
 
 const styles = StyleSheet.create({
