@@ -14,6 +14,14 @@ public interface KiekkoProjection {
 	String getMuovi();
 	@Value("#{target.getVari().getVari()}")
 	String getVari();
+	@Value("#{target.getMold().getNopeus()}")
+	Double getNopeus();
+	@Value("#{target.getMold().getLiito()}")
+	Double getLiito();
+	@Value("#{target.getMold().getVakaus()}")
+	Double getVakaus();
+	@Value("#{target.getMold().getFeidi()}")
+	Double getFeidi();
 	String getKuva();
 	Integer getPaino();
 	Integer getKunto();

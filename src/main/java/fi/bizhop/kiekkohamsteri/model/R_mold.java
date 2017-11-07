@@ -20,10 +20,10 @@ public class R_mold {
 	private R_valm valmistaja;
 		
 	private String kiekko;
-	private Integer nopeus;
-	private Integer liito;
-	private Integer vakaus;
-	private Integer feidi;
+	private Double nopeus;
+	private Double liito;
+	private Double vakaus;
+	private Double feidi;
 	
 	public Long getId() {
 		return id;
@@ -43,28 +43,28 @@ public class R_mold {
 	public void setKiekko(String kiekko) {
 		this.kiekko = kiekko;
 	}
-	public Integer getNopeus() {
+	public Double getNopeus() {
 		return nopeus;
 	}
-	public void setNopeus(Integer nopeus) {
+	public void setNopeus(Double nopeus) {
 		this.nopeus = nopeus;
 	}
-	public Integer getLiito() {
+	public Double getLiito() {
 		return liito;
 	}
-	public void setLiito(Integer liito) {
+	public void setLiito(Double liito) {
 		this.liito = liito;
 	}
-	public Integer getVakaus() {
+	public Double getVakaus() {
 		return vakaus;
 	}
-	public void setVakaus(Integer vakaus) {
+	public void setVakaus(Double vakaus) {
 		this.vakaus = vakaus;
 	}
-	public Integer getFeidi() {
+	public Double getFeidi() {
 		return feidi;
 	}
-	public void setFeidi(Integer feidi) {
+	public void setFeidi(Double feidi) {
 		this.feidi = feidi;
 	}
 }
