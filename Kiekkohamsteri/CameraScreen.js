@@ -4,7 +4,8 @@ import {
 } from 'react-native';
 import { CameraKitCameraScreen } from 'react-native-camera-kit';
 import App from './App'
-
+import RNFS from 'react-native-fs'
+import Api from './Api'
 
 export default class CameraScreen extends Component {
 
@@ -20,16 +21,21 @@ export default class CameraScreen extends Component {
             this.setState(this.setState({app: App}))
         }
         else {
-            const captureImages = JSON.stringify(event.captureImages);
-            Alert.alert(
-            `${event.type} button pressed`,
-            `${captureImages}`,
-            [
-                { text: 'OK', onPress: () => console.log('OK Pressed') },
-            ],
-            { cancelable: false }
-            )
+            this.uploadFirstImage(event.captureImages)
         }
+    }
+
+    async uploadFirstImage(images) {
+        const first = images[0]
+        await RNFS.readFile(first.uri, 'base64').then((image) => {
+            Api.upload(first.name, image)
+            .then((response) => {
+                console.log(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        })
     }
 
     render() {
@@ -38,11 +44,12 @@ export default class CameraScreen extends Component {
             return <CameraScreen />;
         }
         return (
-        <CameraKitCameraScreen
-            actions={{ leftButtonText: 'Peruuta' }}
-            onBottomButtonPressed={(event) => this.onBottomButtonPressed(event)}
-            captureButtonImage={require('./images/cameraButton.png')}
-        />
+            <CameraKitCameraScreen
+                actions={{ leftButtonText: 'Peruuta' }}
+                onBottomButtonPressed={(event) => this.onBottomButtonPressed(event)}
+                captureButtonImage={require('./images/cameraButton.png')}
+                cameraRatioOverlay={['1:1']}
+            />
         );
     }
 }

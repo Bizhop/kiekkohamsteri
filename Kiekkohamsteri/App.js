@@ -24,6 +24,8 @@ export default class App extends Component {
       kiekot: [],
       backendUp: false,
       loggedIn: false,
+      modalVisible: false,
+      selectedDisc: null,
     };
   }
 
@@ -55,6 +57,24 @@ export default class App extends Component {
     }
     return (
       <View style={{flex: 1}}>
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={this.state.modalVisible}
+          >
+          <View>
+            <Text>{this.state.selectedDisc.mold}</Text>
+
+            <TouchableOpacity onPress={() => {
+              this.setState({
+                ...this.state,
+                modalVisible: false,
+              })
+            }}>
+              <Text>Hide Modal</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
         <View style={styles.headerContainer}>
           <Text style={styles.headerText}>
             Kiekkohamsteri
@@ -167,9 +187,22 @@ export default class App extends Component {
 }
 
 const DiscRow = props => (
-  <Text style={styles.text}>
-    {props.kiekko.muovi} {props.kiekko.mold} {props.kiekko.paino}g ({props.kiekko.vari}) {props.kiekko.kunto}/10
-  </Text>
+  <View>
+    <Text style={styles.text}>
+      {props.kiekko.muovi} {props.kiekko.mold} {props.kiekko.paino}g ({props.kiekko.vari}) {props.kiekko.kunto}/10
+    </Text>
+    <TouchableOpacity onPress={() => {
+      this.setState({
+        ...this.state,
+        modalVisible: true,
+        selectedDisc: kiekko
+      })
+    }}>
+      <Text style={styles.buttonText}>
+        Edit
+      </Text>
+    </TouchableOpacity>
+  </View>
 )
 
 const styles = StyleSheet.create({

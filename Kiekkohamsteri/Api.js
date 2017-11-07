@@ -8,7 +8,7 @@ const Api = {
         const response = await fetch(url, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application-json',
+                'Content-Type': 'application/json',
                 'Authorization': user.idToken,
             }
         })
@@ -20,7 +20,7 @@ const Api = {
         const response = await fetch(url, {
             method: 'GET',
             headers: {
-                'Content-Type': 'text-plain',
+                'Content-Type': 'text/plain',
             }
         })
         return response
@@ -30,13 +30,28 @@ const Api = {
         await fetch(url, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application-json',
+                'Content-Type': 'application/json',
                 'Authorization': user.idToken,
             }
         })
         .then((response) => {
             return response.email === user.email
         })
+    },
+    async upload(name, data){
+        const url = base + 'upload'
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                data: `data:image/jpeg;base64,${data}`,
+                name: name,
+            })
+        })
+        const json = await response.json()
+        return json
     }
 }
 
