@@ -55,6 +55,17 @@ const Api = {
         })
         const json = await response.json()
         return json
+    },
+    async dropdowns(valmId) {
+        const url = base + 'dropdown?valmId='+valmId
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        const json = await response.json()
+        return json
     }
 }
 

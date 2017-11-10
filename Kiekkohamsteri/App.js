@@ -7,7 +7,8 @@ import {
   Alert,
   Image,
   Modal,
-  FlatList
+  FlatList,
+  Picker
 } from 'react-native';
 import { List, ListItem, Button } from 'react-native-elements'
 import R from 'ramda'
@@ -28,6 +29,8 @@ export default class App extends Component {
       kiekkoVisible: false,
       listaVisible: false,
       selectedDisc: null,
+      kiekkoUpdate: {},
+      dropdowns: {},
     };
   }
 
@@ -38,7 +41,6 @@ export default class App extends Component {
 
   pingBackend() {
     setTimeout(() => this.pingBackend(), 30000)
-    try {
       Api.ping()
       .then((response) => {
         this.setState({
@@ -46,11 +48,11 @@ export default class App extends Component {
           backendUp: true
         })
       })
+      .catch((e) => {
+        Alert.alert('Error', e.message)
+      })
       .done()
-    }
-    catch (e) {
-      Alert.alert('Error', e.message)
-    }
+
   }
 
   render() {
@@ -68,20 +70,7 @@ export default class App extends Component {
             })
           }}
           >
-          {this.state.selectedDisc ? (
-            <View style={styles.container}>
-              <Text>{discBasics(this.state.selectedDisc)}</Text>
-              <Text>{discStats(this.state.selectedDisc)}</Text>
-              <Image 
-                source={{uri: `${imagesUrl}${this.state.selectedDisc.kuva}`}} 
-                style={styles.discImage}
-              />
-            </View>
-          ) : (
-            <View style={styles.container}>
-              <Text>Ei valittua kiekkoa</Text>
-            </View>
-          )}
+          {this.kiekkoModalContents()}
         </Modal>
         <Modal
           animationType="slide"
@@ -94,13 +83,7 @@ export default class App extends Component {
             })
           }}
           >
-          <List>
-            <FlatList
-              data={this.state.kiekot}
-              keyExtractor={(item, index) => item.id}
-              renderItem={this.discRow}
-            />
-          </List>
+          {this.kiekkoListContents()}
         </Modal>
         <View style={styles.headerContainer}>
           <Text style={styles.headerText}>
@@ -116,6 +99,101 @@ export default class App extends Component {
       </View>
     );
   }
+
+  kiekkoModalContents = () => {
+    return this.state.selectedDisc ? (
+      <View style={styles.container}>
+        <Text>{discBasics(this.state.selectedDisc)}</Text>
+        <Text>{discStats(this.state.selectedDisc)}</Text>
+        <Image 
+          source={{uri: `${imagesUrl}${this.state.selectedDisc.kuva}`}} 
+          style={styles.discImage}
+        />
+        <Picker
+          style={styles.picker}
+          selectedValue={this.state.kiekkoUpdate.valmId}
+          onValueChange={(itemValue, itemIndex) => {
+            Api.dropdowns(itemValue)
+            .then((dropdowns) => 
+              this.setState({
+                ...this.state,
+                kiekkoUpdate: {
+                  ...this.state.kiekkoUpdate,
+                  valmId: itemValue
+                },
+                dropdowns: dropdowns
+              })
+            )
+            console.log(this.state.kiekkoUpdate)
+          }}
+        >
+          {this.state.dropdowns.valms.map(v => <Picker.Item key={v.id} label={v.valmistaja} value={v.id} />)}
+        </Picker>
+        <Picker
+          style={styles.picker}
+          selectedValue={this.state.kiekkoUpdate.moldId}
+          onValueChange={(itemValue, itemIndex) => { 
+            this.setState({
+              ...this.state,
+              kiekkoUpdate: {
+                ...this.state.kiekkoUpdate,
+                moldId: itemValue
+              }
+            })
+            console.log(this.state.kiekkoUpdate)
+          }}
+        >
+        {this.state.dropdowns.molds.map(v => <Picker.Item key={v.id} label={v.kiekko} value={v.id} />)}
+        </Picker>
+        <Picker
+          style={styles.picker}
+          selectedValue={this.state.kiekkoUpdate.muoviId}
+          onValueChange={(itemValue, itemIndex) => { 
+            this.setState({
+              ...this.state,
+              kiekkoUpdate: {
+                ...this.state.kiekkoUpdate,
+                muoviId: itemValue
+              }
+            })
+            console.log(this.state.kiekkoUpdate)
+          }}
+        >
+        {this.state.dropdowns.muovit.map(v => <Picker.Item key={v.id} label={v.muovi} value={v.id} />)}
+        </Picker>
+        <Picker
+          style={styles.picker}
+          selectedValue={this.state.kiekkoUpdate.variId}
+          onValueChange={(itemValue, itemIndex) => { 
+            this.setState({
+              ...this.state,
+              kiekkoUpdate: {
+                ...this.state.kiekkoUpdate,
+                variId: itemValue
+              }
+            })
+            console.log(this.state.kiekkoUpdate)
+          }}
+        >
+        {this.state.dropdowns.varit.map(v => <Picker.Item key={v.id} label={v.vari} value={v.id} />)}
+        </Picker>
+      </View>
+    ) : (
+      <View style={styles.container}>
+        <Text>Ei valittua kiekkoa</Text>
+      </View>
+    )
+  }
+
+  kiekkoListContents = () => (
+    <List>
+      <FlatList
+        data={this.state.kiekot}
+        keyExtractor={(item, index) => item.id}
+        renderItem={this.discRow}
+      />
+    </List>
+  )
 
   showButtons = () => (
     <View style={styles.container}>
@@ -153,13 +231,24 @@ export default class App extends Component {
       subtitle={discStats(item)}
       avatar={{uri: `${imagesUrl}${item.kuva}`}}
       onPress={() => {
+        Api.dropdowns(item.valmId)
+        .then((dropdowns) => {
           this.setState({
             ...this.state,
             kiekkoVisible: true,
             listaVisible: false,
             selectedDisc: item,
+            kiekkoUpdate: {
+              moldId: item.moldId,
+              muoviId: item.muoviId,
+              variId: item.variId,
+              valmId: item.valmId
+            },
+            dropdowns: dropdowns
           })
-        }}
+        })
+        .done()
+      }}
     />
   )
 
@@ -270,5 +359,8 @@ const styles = StyleSheet.create({
   discImage: {
     width: 300,
     height: 300
+  },
+  picker: {
+    width: 150
   }
 });
