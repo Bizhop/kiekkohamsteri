@@ -78,6 +78,8 @@ project.ext.react = [
 
 apply from: "../../node_modules/react-native/react.gradle"
 
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+
 /**
  * Set this to true to create two separate APKs instead of one:
  *   - An APK that only works on ARM devices
@@ -153,6 +155,7 @@ dependencies {
     compile "com.facebook.react:react-native:+"  // From node_modules
     compile project(":rncamerakit")
     compile project(':react-native-fs')
+    compile project(':react-native-vector-icons')
     compile(project(":react-native-google-signin")){         
         exclude group: "com.google.android.gms" // very important
     }

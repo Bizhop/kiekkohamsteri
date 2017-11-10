@@ -3,13 +3,13 @@ import { Alert } from 'react-native'
 const base = 'https://kiekkohamsteri-backend.herokuapp.com/api/'
 
 const Api = {
-    async get(endpoint, user) {
+    async get(endpoint, token) {
         const url = base + endpoint
         const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': user.idToken,
+                'Authorization': token,
             }
         })
         const json = await response.json()
@@ -25,17 +25,20 @@ const Api = {
         })
         return response
     },
-    async login(user) {
+    async login(token) {
         const url = base + 'auth/login'
         await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': user.idToken,
+                'Authorization': token,
             }
         })
         .then((response) => {
-            return response.email === user.email
+            return response.email ? true : false
+        })
+        .catch((error) => {
+            return false
         })
     },
     async upload(name, data){

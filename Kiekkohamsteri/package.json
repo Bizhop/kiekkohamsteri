@@ -11,8 +11,10 @@
 		"react": "16.0.0-beta.5",
 		"react-native": "0.49.5",
 		"react-native-camera-kit": "^5.3.11",
+		"react-native-elements": "^0.18.2",
 		"react-native-fs": "^2.8.4",
-		"react-native-google-signin": "^0.12.0"
+		"react-native-google-signin": "^0.12.0",
+		"react-native-vector-icons": "^4.4.2"
 	},
 	"devDependencies": {
 		"babel-jest": "21.2.0",

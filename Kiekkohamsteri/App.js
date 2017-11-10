@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   Alert,
   Image,
-  Modal
+  Modal,
+  FlatList
 } from 'react-native';
-import { CameraKitCamera } from 'react-native-camera-kit';
+import { List, ListItem, Button } from 'react-native-elements'
 import R from 'ramda'
 import {GoogleSignin, GoogleSigninButton} from 'react-native-google-signin';
 
-import CameraScreen from './CameraScreen';
 import Api from './Api'
 
 const imagesUrl = 'https://res.cloudinary.com/djc4j4dcs/'
@@ -22,11 +22,11 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      app: undefined,
       user: null,
       kiekot: [],
       backendUp: false,
-      modalVisible: false,
+      kiekkoVisible: false,
+      listaVisible: false,
       selectedDisc: null,
     };
   }
@@ -46,6 +46,7 @@ export default class App extends Component {
           backendUp: true
         })
       })
+      .done()
     }
     catch (e) {
       Alert.alert('Error', e.message)
@@ -53,37 +54,53 @@ export default class App extends Component {
   }
 
   render() {
-    if (this.state.app) {
-      const App = this.state.app;
-      return <App />;
-    }
     return (
       <View style={{flex: 1}}>
         <Modal
           animationType="slide"
           transparent={false}
-          visible={this.state.modalVisible}
+          visible={this.state.kiekkoVisible}
           onRequestClose={() => {
             this.setState({
               ...this.state,
-              modalVisible: false,
+              kiekkoVisible: false,
+              listaVisible: true,
             })
           }}
           >
-            {this.state.selectedDisc ? (
-              <View style={styles.container}>
-                <Text>{discBasics(this.state.selectedDisc)}</Text>
-                <Text>{discStats(this.state.selectedDisc)}</Text>
-                <Image 
-                  source={{uri: `${imagesUrl}${this.state.selectedDisc.kuva}`}} 
-                  style={styles.discImage}
-                />
-              </View>
-            ) : (
-              <View style={styles.container}>
-                <Text>Ei valittua kiekkoa</Text>
-              </View>
-            )}
+          {this.state.selectedDisc ? (
+            <View style={styles.container}>
+              <Text>{discBasics(this.state.selectedDisc)}</Text>
+              <Text>{discStats(this.state.selectedDisc)}</Text>
+              <Image 
+                source={{uri: `${imagesUrl}${this.state.selectedDisc.kuva}`}} 
+                style={styles.discImage}
+              />
+            </View>
+          ) : (
+            <View style={styles.container}>
+              <Text>Ei valittua kiekkoa</Text>
+            </View>
+          )}
+        </Modal>
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={this.state.listaVisible}
+          onRequestClose={() => {
+            this.setState({
+              ...this.state,
+              listaVisible: false,
+            })
+          }}
+          >
+          <List>
+            <FlatList
+              data={this.state.kiekot}
+              keyExtractor={(item, index) => item.id}
+              renderItem={this.discRow}
+            />
+          </List>
         </Modal>
         <View style={styles.headerContainer}>
           <Text style={styles.headerText}>
@@ -95,36 +112,56 @@ export default class App extends Component {
           }
         </View>
         {this.state.user ? this.showLogout() : this.showLogin()}
-        {this.state.user && this.showButtons()}
+        {this.state.user && this.state.backendUp && this.showButtons()}
       </View>
     );
   }
 
   showButtons = () => (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => this.getDiscs()} >
-        <Text style={styles.buttonText}>
-          Hae kiekot
-        </Text>
-      </TouchableOpacity>
-      {this.state.kiekot.map(k => this.discRow(k))}
+      <Button
+        raised
+        rightIcon={{name: 'file-download'}}
+        backgroundColor='#0077ff'
+        title='Hae kiekot'
+        onPress={() => this.getDiscs()}
+      />
     </View>
   )
 
   getDiscs() {
-    try {
-      Api.get('kiekot', this.state.user)
+    if(Api.login(this.state.user.idToken)){
+      Api.get('kiekot', this.state.user.idToken)
       .then((response) => {
         this.setState({
           ...this.state,
-          kiekot: R.pathOr([], ['kiekot'], response)
+          kiekot: R.pathOr([], ['kiekot'], response),
+          listaVisible: true,
         })
       })
-    }
-    catch (e) {
-      console.log(e.message)
+      .catch((err) => {
+        Alert.alert('Kiekkojen haku epäonnistui', err.message)
+      })
+      .done()
     }
   }
+
+  discRow = ({item}) => (
+    <ListItem
+      roundAvatar
+      title={discBasics(item)}
+      subtitle={discStats(item)}
+      avatar={{uri: `${imagesUrl}${item.kuva}`}}
+      onPress={() => {
+          this.setState({
+            ...this.state,
+            kiekkoVisible: true,
+            listaVisible: false,
+            selectedDisc: item,
+          })
+        }}
+    />
+  )
 
   async _setupGoogleSignin() {
     try {
@@ -135,26 +172,24 @@ export default class App extends Component {
       });
 
       const user = await GoogleSignin.currentUserAsync();
-      console.log(user);
       if(user) {
-        Api.login(user)
+        console.log(user)
         this.setState({...this.state, user: user});
       }
     }
     catch(err) {
-      console.log("Play services error", err.code, err.message);
+      Alert.alert('Play services error', `${err.code}: ${err.message}`);
     }
   }
 
   _signIn() {
     GoogleSignin.signIn()
     .then((user) => {
-      console.log(user);
-      Api.login(user)
+      console.log(user)
       this.setState({...this.state, user: user});
     })
     .catch((err) => {
-      console.log('WRONG SIGNIN', err);
+      Alert.alert('Google signin failed', `${err.code}: ${err.message}`);
     })
     .done();
   }
@@ -185,22 +220,6 @@ export default class App extends Component {
       <TouchableOpacity onPress={() => this._signOut()}>
         <Text style={styles.buttonText}>
           Kirjaudu ulos
-        </Text>
-      </TouchableOpacity>
-    </View>
-  )
-
-  discRow = kiekko => (
-    <View key={kiekko.id}>
-      <TouchableOpacity onPress={() => {
-        this.setState({
-          ...this.state,
-          modalVisible: true,
-          selectedDisc: kiekko
-        })
-      }}>
-        <Text style={styles.text}>
-          {discBasics(kiekko)}
         </Text>
       </TouchableOpacity>
     </View>
