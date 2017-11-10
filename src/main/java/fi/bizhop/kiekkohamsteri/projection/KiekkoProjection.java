@@ -8,6 +8,8 @@ public interface KiekkoProjection {
 	String getOmistaja();
 	@Value("#{target.getMold().getValmistaja().getValmistaja()}")
 	String getValmistaja();
+	@Value("#{target.getMold().getValmistaja().getId()}")
+	Long getValmId();
 	@Value("#{target.getMold().getKiekko()}")
 	String getMold();
 	@Value("#{target.getMold().getId()}")
