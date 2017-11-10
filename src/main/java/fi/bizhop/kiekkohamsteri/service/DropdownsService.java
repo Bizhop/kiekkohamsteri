@@ -27,18 +27,18 @@ public class DropdownsService {
 	@Autowired
 	VariRepository variRepo;
 	
-	public DropdownsDto getDropdowns() {
+	public DropdownsDto getDropdowns(Long valmId) {
 		DropdownsDto dto = new DropdownsDto();
-		dto.setValms(getValms()).setMolds(getMolds(null)).setMuovit(getMuovit()).setVarit(getVarit());
+		dto.setValms(getValms()).setMolds(getMolds(valmId)).setMuovit(getMuovit(valmId)).setVarit(getVarit());
 		return dto;
 	}
 
-	private List<MoldDropdownProjection> getMolds(Long valmistajaId) {
-		if(valmistajaId == null) {
+	private List<MoldDropdownProjection> getMolds(Long valmId) {
+		if(valmId == null) {
 			return moldRepo.findAllByOrderByKiekkoAsc();
 		}
 		else {
-			R_valm valm = valmRepo.findOne(valmistajaId);
+			R_valm valm = valmRepo.findOne(valmId);
 			return moldRepo.findByValmistajaOrderByKiekkoAsc(valm);
 		}
 	}
@@ -47,8 +47,14 @@ public class DropdownsService {
 		return valmRepo.findAllProjectedBy();
 	}
 	
-	private List<MuoviDropdownProjection> getMuovit() {
-		return muoviRepo.findAllProjectedBy();
+	private List<MuoviDropdownProjection> getMuovit(Long valmId) {
+		if(valmId == null) {
+			return muoviRepo.findAllByOrderByMuoviAsc();
+		}
+		else {
+			R_valm valm = valmRepo.findOne(valmId);
+			return muoviRepo.findByValmistajaOrderByMuoviAsc(valm);
+		}
 	}
 	
 	private List<VariDropdownProjection> getVarit() {
