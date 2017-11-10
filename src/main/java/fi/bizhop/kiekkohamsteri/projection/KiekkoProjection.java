@@ -10,10 +10,16 @@ public interface KiekkoProjection {
 	String getValmistaja();
 	@Value("#{target.getMold().getKiekko()}")
 	String getMold();
+	@Value("#{target.getMold().getId()}")
+	Long getMoldId();
 	@Value("#{target.getMuovi().getMuovi()}")
 	String getMuovi();
+	@Value("#{target.getMuovi().getId()}")
+	Long getMuoviId();
 	@Value("#{target.getVari().getVari()}")
 	String getVari();
+	@Value("#{target.getVari().getId()}")
+	Long getVariId();
 	@Value("#{target.getMold().getNopeus()}")
 	Double getNopeus();
 	@Value("#{target.getMold().getLiito()}")
