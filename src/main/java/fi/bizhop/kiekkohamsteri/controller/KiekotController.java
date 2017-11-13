@@ -4,6 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import fi.bizhop.kiekkohamsteri.dto.KiekkoDto;
-import fi.bizhop.kiekkohamsteri.dto.ListausDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.projection.KiekkoProjection;
@@ -27,7 +28,7 @@ public class KiekotController extends BaseController {
 	AuthService authService;
 	
 	@RequestMapping(value = "/kiekot", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody ListausDto haeKiekot(HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody Page<KiekkoProjection> haeKiekot(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
 		LOG.debug("KiekotController.haeKiekot()...");
 		
 		Members owner = authService.getUser(request);
@@ -37,7 +38,7 @@ public class KiekotController extends BaseController {
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_OK);
-			return new ListausDto(kiekkoService.haeKiekot(owner));
+			return kiekkoService.haeKiekot(owner, pageable);
 		}
 	}
 	

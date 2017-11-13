@@ -11,6 +11,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import fi.bizhop.kiekkohamsteri.db.KiekkoRepository;
@@ -38,8 +40,8 @@ public class KiekkoService {
 	@Autowired
 	private VariRepository variRepo;
 
-	public List<KiekkoProjection> haeKiekot(Members owner) {
-		return kiekkoRepo.findByMember(owner);
+	public Page<KiekkoProjection> haeKiekot(Members owner, Pageable pageable) {
+		return kiekkoRepo.findByMember(owner, pageable);
 	}
 	
 	public KiekkoProjection uusiKiekko(Members owner) {
