@@ -1,7 +1,15 @@
 package fi.bizhop.kiekkohamsteri.service;
 
+import java.beans.PropertyDescriptor;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,28 +60,39 @@ public class KiekkoService {
 			throw new AuthorizationException();
 		}
 		
-		R_mold mold = moldRepo.findOne(dto.getMoldId());
-		R_muovi muovi = muoviRepo.findOne(dto.getMuoviId());
-		R_vari vari = variRepo.findOne(dto.getVariId());
+		String[] ignoreRelations = {"member", "muovi", "mold", "vari"};
+		String[] ignoreNulls = getNullPropertyNames(dto);
+		String[] ignores = Stream.concat(Arrays.stream(ignoreRelations), Arrays.stream(ignoreNulls)).toArray(String[]::new);
 		
-		kiekko.setMold(mold)
-			.setMuovi(muovi)
-			.setVari(vari)
-			.setDyed(dto.getDyed())
-			.setHinta(dto.getHinta())
-			.setHohto(dto.getHohto())
-			.setItb(dto.getItb())
-			.setKunto(dto.getKunto())
-			.setKuva(dto.getKuva())
-			.setLoytokiekko(dto.getLoytokiekko())
-			.setMuuta(dto.getMuuta())
-			.setMyynnissa(dto.getMyynnissa())
-			.setPaino(dto.getPaino())
-			.setSpessu(dto.getSpessu())
-			.setSwirly(dto.getSwirly())
-			.setTussit(dto.getTussit());
+		BeanUtils.copyProperties(dto, kiekko, ignores);
+		
+		if(dto.getMoldId() != null) {
+			R_mold mold = moldRepo.findOne(dto.getMoldId());
+			kiekko.setMold(mold);
+		}
+		if(dto.getMuoviId() != null) {
+			R_muovi muovi = muoviRepo.findOne(dto.getMuoviId());
+			kiekko.setMuovi(muovi);
+		}
+		if(dto.getVariId() != null) {
+			R_vari vari = variRepo.findOne(dto.getVariId());
+			kiekko.setVari(vari);
+		}
 		
 		kiekkoRepo.save(kiekko);
 		return kiekkoRepo.findById(id);
+	}
+	
+	public static String[] getNullPropertyNames (Object source) {
+	    final BeanWrapper src = new BeanWrapperImpl(source);
+	    PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+	    Set<String> emptyNames = new HashSet<String>();
+	    for(PropertyDescriptor pd : pds) {
+	        Object srcValue = src.getPropertyValue(pd.getName());
+	        if (srcValue == null) emptyNames.add(pd.getName());
+	    }
+	    String[] result = new String[emptyNames.size()];
+	    return emptyNames.toArray(result);
 	}
 }
