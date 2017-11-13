@@ -33,14 +33,14 @@ public interface KiekkoProjection {
 	String getKuva();
 	Integer getPaino();
 	Integer getKunto();
-	Integer getHohto();
-	Integer getSpessu();
-	Integer getDyed();
-	Integer getSwirly();
+	Boolean getHohto();
+	Boolean getSpessu();
+	Boolean getDyed();
+	Boolean getSwirly();
 	Integer getTussit();
-	Integer getMyynnissa();
+	Boolean getMyynnissa();
 	Integer getHinta();
 	String getMuuta();
-	Integer getLoytokiekko();
-	Integer getItb();
+	Boolean getLoytokiekko();
+	Boolean getItb();
 }

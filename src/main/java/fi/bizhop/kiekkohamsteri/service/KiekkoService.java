@@ -3,7 +3,6 @@ package fi.bizhop.kiekkohamsteri.service;
 import java.beans.PropertyDescriptor;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -45,8 +44,8 @@ public class KiekkoService {
 	}
 	
 	public KiekkoProjection uusiKiekko(Members owner) {
-		R_mold defaultMold = moldRepo.findOne(568L);
-		R_muovi defaultMuovi = muoviRepo.findOne(109L);
+		R_mold defaultMold = moldRepo.findOne(893L);
+		R_muovi defaultMuovi = muoviRepo.findOne(13L);
 		R_vari defaultVari = variRepo.findOne(1L);
 		
 		Kiekot kiekko = new Kiekot(owner, defaultMold, defaultMuovi, defaultVari);

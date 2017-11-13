@@ -40,21 +40,21 @@ public class Kiekot {
 	private Integer paino;
 	@NotNull
 	private Integer kunto;
-	private Integer hohto;
-	private Integer spessu;
+	private Boolean hohto;
+	private Boolean spessu;
 	@NotNull
-	private Integer dyed;
+	private Boolean dyed;
 	@NotNull
-	private Integer swirly;
+	private Boolean swirly;
 	@NotNull
 	private Integer tussit;
-	private Integer myynnissa;
+	private Boolean myynnissa;
 	@NotNull
 	private Integer hinta;
 	private String muuta;
-	private Integer loytokiekko;
+	private Boolean loytokiekko;
 	@NotNull
-	private Integer itb;
+	private Boolean itb;
 	
 	public Kiekot() {} //default constructor
 	
@@ -64,12 +64,18 @@ public class Kiekot {
 		this.muovi = defaultMuovi;
 		this.vari = defaultVari;
 		this.kuva = "";
+		this.paino = 175;
 		this.kunto = 10;
-		this.dyed = 0;
-		this.swirly = 0;
+		this.hohto = false;
+		this.spessu = false;
+		this.dyed = false;
+		this.swirly = false;
 		this.tussit = 0;
+		this.myynnissa = false;
 		this.hinta = 0;
-		this.itb = 0;
+		this.muuta = "";
+		this.loytokiekko = false;
+		this.itb = false;
 	}
 	
 	public Long getId() {
@@ -128,31 +134,31 @@ public class Kiekot {
 		this.kunto = kunto;
 		return this;
 	}
-	public Integer getHohto() {
+	public Boolean getHohto() {
 		return hohto;
 	}
-	public Kiekot setHohto(Integer hohto) {
+	public Kiekot setHohto(Boolean hohto) {
 		this.hohto = hohto;
 		return this;
 	}
-	public Integer getSpessu() {
+	public Boolean getSpessu() {
 		return spessu;
 	}
-	public Kiekot setSpessu(Integer spessu) {
+	public Kiekot setSpessu(Boolean spessu) {
 		this.spessu = spessu;
 		return this;
 	}
-	public Integer getDyed() {
+	public Boolean getDyed() {
 		return dyed;
 	}
-	public Kiekot setDyed(Integer dyed) {
+	public Kiekot setDyed(Boolean dyed) {
 		this.dyed = dyed;
 		return this;
 	}
-	public Integer getSwirly() {
+	public Boolean getSwirly() {
 		return swirly;
 	}
-	public Kiekot setSwirly(Integer swirly) {
+	public Kiekot setSwirly(Boolean swirly) {
 		this.swirly = swirly;
 		return this;
 	}
@@ -163,10 +169,10 @@ public class Kiekot {
 		this.tussit = tussit;
 		return this;
 	}
-	public Integer getMyynnissa() {
+	public Boolean getMyynnissa() {
 		return myynnissa;
 	}
-	public Kiekot setMyynnissa(Integer myynnissa) {
+	public Kiekot setMyynnissa(Boolean myynnissa) {
 		this.myynnissa = myynnissa;
 		return this;
 	}
@@ -184,17 +190,17 @@ public class Kiekot {
 		this.muuta = muuta;
 		return this;
 	}
-	public Integer getLoytokiekko() {
+	public Boolean getLoytokiekko() {
 		return loytokiekko;
 	}
-	public Kiekot setLoytokiekko(Integer loytokiekko) {
+	public Kiekot setLoytokiekko(Boolean loytokiekko) {
 		this.loytokiekko = loytokiekko;
 		return this;
 	}
-	public Integer getItb() {
+	public Boolean getItb() {
 		return itb;
 	}
-	public Kiekot setItb(Integer itb) {
+	public Kiekot setItb(Boolean itb) {
 		this.itb = itb;
 		return this;
 	}

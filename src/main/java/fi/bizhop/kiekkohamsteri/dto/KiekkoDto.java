@@ -7,16 +7,16 @@ public class KiekkoDto {
 	private String kuva;
 	private Integer paino;
 	private Integer kunto;
-	private Integer hohto;
-	private Integer spessu;
-	private Integer dyed;
-	private Integer swirly;
+	private Boolean hohto;
+	private Boolean spessu;
+	private Boolean dyed;
+	private Boolean swirly;
 	private Integer tussit;
-	private Integer myynnissa;
+	private Boolean myynnissa;
 	private Integer hinta;
 	private String muuta;
-	private Integer loytokiekko;
-	private Integer itb;
+	private Boolean loytokiekko;
+	private Boolean itb;
 	
 	public Long getMoldId() {
 		return moldId;
@@ -60,31 +60,31 @@ public class KiekkoDto {
 		this.kunto = kunto;
 		return this;
 	}
-	public Integer getHohto() {
+	public Boolean getHohto() {
 		return hohto;
 	}
-	public KiekkoDto setHohto(Integer hohto) {
+	public KiekkoDto setHohto(Boolean hohto) {
 		this.hohto = hohto;
 		return this;
 	}
-	public Integer getSpessu() {
+	public Boolean getSpessu() {
 		return spessu;
 	}
-	public KiekkoDto setSpessu(Integer spessu) {
+	public KiekkoDto setSpessu(Boolean spessu) {
 		this.spessu = spessu;
 		return this;
 	}
-	public Integer getDyed() {
+	public Boolean getDyed() {
 		return dyed;
 	}
-	public KiekkoDto setDyed(Integer dyed) {
+	public KiekkoDto setDyed(Boolean dyed) {
 		this.dyed = dyed;
 		return this;
 	}
-	public Integer getSwirly() {
+	public Boolean getSwirly() {
 		return swirly;
 	}
-	public KiekkoDto setSwirly(Integer swirly) {
+	public KiekkoDto setSwirly(Boolean swirly) {
 		this.swirly = swirly;
 		return this;
 	}
@@ -95,10 +95,10 @@ public class KiekkoDto {
 		this.tussit = tussit;
 		return this;
 	}
-	public Integer getMyynnissa() {
+	public Boolean getMyynnissa() {
 		return myynnissa;
 	}
-	public KiekkoDto setMyynnissa(Integer myynnissa) {
+	public KiekkoDto setMyynnissa(Boolean myynnissa) {
 		this.myynnissa = myynnissa;
 		return this;
 	}
@@ -116,17 +116,17 @@ public class KiekkoDto {
 		this.muuta = muuta;
 		return this;
 	}
-	public Integer getLoytokiekko() {
+	public Boolean getLoytokiekko() {
 		return loytokiekko;
 	}
-	public KiekkoDto setLoytokiekko(Integer loytokiekko) {
+	public KiekkoDto setLoytokiekko(Boolean loytokiekko) {
 		this.loytokiekko = loytokiekko;
 		return this;
 	}
-	public Integer getItb() {
+	public Boolean getItb() {
 		return itb;
 	}
-	public KiekkoDto setItb(Integer itb) {
+	public KiekkoDto setItb(Boolean itb) {
 		this.itb = itb;
 		return this;
 	}
