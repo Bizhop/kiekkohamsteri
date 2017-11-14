@@ -61,10 +61,20 @@ public class KiekkoService {
 		return kiekkoRepo.findById(kiekko.getId());
 	}
 	
+	public void poistaKiekko(Long id, Members owner) throws AuthorizationException {
+		Kiekot kiekko = kiekkoRepo.findOne(id);
+		
+		if(kiekko == null || !kiekko.getMember().equals(owner)) {
+			throw new AuthorizationException();
+		}
+		
+		kiekkoRepo.delete(id);
+	}
+	
 	public KiekkoProjection paivitaKiekko(KiekkoDto dto, Long id, Members owner) throws AuthorizationException {
 		Kiekot kiekko = kiekkoRepo.findOne(id);
 		
-		if(!kiekko.getMember().equals(owner)) {
+		if(kiekko == null || !kiekko.getMember().equals(owner)) {
 			throw new AuthorizationException();
 		}
 		
@@ -91,7 +101,7 @@ public class KiekkoService {
 		return kiekkoRepo.findById(id);
 	}
 	
-	public static String[] getNullPropertyNames (Object source) {
+	private String[] getNullPropertyNames (Object source) {
 	    final BeanWrapper src = new BeanWrapperImpl(source);
 	    PropertyDescriptor[] pds = src.getPropertyDescriptors();
 
@@ -103,4 +113,5 @@ public class KiekkoService {
 	    String[] result = new String[emptyNames.size()];
 	    return emptyNames.toArray(result);
 	}
+
 }
