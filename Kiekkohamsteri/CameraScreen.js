@@ -35,6 +35,7 @@ export default class CameraScreen extends Component {
             .catch((error) => {
                 console.log(error)
             })
+            .done()
         })
     }
 

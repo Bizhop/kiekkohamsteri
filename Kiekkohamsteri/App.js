@@ -3,12 +3,14 @@ import {
   StyleSheet,
   Text,
   View,
+  ScrollView,
   TouchableOpacity,
   Alert,
   Image,
   Modal,
   FlatList,
-  Picker
+  Picker,
+  TextInput
 } from 'react-native';
 import { List, ListItem, Button } from 'react-native-elements'
 import R from 'ramda'
@@ -39,14 +41,22 @@ export default class App extends Component {
     this.pingBackend();
   }
 
+  updateState = obj => {
+    this.setState(R.mergeDeepRight(this.state, obj))
+  }
+
+  updateKiekkoUpdate = obj => {
+    this.setState({
+      ...this.state,
+      kiekkoUpdate: R.mergeDeepRight(this.state.kiekkoUpdate, obj)
+    })
+  }
+
   pingBackend() {
     setTimeout(() => this.pingBackend(), 30000)
       Api.ping()
       .then((response) => {
-        this.setState({
-          ...this.state,
-          backendUp: true
-        })
+        this.updateState({ backendUp: true })
       })
       .catch((e) => {
         Alert.alert('Error', e.message)
@@ -63,8 +73,8 @@ export default class App extends Component {
           transparent={false}
           visible={this.state.kiekkoVisible}
           onRequestClose={() => {
-            this.setState({
-              ...this.state,
+            this.getDiscs()
+            this.updateState({
               kiekkoVisible: false,
               listaVisible: true,
             })
@@ -77,10 +87,7 @@ export default class App extends Component {
           transparent={false}
           visible={this.state.listaVisible}
           onRequestClose={() => {
-            this.setState({
-              ...this.state,
-              listaVisible: false,
-            })
+            this.updateState({ listaVisible: false })
           }}
           >
           {this.kiekkoListContents()}
@@ -102,82 +109,94 @@ export default class App extends Component {
 
   kiekkoModalContents = () => {
     return this.state.selectedDisc ? (
-      <View style={styles.container}>
+      <ScrollView style={styles.scrollContainer}>
         <Text>{discBasics(this.state.selectedDisc)}</Text>
         <Text>{discStats(this.state.selectedDisc)}</Text>
         <Image 
-          source={{uri: `${imagesUrl}${this.state.selectedDisc.kuva}`}} 
+          source={{uri: `${imagesUrl}t_kiekko/${this.state.selectedDisc.kuva}`}} 
           style={styles.discImage}
         />
-        <Picker
-          style={styles.picker}
-          selectedValue={this.state.kiekkoUpdate.valmId}
-          onValueChange={(itemValue, itemIndex) => {
-            Api.dropdowns(itemValue)
-            .then((dropdowns) => 
-              this.setState({
-                ...this.state,
-                kiekkoUpdate: {
-                  ...this.state.kiekkoUpdate,
-                  valmId: itemValue
-                },
-                dropdowns: dropdowns
+        <View style={styles.inputRow}>
+          <Text>Valmistaja</Text>
+          <Picker
+            style={styles.picker}
+            selectedValue={this.state.kiekkoUpdate.valmId}
+            onValueChange={(itemValue, itemIndex) => {
+              Api.dropdowns(itemValue)
+              .then((dropdowns) => {
+                this.updateState({ dropdowns: dropdowns })
+                this.updateKiekkoUpdate({ valmId: itemValue })
               })
-            )
-            console.log(this.state.kiekkoUpdate)
-          }}
-        >
-          {this.state.dropdowns.valms.map(v => <Picker.Item key={v.id} label={v.valmistaja} value={v.id} />)}
-        </Picker>
-        <Picker
-          style={styles.picker}
-          selectedValue={this.state.kiekkoUpdate.moldId}
-          onValueChange={(itemValue, itemIndex) => { 
-            this.setState({
-              ...this.state,
-              kiekkoUpdate: {
-                ...this.state.kiekkoUpdate,
-                moldId: itemValue
-              }
-            })
-            console.log(this.state.kiekkoUpdate)
-          }}
-        >
-        {this.state.dropdowns.molds.map(v => <Picker.Item key={v.id} label={v.kiekko} value={v.id} />)}
-        </Picker>
-        <Picker
-          style={styles.picker}
-          selectedValue={this.state.kiekkoUpdate.muoviId}
-          onValueChange={(itemValue, itemIndex) => { 
-            this.setState({
-              ...this.state,
-              kiekkoUpdate: {
-                ...this.state.kiekkoUpdate,
-                muoviId: itemValue
-              }
-            })
-            console.log(this.state.kiekkoUpdate)
-          }}
-        >
-        {this.state.dropdowns.muovit.map(v => <Picker.Item key={v.id} label={v.muovi} value={v.id} />)}
-        </Picker>
-        <Picker
-          style={styles.picker}
-          selectedValue={this.state.kiekkoUpdate.variId}
-          onValueChange={(itemValue, itemIndex) => { 
-            this.setState({
-              ...this.state,
-              kiekkoUpdate: {
-                ...this.state.kiekkoUpdate,
-                variId: itemValue
-              }
-            })
-            console.log(this.state.kiekkoUpdate)
-          }}
-        >
-        {this.state.dropdowns.varit.map(v => <Picker.Item key={v.id} label={v.vari} value={v.id} />)}
-        </Picker>
-      </View>
+            }}
+          >
+            {this.state.dropdowns.valms.map(v => <Picker.Item key={v.id} label={v.valmistaja} value={v.id} />)}
+          </Picker>
+        </View>
+        <View style={styles.inputRow}>
+          <Text>Mold</Text>
+          <Picker
+            style={styles.picker}
+            selectedValue={this.state.kiekkoUpdate.moldId}
+            onValueChange={(itemValue, itemIndex) => this.updateKiekkoUpdate({ moldId: itemValue })}
+          >
+          {this.state.dropdowns.molds.map(v => <Picker.Item key={v.id} label={v.kiekko} value={v.id} />)}
+          </Picker>
+        </View>
+        <View style={styles.inputRow}>
+          <Text>Muovi</Text>
+          <Picker
+            style={styles.picker}
+            selectedValue={this.state.kiekkoUpdate.muoviId}
+            onValueChange={(itemValue, itemIndex) => this.updateKiekkoUpdate({ muoviId: itemValue })}
+          >
+          {this.state.dropdowns.muovit.map(v => <Picker.Item key={v.id} label={v.muovi} value={v.id} />)}
+          </Picker>
+        </View>
+        <View style={styles.inputRow}>
+          <Text>Väri</Text>
+          <Picker
+            style={styles.picker}
+            selectedValue={this.state.kiekkoUpdate.variId}
+            onValueChange={(itemValue, itemIndex) => this.updateKiekkoUpdate({ variId: itemValue })}
+          >
+          {this.state.dropdowns.varit.map(v => <Picker.Item key={v.id} label={v.vari} value={v.id} />)}
+          </Picker>
+        </View>
+        <View style={styles.inputTextContainer}>
+          <Text>Paino</Text>
+          <TextInput
+            style={styles.textInput}
+            onChangeText={(text) => this.updateKiekkoUpdate({ paino: text })}
+            value={this.state.kiekkoUpdate.paino.toString()}
+            keyboardType='numeric'
+          />
+        </View>
+        <View style={styles.inputTextContainer}>
+          <Text>Muuta</Text>
+          <TextInput
+            style={styles.textInput}
+            onChangeText={(text) => this.updateKiekkoUpdate({ muuta: text })}
+            value={this.state.kiekkoUpdate.muuta}
+          />
+        </View>
+        <Text>Kunto: {this.state.selectedDisc.kunto}</Text>
+        <Text>Hohto: {this.state.selectedDisc.hohto && 'X'}</Text>
+        <Text>Spesiaali: {this.state.selectedDisc.spessu && 'X'}</Text>
+        <Text>Värjätty: {this.state.selectedDisc.dyed && 'X'}</Text>
+        <Text>Swirly: {this.state.selectedDisc.swirly && 'X'}</Text>
+        <Text>Tussit: {this.state.selectedDisc.tussit}</Text>
+        <Text>Myynnissä: {this.state.selectedDisc.myynnissä && 'X'}</Text>
+        <Text>Hinta: {this.state.selectedDisc.hinta}</Text>
+        <Text>Löytökiekko: {this.state.selectedDisc.loytokiekko && 'X'}</Text>
+        <Text>In the bag: {this.state.selectedDisc.itb && 'X'}</Text>
+        <Button
+          raised
+          rightIcon={{name: 'file-upload'}}
+          backgroundColor='#0077ff'
+          title='Päivitä tiedot'
+          onPress={() => this.updateDisc()}
+        />
+      </ScrollView>
     ) : (
       <View style={styles.container}>
         <Text>Ei valittua kiekkoa</Text>
@@ -211,9 +230,8 @@ export default class App extends Component {
     if(Api.login(this.state.user.idToken)){
       Api.get('kiekot', this.state.user.idToken)
       .then((response) => {
-        this.setState({
-          ...this.state,
-          kiekot: R.pathOr([], ['kiekot'], response),
+        this.updateState({
+          kiekot: R.pathOr([], ['content'], response),
           listaVisible: true,
         })
       })
@@ -224,27 +242,46 @@ export default class App extends Component {
     }
   }
 
+  updateDisc() {
+    if(Api.login(this.state.user.idToken)){
+      Api.put('kiekot', {
+        token: this.state.user.idToken,
+        kiekko: this.state.kiekkoUpdate,
+        id: this.state.selectedDisc.id
+      })
+      .then((response) => {
+        this.updateState({ selectedDisc: response })
+        Alert.alert('Kiekon päivitys onnistui!')
+      })
+      .catch((err) => {
+        Alert.alert('Kiekon päivitys epäonnistui', err.message)
+      })
+      .done()
+    }
+  }
+
   discRow = ({item}) => (
     <ListItem
       roundAvatar
       title={discBasics(item)}
       subtitle={discStats(item)}
-      avatar={{uri: `${imagesUrl}${item.kuva}`}}
+      avatar={{uri: `${imagesUrl}t_lista/${item.kuva}`}}
       onPress={() => {
         Api.dropdowns(item.valmId)
         .then((dropdowns) => {
-          this.setState({
-            ...this.state,
+          this.updateState({
             kiekkoVisible: true,
             listaVisible: false,
             selectedDisc: item,
+            dropdowns: dropdowns,
             kiekkoUpdate: {
               moldId: item.moldId,
               muoviId: item.muoviId,
               variId: item.variId,
-              valmId: item.valmId
+              valmId: item.valmId,
+              paino: item.paino,
+              muuta: item.muuta
             },
-            dropdowns: dropdowns
           })
         })
         .done()
@@ -263,7 +300,7 @@ export default class App extends Component {
       const user = await GoogleSignin.currentUserAsync();
       if(user) {
         console.log(user)
-        this.setState({...this.state, user: user});
+        this.updateState({ user: user })
       }
     }
     catch(err) {
@@ -275,7 +312,7 @@ export default class App extends Component {
     GoogleSignin.signIn()
     .then((user) => {
       console.log(user)
-      this.setState({...this.state, user: user});
+      this.updateState({ user: user })
     })
     .catch((err) => {
       Alert.alert('Google signin failed', `${err.code}: ${err.message}`);
@@ -285,7 +322,7 @@ export default class App extends Component {
 
   _signOut() {
     GoogleSignin.revokeAccess().then(() => GoogleSignin.signOut()).then(() => {
-      this.setState({...this.state, user: null});
+      this.updateState({ user: null })
     })
     .done();
   }
@@ -316,7 +353,7 @@ export default class App extends Component {
 }
 
 discBasics = kiekko => {
-  return `${kiekko.muovi} ${kiekko.mold} ${kiekko.paino}g (${kiekko.vari}) ${kiekko.kunto}/10`
+  return `${kiekko.valmistaja} ${kiekko.muovi} ${kiekko.mold} ${kiekko.paino}g (${kiekko.vari}) ${kiekko.kunto}/10`
 }
 
 discStats = kiekko => {
@@ -337,6 +374,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 50
+  },
+  scrollContainer: {
+    flex: 1,
+    alignItems: 'flex-start',
+    height: 1000
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  inputTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 5
+  },
+  textInput: {
+    height: 40,
+    width: 300,
   },
   headerText: {
     color: 'black',
