@@ -8,29 +8,30 @@ import RNFS from 'react-native-fs'
 import Api from './Api'
 
 export default class CameraScreen extends Component {
+    static navigationOptions = {
+        title: 'Kamera'
+    }
 
     constructor(props) {
         super(props);
+        console.log(props)
         this.state = {
-          app: undefined
-        };
+          user: props.navigation.state.params.user,
+          newDisc: false
+        }
       }
 
     onBottomButtonPressed(event) {
-        if(event.type === 'left') {
-            this.setState(this.setState({app: App}))
-        }
-        else {
-            this.uploadFirstImage(event.captureImages)
-        }
+        this.uploadFirstImage(event.captureImages)
     }
 
     async uploadFirstImage(images) {
         const first = images[0]
         await RNFS.readFile(first.uri, 'base64').then((image) => {
-            Api.upload(first.name, image)
+            Api.post(first.name, image, this.state.user.idToken)
             .then((response) => {
                 console.log(response)
+                Alert.alert('Go forward request')
             })
             .catch((error) => {
                 console.log(error)
@@ -40,16 +41,11 @@ export default class CameraScreen extends Component {
     }
 
     render() {
-        if (this.state.app) {
-            const CameraScreen = this.state.app;
-            return <CameraScreen />;
-        }
         return (
             <CameraKitCameraScreen
-                actions={{ leftButtonText: 'Peruuta' }}
                 onBottomButtonPressed={(event) => this.onBottomButtonPressed(event)}
                 captureButtonImage={require('./images/cameraButton.png')}
             />
-        );
+        )
     }
 }

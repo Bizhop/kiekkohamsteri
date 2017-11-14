@@ -3,8 +3,8 @@ import { Alert } from 'react-native'
 const base = 'https://kiekkohamsteri-backend.herokuapp.com/api/'
 
 const Api = {
-    async get(endpoint, token) {
-        const url = `${base}${endpoint}?size=1000&sort=id,asc`
+    async get(token) {
+        const url = `${base}kiekot?size=1000&sort=id,asc`
         const response = await fetch(url, {
             method: 'GET',
             headers: {
@@ -15,8 +15,8 @@ const Api = {
         const json = await response.json()
         return json
     },
-    async put(endpoint, params) {
-        const url = `${base}${endpoint}/${params.id}`
+    async put(params) {
+        const url = `${base}kiekot/${params.id}`
         const response = await fetch(url, {
             method: 'PUT',
             headers: {
@@ -27,6 +27,34 @@ const Api = {
         })
         const json = await response.json()
         return json
+    },
+    async post(name, data, token){
+        const url = base + 'kiekot'
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+            body: JSON.stringify({
+                data: `data:image/jpeg;base64,${data}`,
+                name: name,
+            })
+        })
+        const json = await response.json()
+        return json
+    },
+    async delete(id, token){
+        const url = `${base}kiekot/${id}`
+        await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': token,
+            },
+        })
+        .then(() => {return true})
+        .catch((err) => {return false})
+        .done()
     },
     async ping() {
         const url = base + 'ping'
@@ -53,21 +81,7 @@ const Api = {
         .catch((error) => {
             return false
         })
-    },
-    async upload(name, data){
-        const url = base + 'upload'
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                data: `data:image/jpeg;base64,${data}`,
-                name: name,
-            })
-        })
-        const json = await response.json()
-        return json
+        .done()
     },
     async dropdowns(valmId) {
         const url = base + 'dropdown?valmId='+valmId

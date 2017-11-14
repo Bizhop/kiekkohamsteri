@@ -14,7 +14,8 @@
 		"react-native-elements": "^0.18.2",
 		"react-native-fs": "^2.8.4",
 		"react-native-google-signin": "^0.12.0",
-		"react-native-vector-icons": "^4.4.2"
+		"react-native-vector-icons": "^4.4.2",
+		"react-navigation": "^1.0.0-beta.19"
 	},
 	"devDependencies": {
 		"babel-jest": "21.2.0",
