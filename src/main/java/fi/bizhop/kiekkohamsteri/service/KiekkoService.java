@@ -54,6 +54,13 @@ public class KiekkoService {
 		return kiekkoRepo.findById(kiekko.getId());
 	}
 	
+	public KiekkoProjection paivitaKuva(Long id, String kuva) {
+		Kiekot kiekko = kiekkoRepo.findOne(id);
+		kiekko.setKuva(kuva);
+		kiekko = kiekkoRepo.save(kiekko);
+		return kiekkoRepo.findById(kiekko.getId());
+	}
+	
 	public KiekkoProjection paivitaKiekko(KiekkoDto dto, Long id, Members owner) throws AuthorizationException {
 		Kiekot kiekko = kiekkoRepo.findOne(id);
 		

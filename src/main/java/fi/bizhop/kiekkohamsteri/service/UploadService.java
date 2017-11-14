@@ -13,10 +13,10 @@ import fi.bizhop.kiekkohamsteri.dto.UploadDto;
 
 @Service
 public class UploadService {
-	public void upload(UploadDto dto) throws IOException {
+	public void upload(UploadDto dto, String name) throws IOException {
 		Cloudinary cloudinary = Singleton.getCloudinary();
 		Map<String, String> options = new HashMap<>();
-		options.put("public_id", dto.getName());
+		options.put("public_id", name);
 		cloudinary.uploader().upload(dto.getData(), options);
 	}
 }

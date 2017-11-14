@@ -1,5 +1,7 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,11 +16,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import fi.bizhop.kiekkohamsteri.dto.KiekkoDto;
+import fi.bizhop.kiekkohamsteri.dto.UploadDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.projection.KiekkoProjection;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.KiekkoService;
+import fi.bizhop.kiekkohamsteri.service.UploadService;
 
 @RestController
 public class KiekotController extends BaseController {
@@ -26,6 +30,8 @@ public class KiekotController extends BaseController {
 	KiekkoService kiekkoService;
 	@Autowired
 	AuthService authService;
+	@Autowired
+	UploadService uploadService;
 	
 	@RequestMapping(value = "/kiekot", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody Page<KiekkoProjection> haeKiekot(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
@@ -43,7 +49,7 @@ public class KiekotController extends BaseController {
 	}
 	
 	@RequestMapping(value = "/kiekot", method = RequestMethod.POST, produces = "application/json")
-	public @ResponseBody KiekkoProjection uusiKiekko(HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody KiekkoProjection uusiKiekko(@RequestBody UploadDto dto, HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug("KiekotController.uusiKiekko()...");
 		
 		Members owner = authService.getUser(request);
@@ -52,8 +58,17 @@ public class KiekotController extends BaseController {
 			return null;
 		}
 		else {
-			response.setStatus(HttpServletResponse.SC_OK);
-			return kiekkoService.uusiKiekko(owner);
+			KiekkoProjection kiekko = kiekkoService.uusiKiekko(owner);
+			String kuva = String.format("%s-%d", owner.getUsername(), kiekko.getId());
+			try {
+				uploadService.upload(dto, kuva);
+				kiekko = kiekkoService.paivitaKuva(kiekko.getId(), kuva);
+				response.setStatus(HttpServletResponse.SC_OK);
+				return kiekko;
+			} 
+			catch (IOException e) {
+				return null;
+			}
 		}
 	}
 	

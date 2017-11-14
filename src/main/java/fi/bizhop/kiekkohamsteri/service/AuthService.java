@@ -37,7 +37,9 @@ public class AuthService {
 			Members user = membersRepo.findByEmail(userEmail);
 			if(user == null) {
 				user = new Members(userEmail);
-				membersRepo.save(user);
+				user = membersRepo.save(user);
+				user.setUsername("Uusi" + user.getId());
+				user = membersRepo.save(user);
 			}
 			return user;
 		}
