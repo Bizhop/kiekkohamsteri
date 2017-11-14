@@ -81,13 +81,33 @@ public class KiekotController extends BaseController {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			return null;
 		}
-		try {
-			response.setStatus(HttpServletResponse.SC_OK);
-			return kiekkoService.paivitaKiekko(dto, id, owner);
+		else {
+			try {
+				response.setStatus(HttpServletResponse.SC_OK);
+				return kiekkoService.paivitaKiekko(dto, id, owner);
+			}
+			catch(AuthorizationException ae) {
+				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+				return null;
+			}
 		}
-		catch(AuthorizationException ae) {
+	}
+	
+	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.DELETE)
+	public void poistaKiekko(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
+		LOG.debug("KiekotController.poistaKiekko()...");
+		
+		Members owner = authService.getUser(request);
+		if(owner == null) {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			return null;
+		}
+		else {
+			try {
+				kiekkoService.poistaKiekko(id, owner);
+			}
+			catch(AuthorizationException ae) {
+				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			}
 		}
 	}
 }
