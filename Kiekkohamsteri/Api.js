@@ -4,13 +4,26 @@ const base = 'https://kiekkohamsteri-backend.herokuapp.com/api/'
 
 const Api = {
     async get(endpoint, token) {
-        const url = base + endpoint
+        const url = `${base}${endpoint}?size=1000&sort=id,asc`
         const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': token,
             }
+        })
+        const json = await response.json()
+        return json
+    },
+    async put(endpoint, params) {
+        const url = `${base}${endpoint}/${params.id}`
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': params.token,
+            },
+            body: JSON.stringify(params.kiekko)
         })
         const json = await response.json()
         return json
