@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, FlatList, Alert } from 'react-native'
+import { View, FlatList, Alert, Text } from 'react-native'
 import { List, ListItem, Icon } from 'react-native-elements'
 import R from 'ramda'
 import { NavigationActions } from 'react-navigation'
@@ -22,13 +22,13 @@ export default class HomeScreen extends Component {
     super(props)
     this.state = {
       user: params.user,
-      kiekot: []
+      kiekot: null
     }
     this.getDiscs()
   }
 
   render() {
-    return (
+    return this.state.kiekot ? (
       <View style={{ flex: 1 }}>
         <List>
           <FlatList
@@ -37,6 +37,10 @@ export default class HomeScreen extends Component {
             renderItem={this.discRow}
           />
         </List>
+      </View>
+    ) : (
+      <View>
+        <Text>Haetaan tietoja...</Text>
       </View>
     )
   }
@@ -62,7 +66,7 @@ export default class HomeScreen extends Component {
         .then(response => {
           this.setState({
             ...this.state,
-            kiekot: R.pathOr([], ['content'], response)
+            kiekot: R.pathOr(null, ['content'], response)
           })
         })
         .catch(err => {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { StyleSheet, Text, View, ScrollView, Alert, Image, Picker, TextInput } from 'react-native'
-import { Button } from 'react-native-elements'
+import { Button, CheckBox } from 'react-native-elements'
 import R from 'ramda'
 
 import Api from './Api'
@@ -15,18 +15,32 @@ export default class KiekkoScreen extends Component {
     const { params } = props.navigation.state
     console.log(params)
     super(props)
+
+    const list = [
+      'moldId',
+      'muoviId',
+      'variId',
+      'valmId',
+      'kunto',
+      'tussit',
+      'paino',
+      'muuta',
+      'hohto',
+      'spessu',
+      'dyed',
+      'swirly',
+      'loytokiekko',
+      'itb',
+      'myynnissa',
+      'hinta'
+    ]
+    const predicate = (val, key) => R.contains(key, list)
+
     this.state = {
       user: params.user,
       selectedDisc: params.selectedDisc,
       dropdowns: null,
-      kiekkoUpdate: {
-        moldId: params.selectedDisc.moldId,
-        muoviId: params.selectedDisc.muoviId,
-        variId: params.selectedDisc.variId,
-        valmId: params.selectedDisc.valmId,
-        paino: params.selectedDisc.paino,
-        muuta: params.selectedDisc.muuta
-      },
+      kiekkoUpdate: R.pickBy(predicate, params.selectedDisc),
       buttonsDisabled: false
     }
     this.initDropdowns(params.selectedDisc)
@@ -123,6 +137,30 @@ export default class KiekkoScreen extends Component {
             ))}
           </Picker>
         </View>
+        <View style={styles.inputRow}>
+          <Text>Kunto</Text>
+          <Picker
+            style={styles.picker}
+            selectedValue={this.state.kiekkoUpdate.kunto}
+            onValueChange={(itemValue, itemIndex) => this.updateKiekkoUpdate({ kunto: itemValue })}
+          >
+            {this.state.dropdowns.kunto.map(v => (
+              <Picker.Item key={v.id} label={v.nimi} value={v.id} />
+            ))}
+          </Picker>
+        </View>
+        <View style={styles.inputRow}>
+          <Text>Tussit</Text>
+          <Picker
+            style={styles.picker}
+            selectedValue={this.state.kiekkoUpdate.tussit}
+            onValueChange={(itemValue, itemIndex) => this.updateKiekkoUpdate({ tussit: itemValue })}
+          >
+            {this.state.dropdowns.tussit.map(v => (
+              <Picker.Item key={v.id} label={v.nimi} value={v.id} />
+            ))}
+          </Picker>
+        </View>
         <View style={styles.inputTextContainer}>
           <Text>Paino</Text>
           <TextInput
@@ -132,6 +170,12 @@ export default class KiekkoScreen extends Component {
             keyboardType="numeric"
           />
         </View>
+        {this.myCheckBox('Hohto', 'hohto')}
+        {this.myCheckBox('Spesiaali', 'spessu')}
+        {this.myCheckBox('Värjätty', 'dyed')}
+        {this.myCheckBox('Swirly', 'swirly')}
+        {this.myCheckBox('Löytökiekko', 'loytokiekko')}
+        {this.myCheckBox('In the bag', 'itb')}
         <View style={styles.inputTextContainer}>
           <Text>Muuta</Text>
           <TextInput
@@ -140,16 +184,18 @@ export default class KiekkoScreen extends Component {
             value={this.state.kiekkoUpdate.muuta}
           />
         </View>
-        <Text>Kunto: {this.state.selectedDisc.kunto}</Text>
-        <Text>Hohto: {this.state.selectedDisc.hohto && 'X'}</Text>
-        <Text>Spesiaali: {this.state.selectedDisc.spessu && 'X'}</Text>
-        <Text>Värjätty: {this.state.selectedDisc.dyed && 'X'}</Text>
-        <Text>Swirly: {this.state.selectedDisc.swirly && 'X'}</Text>
-        <Text>Tussit: {this.state.selectedDisc.tussit}</Text>
-        <Text>Myynnissä: {this.state.selectedDisc.myynnissä && 'X'}</Text>
-        <Text>Hinta: {this.state.selectedDisc.hinta}</Text>
-        <Text>Löytökiekko: {this.state.selectedDisc.loytokiekko && 'X'}</Text>
-        <Text>In the bag: {this.state.selectedDisc.itb && 'X'}</Text>
+        {this.myCheckBox('Myynnissä', 'myynnissa')}
+        {this.state.kiekkoUpdate.myynnissa && (
+          <View style={styles.inputTextContainer}>
+            <Text>Hinta</Text>
+            <TextInput
+              style={styles.textInput}
+              onChangeText={text => this.updateKiekkoUpdate({ hinta: text })}
+              value={this.state.kiekkoUpdate.hinta.toString()}
+              keyboardType="numeric"
+            />
+          </View>
+        )}
         <Button
           raised
           rightIcon={{ name: 'file-upload' }}
@@ -176,6 +222,21 @@ export default class KiekkoScreen extends Component {
       <View>
         <Text>Haetaan tietoja...</Text>
       </View>
+    )
+  }
+
+  myCheckBox(title, value) {
+    return (
+      <CheckBox
+        title={title}
+        checked={R.path([value], this.state.kiekkoUpdate)}
+        onIconPress={() =>
+          this.updateKiekkoUpdate(R.zipObj([value], [!R.path([value], this.state.kiekkoUpdate)]))
+        }
+        onPress={() =>
+          this.updateKiekkoUpdate(R.zipObj([value], [!R.path([value], this.state.kiekkoUpdate)]))
+        }
+      />
     )
   }
 
