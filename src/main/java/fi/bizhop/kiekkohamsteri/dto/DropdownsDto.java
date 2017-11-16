@@ -2,6 +2,7 @@ package fi.bizhop.kiekkohamsteri.dto;
 
 import java.util.List;
 
+import fi.bizhop.kiekkohamsteri.projection.DDProjection;
 import fi.bizhop.kiekkohamsteri.projection.MoldDropdownProjection;
 import fi.bizhop.kiekkohamsteri.projection.MuoviDropdownProjection;
 import fi.bizhop.kiekkohamsteri.projection.ValmDropdownProjection;
@@ -12,6 +13,8 @@ public class DropdownsDto {
 	private List<ValmDropdownProjection> valms;
 	private List<MuoviDropdownProjection> muovit;
 	private List<VariDropdownProjection> varit;
+	private List<DDProjection> kunto;
+	private List<DDProjection> tussit;
 	
 	public List<MoldDropdownProjection> getMolds() {
 		return molds;
@@ -39,6 +42,20 @@ public class DropdownsDto {
 	}
 	public DropdownsDto setVarit(List<VariDropdownProjection> varit) {
 		this.varit = varit;
+		return this;
+	}
+	public List<DDProjection> getKunto() {
+		return kunto;
+	}
+	public DropdownsDto setKunto(List<DDProjection> kunto) {
+		this.kunto = kunto;
+		return this;
+	}
+	public List<DDProjection> getTussit() {
+		return tussit;
+	}
+	public DropdownsDto setTussit(List<DDProjection> tussit) {
+		this.tussit = tussit;
 		return this;
 	}
 }
