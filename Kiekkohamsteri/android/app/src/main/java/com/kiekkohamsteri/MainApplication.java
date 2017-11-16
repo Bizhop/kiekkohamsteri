@@ -10,11 +10,10 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.rnfs.RNFSPackage;
+import com.lwansbrough.RCTCamera.RCTCameraPackage;
 
 import java.util.Arrays;
 import java.util.List;
-
-import com.wix.RNCameraKit.RNCameraKitPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -30,8 +29,8 @@ public class MainApplication extends Application implements ReactApplication {
           new MainReactPackage(),
           new VectorIconsPackage(),
           new RNGoogleSigninPackage(),
-          new RNCameraKitPackage(),
-          new RNFSPackage()
+          new RNFSPackage(),
+          new RCTCameraPackage()
       );
     }
 
