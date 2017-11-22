@@ -74,7 +74,7 @@ public class KiekotController extends BaseController {
 	
 	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
 	public @ResponseBody KiekkoProjection paivitaKiekko(@PathVariable Long id, @RequestBody KiekkoDto dto, HttpServletRequest request, HttpServletResponse response) {
-		LOG.debug("KiekotController.paivitaKiekko()...");
+		LOG.debug(String.format("KiekotController.paivitaKiekko(%d)...", id));
 		
 		Members owner = authService.getUser(request);
 		if(owner == null) {

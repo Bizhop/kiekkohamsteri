@@ -1,14 +1,9 @@
 package fi.bizhop.kiekkohamsteri.service;
 
-import java.beans.PropertyDescriptor;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +21,7 @@ import fi.bizhop.kiekkohamsteri.model.R_mold;
 import fi.bizhop.kiekkohamsteri.model.R_muovi;
 import fi.bizhop.kiekkohamsteri.model.R_vari;
 import fi.bizhop.kiekkohamsteri.projection.KiekkoProjection;
+import fi.bizhop.kiekkohamsteri.util.Utils;
 
 @Service
 public class KiekkoService {
@@ -79,7 +75,7 @@ public class KiekkoService {
 		}
 		
 		String[] ignoreRelations = {"member", "muovi", "mold", "vari"};
-		String[] ignoreNulls = getNullPropertyNames(dto);
+		String[] ignoreNulls = Utils.getNullPropertyNames(dto);
 		String[] ignores = Stream.concat(Arrays.stream(ignoreRelations), Arrays.stream(ignoreNulls)).toArray(String[]::new);
 		
 		BeanUtils.copyProperties(dto, kiekko, ignores);
@@ -101,17 +97,6 @@ public class KiekkoService {
 		return kiekkoRepo.findById(id);
 	}
 	
-	private String[] getNullPropertyNames (Object source) {
-	    final BeanWrapper src = new BeanWrapperImpl(source);
-	    PropertyDescriptor[] pds = src.getPropertyDescriptors();
-
-	    Set<String> emptyNames = new HashSet<String>();
-	    for(PropertyDescriptor pd : pds) {
-	        Object srcValue = src.getPropertyValue(pd.getName());
-	        if (srcValue == null) emptyNames.add(pd.getName());
-	    }
-	    String[] result = new String[emptyNames.size()];
-	    return emptyNames.toArray(result);
-	}
+	
 
 }
