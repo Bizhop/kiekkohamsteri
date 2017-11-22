@@ -8,7 +8,7 @@ import {
   Image,
   Picker,
   TextInput,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native'
 import { Button, CheckBox } from 'react-native-elements'
 import R from 'ramda'
@@ -18,7 +18,7 @@ import Helpers from './Helpers'
 
 export default class KiekkoScreen extends Component {
   static navigationOptions = {
-    title: 'Kiekko'
+    title: 'Kiekko',
   }
 
   constructor(props) {
@@ -42,7 +42,7 @@ export default class KiekkoScreen extends Component {
       'loytokiekko',
       'itb',
       'myynnissa',
-      'hinta'
+      'hinta',
     ]
     const predicate = (val, key) => R.contains(key, list)
 
@@ -51,7 +51,7 @@ export default class KiekkoScreen extends Component {
       selectedDisc: params.selectedDisc,
       dropdowns: null,
       kiekkoUpdate: R.pickBy(predicate, params.selectedDisc),
-      buttonsDisabled: false
+      buttonsDisabled: false,
     }
     this.initDropdowns(params.selectedDisc)
   }
@@ -74,7 +74,7 @@ export default class KiekkoScreen extends Component {
   updateKiekkoUpdate = obj => {
     this.setState({
       ...this.state,
-      kiekkoUpdate: R.mergeDeepRight(this.state.kiekkoUpdate, obj)
+      kiekkoUpdate: R.mergeDeepRight(this.state.kiekkoUpdate, obj),
     })
   }
 
@@ -222,7 +222,7 @@ export default class KiekkoScreen extends Component {
           onPress={() =>
             Alert.alert('Varoitus', 'Kiekko poistetaan pysyvästi', [
               { text: 'Peruuta' },
-              { text: 'Poista', onPress: () => this.deleteDisc() }
+              { text: 'Poista', onPress: () => this.deleteDisc() },
             ])
           }
           disabled={this.state.buttonsDisabled}
@@ -257,7 +257,7 @@ export default class KiekkoScreen extends Component {
       Api.put({
         token: this.state.user.idToken,
         kiekko: this.state.kiekkoUpdate,
-        id: this.state.selectedDisc.id
+        id: this.state.selectedDisc.id,
       })
         .then(() => {
           navigate('Lista', { user: this.state.user })
@@ -287,32 +287,32 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF'
+    backgroundColor: '#FFFFFF',
   },
   scrollContainer: {
     flex: 1,
     alignItems: 'flex-start',
     height: 1000,
-    backgroundColor: '#FFFFFF'
+    backgroundColor: '#FFFFFF',
   },
   discImage: {
     width: 300,
-    height: 300
+    height: 300,
   },
   inputRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start'
+    alignItems: 'flex-start',
   },
   inputTextContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 5
+    marginBottom: 5,
   },
   textInput: {
     height: 40,
-    width: 300
+    width: 300,
   },
   picker: {
-    width: 150
-  }
+    width: 150,
+  },
 })

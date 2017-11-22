@@ -8,7 +8,7 @@ import Api from './Api'
 
 export default class CameraScreen extends Component {
   static navigationOptions = {
-    title: 'Kamera'
+    title: 'Kamera',
   }
 
   constructor(props) {
@@ -16,7 +16,7 @@ export default class CameraScreen extends Component {
     this.state = {
       user: props.navigation.state.params.user,
       newDisc: false,
-      takingPicture: false
+      takingPicture: false,
     }
   }
 
@@ -72,7 +72,7 @@ export default class CameraScreen extends Component {
       .then(data => {
         this.setState({
           ...this.state,
-          takingPicture: true
+          takingPicture: true,
         })
         this.uploadImage(data.path)
       })
@@ -82,9 +82,9 @@ export default class CameraScreen extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   preview: {
-    height: Dimensions.get('window').width
-  }
+    height: Dimensions.get('window').width,
+  },
 })
