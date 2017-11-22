@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, FlatList, Alert, Text } from 'react-native'
+import { View, FlatList, Alert, ActivityIndicator, StyleSheet } from 'react-native'
 import { List, ListItem, Icon } from 'react-native-elements'
 import R from 'ramda'
 import { NavigationActions } from 'react-navigation'
@@ -13,7 +13,7 @@ export default class HomeScreen extends Component {
       title: 'Kiekkolistaus',
       headerLeft: (
         <Icon name="home" size={35} onPress={() => props.navigation.dispatch(resetAction)} />
-      )
+      ),
     }
   }
 
@@ -22,8 +22,11 @@ export default class HomeScreen extends Component {
     super(props)
     this.state = {
       user: params.user,
-      kiekot: null
+      kiekot: null,
     }
+  }
+
+  componentDidMount() {
     this.getDiscs()
   }
 
@@ -39,8 +42,8 @@ export default class HomeScreen extends Component {
         </List>
       </View>
     ) : (
-      <View>
-        <Text>Haetaan tietoja...</Text>
+      <View style={styles.container}>
+        <ActivityIndicator size="large" />
       </View>
     )
   }
@@ -66,7 +69,7 @@ export default class HomeScreen extends Component {
         .then(response => {
           this.setState({
             ...this.state,
-            kiekot: R.pathOr(null, ['content'], response)
+            kiekot: R.pathOr(null, ['content'], response),
           })
         })
         .catch(err => {
@@ -79,5 +82,14 @@ export default class HomeScreen extends Component {
 
 const resetAction = NavigationActions.reset({
   index: 0,
-  actions: [NavigationActions.navigate({ routeName: 'Home' })]
+  actions: [NavigationActions.navigate({ routeName: 'Home' })],
+})
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+  },
 })

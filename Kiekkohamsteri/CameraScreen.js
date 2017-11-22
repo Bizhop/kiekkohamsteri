@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, Alert, View, Dimensions } from 'react-native'
+import { StyleSheet, Alert, View, Dimensions, ActivityIndicator } from 'react-native'
 import { Button } from 'react-native-elements'
 import RNFS from 'react-native-fs'
 import Camera from 'react-native-camera'
@@ -37,7 +37,11 @@ export default class CameraScreen extends Component {
   }
 
   render() {
-    return (
+    return this.state.takingPicture ? (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" />
+      </View>
+    ) : (
       <View style={styles.container}>
         <Camera
           ref={cam => {
@@ -63,13 +67,15 @@ export default class CameraScreen extends Component {
   }
 
   takePicture() {
-    this.setState({
-      ...this.state,
-      takingPicture: true
-    })
     this.camera
       .capture({})
-      .then(data => this.uploadImage(data.path))
+      .then(data => {
+        this.setState({
+          ...this.state,
+          takingPicture: true
+        })
+        this.uploadImage(data.path)
+      })
       .catch(err => console.error(err))
   }
 }

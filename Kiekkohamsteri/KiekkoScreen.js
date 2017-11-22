@@ -1,5 +1,15 @@
 import React, { Component } from 'react'
-import { StyleSheet, Text, View, ScrollView, Alert, Image, Picker, TextInput } from 'react-native'
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Alert,
+  Image,
+  Picker,
+  TextInput,
+  ActivityIndicator
+} from 'react-native'
 import { Button, CheckBox } from 'react-native-elements'
 import R from 'ramda'
 
@@ -219,8 +229,8 @@ export default class KiekkoScreen extends Component {
         />
       </ScrollView>
     ) : (
-      <View>
-        <Text>Haetaan tietoja...</Text>
+      <View style={styles.container}>
+        <ActivityIndicator size="large" />
       </View>
     )
   }
@@ -273,10 +283,17 @@ export default class KiekkoScreen extends Component {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF'
+  },
   scrollContainer: {
     flex: 1,
     alignItems: 'flex-start',
-    height: 1000
+    height: 1000,
+    backgroundColor: '#FFFFFF'
   },
   discImage: {
     width: 300,
