@@ -18,19 +18,6 @@ public class AuthController extends BaseController {
 	@Autowired
 	AuthService authService;
 	
-	@RequestMapping(value = "/auth/me", method = RequestMethod.GET, produces="application/json")
-	public UserDto getUserInfo(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		Members user = authService.getUser(request);
-		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			return null;
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_ACCEPTED);
-			return new UserDto(user.getEmail());
-		}
-	}
-	
 	@RequestMapping(value = "/auth/login", method = RequestMethod.GET)
 	public UserDto login(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Members user = authService.login(request);
@@ -40,7 +27,7 @@ public class AuthController extends BaseController {
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_ACCEPTED);
-			return new UserDto(user.getEmail());
+			return new UserDto(user.getId(), user.getEmail());
 		}
 	}
 }
