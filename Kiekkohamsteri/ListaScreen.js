@@ -132,21 +132,19 @@ export default class HomeScreen extends Component {
   }
 
   getDiscs() {
-    if (Api.login(this.state.user.idToken)) {
-      Api.get(this.state.user.idToken)
-        .then(response => {
-          const kiekot = R.pathOr([], ['content'], response)
-          this.setState({
-            ...this.state,
-            kiekot: kiekot,
-            kiekotFiltered: kiekot,
-          })
+    Api.get(this.state.user.idToken)
+      .then(response => {
+        const kiekot = R.pathOr([], ['content'], response)
+        this.setState({
+          ...this.state,
+          kiekot: kiekot,
+          kiekotFiltered: kiekot,
         })
-        .catch(err => {
-          Alert.alert('Kiekkojen haku epäonnistui', err.message)
-        })
-        .done()
-    }
+      })
+      .catch(err => {
+        Alert.alert('Kiekkojen haku epäonnistui', err.message)
+      })
+      .done()
   }
 }
 

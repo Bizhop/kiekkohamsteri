@@ -15,6 +15,7 @@ export default class HomeScreen extends Component {
     super(props)
     this.state = {
       user: null,
+      userId: null,
       backendUp: false,
     }
   }
@@ -51,8 +52,10 @@ export default class HomeScreen extends Component {
             <Image source={require('./images/red_light.png')} style={styles.icon} />
           )}
         </View>
-        {this.state.user ? this.showLogout() : this.showLogin()}
-        {this.state.user && this.state.backendUp && this.showButtons()}
+        {this.state.user
+          ? this.state.backendUp && this.showLogout()
+          : this.state.backendUp && this.showLogin()}
+        {this.state.backendUp && this.state.user && this.showButtons()}
       </View>
     )
   }
@@ -93,8 +96,7 @@ export default class HomeScreen extends Component {
 
       const user = await GoogleSignin.currentUserAsync()
       if (user) {
-        console.log(user)
-        this.updateState({ user: user })
+        this.backendLogin(user)
       }
     } catch (err) {
       Alert.alert('Play services error', `${err.code}: ${err.message}`)
@@ -104,8 +106,7 @@ export default class HomeScreen extends Component {
   _signIn() {
     GoogleSignin.signIn()
       .then(user => {
-        console.log(user)
-        this.updateState({ user: user })
+        this.backendLogin(user)
       })
       .catch(err => {
         Alert.alert('Google signin failed', `${err.code}: ${err.message}`)
@@ -119,8 +120,20 @@ export default class HomeScreen extends Component {
       .then(() => {
         this.updateState({ user: null })
       })
-      .catch(() => {
-        console.log('Signout from google failed')
+      .catch(err => {
+        Alert.alert('Signout from google failed', err.message)
+      })
+      .done()
+  }
+
+  backendLogin = user => {
+    console.log(user)
+    Api.login(user.idToken)
+      .then(response => {
+        this.updateState({ user: user, userId: response.id })
+      })
+      .catch(err => {
+        Alert.alert('Backend login failed', err.message)
       })
       .done()
   }
@@ -138,20 +151,30 @@ export default class HomeScreen extends Component {
     </View>
   )
 
-  showLogout = () => (
-    <View style={styles.container}>
-      <Text style={styles.text}>
-        {this.state.user.givenName} {this.state.user.familyName}: ({this.state.user.email})
-      </Text>
-      <Button
-        raised
-        rightIcon={{ name: 'error' }}
-        backgroundColor="#ff3333"
-        title="Kirjaudu ulos"
-        onPress={() => this._signOut()}
-      />
-    </View>
-  )
+  showLogout = () => {
+    const { navigate } = this.props.navigation
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>
+          {this.state.user.givenName} {this.state.user.familyName}: ({this.state.user.email})
+        </Text>
+        <Button
+          raised
+          rightIcon={{ name: 'settings' }}
+          backgroundColor="#009933"
+          title="Käyttäjän tiedot"
+          onPress={() => navigate('User', { user: this.state.user, userId: this.state.userId })}
+        />
+        <Button
+          raised
+          rightIcon={{ name: 'error' }}
+          backgroundColor="#ff3333"
+          title="Kirjaudu ulos"
+          onPress={() => this._signOut()}
+        />
+      </View>
+    )
+  }
 }
 
 const styles = StyleSheet.create({
