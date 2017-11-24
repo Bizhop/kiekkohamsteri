@@ -3,12 +3,14 @@ package fi.bizhop.kiekkohamsteri.dto;
 public class UserDto {
 	private Long id;
 	private String email;
+	private Integer level;
 	
 	public UserDto() {}
 	
-	public UserDto(Long id, String email) {
+	public UserDto(Long id, String email, Integer level) {
 		this.email = email;
 		this.id = id;
+		this.level = level;
 	}
 
 	public String getEmail() {
@@ -25,6 +27,15 @@ public class UserDto {
 
 	public UserDto setId(Long id) {
 		this.id = id;
+		return this;
+	}
+
+	public Integer getLevel() {
+		return level;
+	}
+
+	public UserDto setLevel(Integer level) {
+		this.level = level;
 		return this;
 	}
 }

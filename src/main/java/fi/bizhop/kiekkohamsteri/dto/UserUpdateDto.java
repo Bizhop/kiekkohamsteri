@@ -2,7 +2,6 @@ package fi.bizhop.kiekkohamsteri.dto;
 
 public class UserUpdateDto {
 	private String username;
-	private String email;
 	private String etunimi;
 	private String sukunimi;
 	private Integer pdga_num;
@@ -12,13 +11,6 @@ public class UserUpdateDto {
 	}
 	public UserUpdateDto setUsername(String username) {
 		this.username = username;
-		return this;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public UserUpdateDto setEmail(String email) {
-		this.email = email;
 		return this;
 	}
 	public String getEtunimi() {

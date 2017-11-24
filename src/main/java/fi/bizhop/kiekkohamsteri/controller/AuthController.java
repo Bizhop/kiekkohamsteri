@@ -27,7 +27,7 @@ public class AuthController extends BaseController {
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_ACCEPTED);
-			return new UserDto(user.getId(), user.getEmail());
+			return new UserDto(user.getId(), user.getEmail(), user.getLevel());
 		}
 	}
 }
