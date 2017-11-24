@@ -47,10 +47,11 @@ export default class CameraScreen extends Component {
           ref={cam => {
             this.camera = cam
           }}
-          style={styles.preview}
+          style={styles.camera}
           aspect={Camera.constants.Aspect.fill}
           captureQuality={Camera.constants.CaptureQuality.preview}
           captureTarget={Camera.constants.CaptureTarget.temp}
+          playSoundOnCapture={false}
         />
         <View>
           <Button
@@ -82,9 +83,9 @@ export default class CameraScreen extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
   },
-  preview: {
+  camera: {
     height: Dimensions.get('window').width,
   },
 })

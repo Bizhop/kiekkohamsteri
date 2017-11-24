@@ -23,7 +23,6 @@ export default class KiekkoScreen extends Component {
 
   constructor(props) {
     const { params } = props.navigation.state
-    console.log(params)
     super(props)
 
     const list = [
@@ -53,11 +52,14 @@ export default class KiekkoScreen extends Component {
       kiekkoUpdate: R.pickBy(predicate, params.selectedDisc),
       buttonsDisabled: false,
     }
-    this.initDropdowns(params.selectedDisc)
   }
 
-  initDropdowns = item => {
-    Api.dropdowns(item.valmId)
+  componentDidMount() {
+    this.initDropdowns()
+  }
+
+  initDropdowns = () => {
+    Api.dropdowns(this.state.selectedDisc.valmId)
       .then(dropdowns => {
         this.updateState({ dropdowns: dropdowns })
       })
@@ -253,31 +255,27 @@ export default class KiekkoScreen extends Component {
   updateDisc() {
     this.updateState({ buttonsDisabled: true })
     const { navigate } = this.props.navigation
-    if (Api.login(this.state.user.idToken)) {
-      Api.put({
-        token: this.state.user.idToken,
-        kiekko: this.state.kiekkoUpdate,
-        id: this.state.selectedDisc.id,
+    Api.put({
+      token: this.state.user.idToken,
+      kiekko: this.state.kiekkoUpdate,
+      id: this.state.selectedDisc.id,
+    })
+      .then(() => {
+        navigate('Lista', { user: this.state.user })
       })
-        .then(() => {
-          navigate('Lista', { user: this.state.user })
-        })
-        .catch(err => {
-          Alert.alert('Kiekon päivitys epäonnistui', err.message)
-        })
-        .done()
-    }
+      .catch(err => {
+        Alert.alert('Kiekon päivitys epäonnistui', err.message)
+      })
+      .done()
   }
 
   deleteDisc() {
     this.updateState({ buttonsDisabled: true })
     const { navigate } = this.props.navigation
-    if (Api.login(this.state.user.idToken)) {
-      if (Api.delete(this.state.selectedDisc.id, this.state.user.idToken)) {
-        navigate('Lista', { user: this.state.user })
-      } else {
-        Alert.alert('Kiekon poisto epäonnistui')
-      }
+    if (Api.delete(this.state.selectedDisc.id, this.state.user.idToken)) {
+      navigate('Lista', { user: this.state.user })
+    } else {
+      Alert.alert('Kiekon poisto epäonnistui')
     }
   }
 }

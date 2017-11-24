@@ -66,16 +66,15 @@ const Api = {
   },
   async login(token) {
     const url = `${base}auth/login`
-    await fetch(url, {
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: token,
       },
     })
-      .then(response => !!response.email)
-      .catch(() => false)
-      .done()
+    const json = await response.json()
+    return json
   },
   async dropdowns(valmId) {
     const url = `${base}dropdown?valmId=${valmId}`
@@ -83,6 +82,18 @@ const Api = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+      },
+    })
+    const json = await response.json()
+    return json
+  },
+  async getUser(token, userId) {
+    const url = `${base}user/${userId}`
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token,
       },
     })
     const json = await response.json()
