@@ -28,43 +28,50 @@ public class R_mold {
 	public Long getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public R_mold setId(Long id) {
 		this.id = id;
+		return this;
 	}
 	public R_valm getValmistaja() {
 		return valmistaja;
 	}
-	public void setValmistaja(R_valm valmistaja) {
+	public R_mold setValmistaja(R_valm valmistaja) {
 		this.valmistaja = valmistaja;
+		return this;
 	}
 	public String getKiekko() {
 		return kiekko;
 	}
-	public void setKiekko(String kiekko) {
+	public R_mold setKiekko(String kiekko) {
 		this.kiekko = kiekko;
+		return this;
 	}
 	public Double getNopeus() {
 		return nopeus;
 	}
-	public void setNopeus(Double nopeus) {
+	public R_mold setNopeus(Double nopeus) {
 		this.nopeus = nopeus;
+		return this;
 	}
 	public Double getLiito() {
 		return liito;
 	}
-	public void setLiito(Double liito) {
+	public R_mold setLiito(Double liito) {
 		this.liito = liito;
+		return this;
 	}
 	public Double getVakaus() {
 		return vakaus;
 	}
-	public void setVakaus(Double vakaus) {
+	public R_mold setVakaus(Double vakaus) {
 		this.vakaus = vakaus;
+		return this;
 	}
 	public Double getFeidi() {
 		return feidi;
 	}
-	public void setFeidi(Double feidi) {
+	public R_mold setFeidi(Double feidi) {
 		this.feidi = feidi;
+		return this;
 	}
 }

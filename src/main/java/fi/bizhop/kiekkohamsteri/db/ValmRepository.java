@@ -9,4 +9,6 @@ import fi.bizhop.kiekkohamsteri.projection.ValmDropdownProjection;
 
 public interface ValmRepository extends CrudRepository<R_valm, Long> {
 	List<ValmDropdownProjection> findAllProjectedBy();
+
+	R_valm findFirstByValmistaja(String valmistaja);
 }
