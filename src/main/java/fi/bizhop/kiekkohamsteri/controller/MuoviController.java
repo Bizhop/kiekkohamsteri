@@ -13,22 +13,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import fi.bizhop.kiekkohamsteri.dto.MoldCreateDto;
+import fi.bizhop.kiekkohamsteri.dto.MuoviCreateDto;
 import fi.bizhop.kiekkohamsteri.model.Members;
-import fi.bizhop.kiekkohamsteri.projection.MoldProjection;
+import fi.bizhop.kiekkohamsteri.projection.MuoviProjection;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
-import fi.bizhop.kiekkohamsteri.service.MoldService;
+import fi.bizhop.kiekkohamsteri.service.MuoviService;
 
 @RestController
-public class MoldController extends BaseController {
+public class MuoviController extends BaseController {
 	@Autowired
 	AuthService authService;
 	@Autowired
-	MoldService moldService;
+	MuoviService muoviService;
 	
-	@RequestMapping(value="/molds", method=RequestMethod.GET, produces="application/json")
-	public @ResponseBody Page<MoldProjection> getMolds(@RequestParam(required=false) Long valmId, Pageable pageable, HttpServletRequest request, HttpServletResponse response) {
-		LOG.debug("MoldController.getMolds()...");
+	@RequestMapping(value="/muovit", method=RequestMethod.GET, produces="application/json")
+	public @ResponseBody Page<MuoviProjection> getMuovit(@RequestParam(required=false) Long valmId, Pageable pageable, HttpServletRequest request, HttpServletResponse response) {
+		LOG.debug("MuoviController.getMuovit()...");
 		
 		Members user = authService.getUser(request);
 		if(user == null || user.getLevel() != 2) {
@@ -37,13 +37,13 @@ public class MoldController extends BaseController {
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_OK);
-			return moldService.getMolds(valmId, pageable);
+			return muoviService.getMuovit(valmId, pageable);
 		}
 	}
 	
-	@RequestMapping(value="/molds", method=RequestMethod.POST, consumes="application/json")
-	public void createMold(@RequestBody MoldCreateDto dto, HttpServletRequest request, HttpServletResponse response) {
-		LOG.debug("MoldController.createMold()...");
+	@RequestMapping(value="/muovit", method=RequestMethod.POST, consumes="application/json")
+	public void createMuovi(@RequestBody MuoviCreateDto dto, HttpServletRequest request, HttpServletResponse response) {
+		LOG.debug("MuoviController.createMuovi()...");
 		
 		Members user = authService.getUser(request);
 		if(user == null || user.getLevel() != 2) {
@@ -51,7 +51,7 @@ public class MoldController extends BaseController {
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_OK);
-			moldService.createMold(dto);
+			muoviService.createMuovi(dto);
 		}
 	}
 }
