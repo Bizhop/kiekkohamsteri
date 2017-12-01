@@ -48,6 +48,21 @@ public class KiekotController extends BaseController {
 		}
 	}
 	
+	@RequestMapping(value = "/kiekot/myytavat", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody Page<KiekkoProjection> haeMyytavat(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
+		LOG.debug("KiekotController.haeMyytavat()...");
+		
+		Members owner = authService.getUser(request);
+		if(owner == null) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return null;
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_OK);
+			return kiekkoService.haeMyytavat(pageable);
+		}
+	}
+	
 	@RequestMapping(value = "/kiekot", method = RequestMethod.POST, produces = "application/json")
 	public @ResponseBody KiekkoProjection uusiKiekko(@RequestBody UploadDto dto, HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug("KiekotController.uusiKiekko()...");

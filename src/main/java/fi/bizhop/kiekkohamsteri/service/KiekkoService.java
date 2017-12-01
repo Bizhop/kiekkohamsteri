@@ -96,6 +96,10 @@ public class KiekkoService {
 		kiekkoRepo.save(kiekko);
 		return kiekkoRepo.findById(id);
 	}
+
+	public Page<KiekkoProjection> haeMyytavat(Pageable pageable) {
+		return kiekkoRepo.findByMyynnissaTrue(pageable);
+	}
 	
 	
 
