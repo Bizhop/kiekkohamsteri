@@ -45,6 +45,7 @@ public class KiekkoService {
 		R_vari defaultVari = variRepo.findOne(1L);
 		
 		Kiekot kiekko = new Kiekot(owner, defaultMold, defaultMuovi, defaultVari);
+		kiekko.setTussit(1);
 		kiekko = kiekkoRepo.save(kiekko);
 		
 		return kiekkoRepo.findById(kiekko.getId());
