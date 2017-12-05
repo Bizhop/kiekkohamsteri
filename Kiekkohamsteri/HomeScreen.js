@@ -82,6 +82,15 @@ export default class HomeScreen extends Component {
             onPress={() => navigate('Camera', { user: this.state.user })}
           />
         </View>
+        <View style={styles.buttons}>
+          <Button
+            raised
+            rightIcon={{ name: 'shopping-cart' }}
+            backgroundColor="#ff9400"
+            title="Myytävät"
+            onPress={() => navigate('Myytavat', { user: this.state.user })}
+          />
+        </View>
       </View>
     )
   }

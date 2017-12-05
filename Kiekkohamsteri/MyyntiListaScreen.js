@@ -7,10 +7,10 @@ import { NavigationActions } from 'react-navigation'
 import Api from './Api'
 import Helpers from './Helpers'
 
-export default class ListaScreen extends Component {
+export default class MyyntiListaScreen extends Component {
   static navigationOptions = props => {
     return {
-      title: 'Kiekkolistaus',
+      title: 'Myytävät',
       headerLeft: (
         <Icon name="home" size={35} onPress={() => props.navigation.dispatch(resetAction)} />
       )
@@ -46,8 +46,6 @@ export default class ListaScreen extends Component {
             {this.myCheckBox('Värjätty', 'dyed')}
             {this.myCheckBox('Swirly', 'swirly')}
             {this.myCheckBox('Löytökiekko', 'loytokiekko')}
-            {this.myCheckBox('In the bag', 'itb')}
-            {this.myCheckBox('Myynnissä', 'myynnissa')}
             <Button
               raised
               rightIcon={{ name: 'filter-list' }}
@@ -122,17 +120,17 @@ export default class ListaScreen extends Component {
       <ListItem
         roundAvatar
         title={Helpers.discBasics(item)}
-        subtitle={Helpers.discStats(item)}
+        subtitle={`${item.omistaja}, ${item.hinta}€`}
         avatar={{ uri: `${Helpers.imagesUrl}t_lista/${item.kuva}` }}
         onPress={() => {
-          navigate('Kiekko', { selectedDisc: item, user: this.state.user })
+          navigate('Myyntikiekko', { selectedDisc: item, user: this.state.user })
         }}
       />
     )
   }
 
   getDiscs() {
-    Api.get(this.state.user.idToken)
+    Api.getSales(this.state.user.idToken)
       .then(response => {
         const kiekot = R.pathOr([], ['content'], response)
         this.setState({

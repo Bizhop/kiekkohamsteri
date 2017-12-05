@@ -7,8 +7,20 @@ const Api = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: token,
-      },
+        Authorization: token
+      }
+    })
+    const json = await response.json()
+    return json
+  },
+  async getSales(token) {
+    const url = `${base}kiekot/myytavat?size=1000&sort=member.username,asc`
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
     })
     const json = await response.json()
     return json
@@ -19,9 +31,9 @@ const Api = {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: params.token,
+        Authorization: params.token
       },
-      body: JSON.stringify(params.kiekko),
+      body: JSON.stringify(params.kiekko)
     })
     const json = await response.json()
     return json
@@ -32,12 +44,12 @@ const Api = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: token,
+        Authorization: token
       },
       body: JSON.stringify({
         data: `data:image/jpeg;base64,${data}`,
-        name: '',
-      }),
+        name: ''
+      })
     })
     const json = await response.json()
     return json
@@ -47,8 +59,8 @@ const Api = {
     await fetch(url, {
       method: 'DELETE',
       headers: {
-        Authorization: token,
-      },
+        Authorization: token
+      }
     })
       .then(() => true)
       .catch(() => false)
@@ -59,8 +71,8 @@ const Api = {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Content-Type': 'text/plain',
-      },
+        'Content-Type': 'text/plain'
+      }
     })
     return response
   },
@@ -70,8 +82,8 @@ const Api = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: token,
-      },
+        Authorization: token
+      }
     })
     const json = await response.json()
     return json
@@ -81,8 +93,8 @@ const Api = {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-      },
+        'Content-Type': 'application/json'
+      }
     })
     const json = await response.json()
     return json
@@ -93,12 +105,12 @@ const Api = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: token,
-      },
+        Authorization: token
+      }
     })
     const json = await response.json()
     return json
-  },
+  }
 }
 
 export default Api
