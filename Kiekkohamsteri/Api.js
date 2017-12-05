@@ -110,6 +110,19 @@ const Api = {
     })
     const json = await response.json()
     return json
+  },
+  async updateUser(params) {
+    const url = `${base}user/${params.id}`
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: params.token
+      },
+      body: JSON.stringify(params.update)
+    })
+    const json = await response.json()
+    return json
   }
 }
 

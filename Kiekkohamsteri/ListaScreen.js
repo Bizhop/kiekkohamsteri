@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, FlatList, Alert, ActivityIndicator, StyleSheet, Modal } from 'react-native'
+import { View, FlatList, Text, Alert, ActivityIndicator, StyleSheet, Modal } from 'react-native'
 import { List, ListItem, Icon, Button, CheckBox } from 'react-native-elements'
 import R from 'ramda'
 import { NavigationActions } from 'react-navigation'
@@ -58,6 +58,9 @@ export default class ListaScreen extends Component {
           </View>
         </Modal>
         <View style={styles.filter}>
+          <Text>
+            Näytetään: {this.state.kiekotFiltered.length}/{this.state.kiekot.length}
+          </Text>
           <Button
             raised
             rightIcon={{ name: 'filter-list' }}
@@ -156,6 +159,7 @@ const resetAction = NavigationActions.reset({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FFFFFF'
@@ -165,6 +169,9 @@ const styles = StyleSheet.create({
   },
   filter: {
     flex: 1,
-    alignItems: 'flex-end'
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF'
   }
 })
