@@ -8,9 +8,11 @@ import {
   Image,
   Picker,
   TextInput,
+  Switch,
   ActivityIndicator,
+  Dimensions
 } from 'react-native'
-import { Button, CheckBox } from 'react-native-elements'
+import { Button } from 'react-native-elements'
 import R from 'ramda'
 
 import Api from './Api'
@@ -18,7 +20,7 @@ import Helpers from './Helpers'
 
 export default class KiekkoScreen extends Component {
   static navigationOptions = {
-    title: 'Kiekko',
+    title: 'Kiekko'
   }
 
   constructor(props) {
@@ -41,7 +43,7 @@ export default class KiekkoScreen extends Component {
       'loytokiekko',
       'itb',
       'myynnissa',
-      'hinta',
+      'hinta'
     ]
     const predicate = (val, key) => R.contains(key, list)
 
@@ -50,7 +52,7 @@ export default class KiekkoScreen extends Component {
       selectedDisc: params.selectedDisc,
       dropdowns: null,
       kiekkoUpdate: R.pickBy(predicate, params.selectedDisc),
-      buttonsDisabled: false,
+      buttonsDisabled: false
     }
   }
 
@@ -76,21 +78,25 @@ export default class KiekkoScreen extends Component {
   updateKiekkoUpdate = obj => {
     this.setState({
       ...this.state,
-      kiekkoUpdate: R.mergeDeepRight(this.state.kiekkoUpdate, obj),
+      kiekkoUpdate: R.mergeDeepRight(this.state.kiekkoUpdate, obj)
     })
   }
 
   render() {
     return this.state.selectedDisc && this.state.dropdowns ? (
       <ScrollView style={styles.scrollContainer}>
-        <Text>{Helpers.discBasics(this.state.selectedDisc)}</Text>
-        <Text>{Helpers.discStats(this.state.selectedDisc)}</Text>
-        <Image
-          source={{ uri: `${Helpers.imagesUrl}t_kiekko/${this.state.selectedDisc.kuva}` }}
-          style={styles.discImage}
-        />
+        <View style={styles.header}>
+          <Text>{Helpers.discBasics(this.state.selectedDisc)}</Text>
+          <Text style={{ color: 'grey' }}>{Helpers.discStats(this.state.selectedDisc)}</Text>
+        </View>
         <View style={styles.inputRow}>
-          <Text>Valmistaja</Text>
+          <Image
+            source={{ uri: `${Helpers.imagesUrl}t_kiekko/${this.state.selectedDisc.kuva}` }}
+            style={styles.discImage}
+          />
+        </View>
+        <View style={styles.inputRow}>
+          <Text style={styles.label}>Valmistaja</Text>
           <Picker
             style={styles.picker}
             selectedValue={this.state.kiekkoUpdate.valmId}
@@ -112,7 +118,7 @@ export default class KiekkoScreen extends Component {
           </Picker>
         </View>
         <View style={styles.inputRow}>
-          <Text>Mold</Text>
+          <Text style={styles.label}>Mold</Text>
           <Picker
             style={styles.picker}
             selectedValue={this.state.kiekkoUpdate.moldId}
@@ -124,7 +130,7 @@ export default class KiekkoScreen extends Component {
           </Picker>
         </View>
         <View style={styles.inputRow}>
-          <Text>Muovi</Text>
+          <Text style={styles.label}>Muovi</Text>
           <Picker
             style={styles.picker}
             selectedValue={this.state.kiekkoUpdate.muoviId}
@@ -138,7 +144,7 @@ export default class KiekkoScreen extends Component {
           </Picker>
         </View>
         <View style={styles.inputRow}>
-          <Text>Väri</Text>
+          <Text style={styles.label}>Väri</Text>
           <Picker
             style={styles.picker}
             selectedValue={this.state.kiekkoUpdate.variId}
@@ -150,7 +156,7 @@ export default class KiekkoScreen extends Component {
           </Picker>
         </View>
         <View style={styles.inputRow}>
-          <Text>Kunto</Text>
+          <Text style={styles.label}>Kunto</Text>
           <Picker
             style={styles.picker}
             selectedValue={this.state.kiekkoUpdate.kunto}
@@ -162,7 +168,7 @@ export default class KiekkoScreen extends Component {
           </Picker>
         </View>
         <View style={styles.inputRow}>
-          <Text>Tussit</Text>
+          <Text style={styles.label}>Tussit</Text>
           <Picker
             style={styles.picker}
             selectedValue={this.state.kiekkoUpdate.tussit}
@@ -174,7 +180,7 @@ export default class KiekkoScreen extends Component {
           </Picker>
         </View>
         <View style={styles.inputTextContainer}>
-          <Text>Paino</Text>
+          <Text style={styles.label}>Paino</Text>
           <TextInput
             style={styles.textInput}
             onChangeText={text => this.updateKiekkoUpdate({ paino: text })}
@@ -182,14 +188,14 @@ export default class KiekkoScreen extends Component {
             keyboardType="numeric"
           />
         </View>
-        {this.myCheckBox('Hohto', 'hohto')}
+        {this.myCheckBox('Hohtava', 'hohto')}
         {this.myCheckBox('Spesiaali', 'spessu')}
         {this.myCheckBox('Värjätty', 'dyed')}
         {this.myCheckBox('Swirly', 'swirly')}
         {this.myCheckBox('Löytökiekko', 'loytokiekko')}
         {this.myCheckBox('In the bag', 'itb')}
         <View style={styles.inputTextContainer}>
-          <Text>Muuta</Text>
+          <Text style={styles.label}>Muuta</Text>
           <TextInput
             style={styles.textInput}
             onChangeText={text => this.updateKiekkoUpdate({ muuta: text })}
@@ -199,7 +205,7 @@ export default class KiekkoScreen extends Component {
         {this.myCheckBox('Myynnissä', 'myynnissa')}
         {this.state.kiekkoUpdate.myynnissa && (
           <View style={styles.inputTextContainer}>
-            <Text>Hinta</Text>
+            <Text style={styles.label}>Hinta</Text>
             <TextInput
               style={styles.textInput}
               onChangeText={text => this.updateKiekkoUpdate({ hinta: text })}
@@ -224,7 +230,7 @@ export default class KiekkoScreen extends Component {
           onPress={() =>
             Alert.alert('Varoitus', 'Kiekko poistetaan pysyvästi', [
               { text: 'Peruuta' },
-              { text: 'Poista', onPress: () => this.deleteDisc() },
+              { text: 'Poista', onPress: () => this.deleteDisc() }
             ])
           }
           disabled={this.state.buttonsDisabled}
@@ -239,16 +245,19 @@ export default class KiekkoScreen extends Component {
 
   myCheckBox(title, value) {
     return (
-      <CheckBox
-        title={title}
-        checked={R.path([value], this.state.kiekkoUpdate)}
-        onIconPress={() =>
-          this.updateKiekkoUpdate(R.zipObj([value], [!R.path([value], this.state.kiekkoUpdate)]))
-        }
-        onPress={() =>
-          this.updateKiekkoUpdate(R.zipObj([value], [!R.path([value], this.state.kiekkoUpdate)]))
-        }
-      />
+      <View style={styles.inputRow}>
+        <Text style={styles.label}>{title}</Text>
+        <View style={styles.checkbox}>
+          <Switch
+            value={R.path([value], this.state.kiekkoUpdate)}
+            onValueChange={() =>
+              this.updateKiekkoUpdate(
+                R.zipObj([value], [!R.path([value], this.state.kiekkoUpdate)])
+              )
+            }
+          />
+        </View>
+      </View>
     )
   }
 
@@ -258,7 +267,7 @@ export default class KiekkoScreen extends Component {
     Api.put({
       token: this.state.user.idToken,
       kiekko: this.state.kiekkoUpdate,
-      id: this.state.selectedDisc.id,
+      id: this.state.selectedDisc.id
     })
       .then(() => {
         navigate('Lista', { user: this.state.user })
@@ -285,32 +294,46 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFFFFF'
   },
   scrollContainer: {
     flex: 1,
     alignItems: 'flex-start',
     height: 1000,
+    backgroundColor: '#FFFFFF'
+  },
+  header: {
+    alignItems: 'center',
     backgroundColor: '#FFFFFF',
+    color: 'black',
+    fontSize: 24
   },
   discImage: {
-    width: 300,
-    height: 300,
+    height: Dimensions.get('window').width,
+    width: Dimensions.get('window').width
   },
   inputRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'flex-start'
+  },
+  label: {
+    flex: 1
   },
   inputTextContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 5,
+    marginBottom: 5
   },
   textInput: {
     height: 40,
-    width: 300,
+    flex: 4
   },
   picker: {
-    width: 150,
+    flex: 4
   },
+  checkbox: {
+    flex: 4,
+    flexDirection: 'row',
+    alignItems: 'flex-start'
+  }
 })
