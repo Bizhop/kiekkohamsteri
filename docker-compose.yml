@@ -1,0 +1,11 @@
+version: '2'
+
+services:
+  db:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: hamsteri/hamsteri-database
+    container_name: hamsteri-database
+    ports:
+     - "5432:5432"
