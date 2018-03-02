@@ -9,3 +9,12 @@ services:
     container_name: hamsteri-database
     ports:
      - "5432:5432"
+  backend:
+    image: kiekkohamsteri-backend
+    ports:
+     - "8181:8181"
+    depends_on:
+     - db
+    links:
+     - db
+    container_name: kiekkohamsteri-backend
