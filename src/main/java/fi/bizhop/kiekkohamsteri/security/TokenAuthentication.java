@@ -31,8 +31,12 @@ public class TokenAuthentication {
 			return null;
 		}
 
-		String json = Jsoup.connect(String.format(GOOGLE_PARSER_URL_TEMPLATE, token)).ignoreContentType(true).execute().body();
-		
-		return new ObjectMapper().readValue(json, HashMap.class);
+		try {
+			String json = Jsoup.connect(String.format(GOOGLE_PARSER_URL_TEMPLATE, token)).ignoreContentType(true).execute().body();
+			return new ObjectMapper().readValue(json, HashMap.class);
+		}
+		catch (Exception e) {
+			return null;
+		}
 	}
 }

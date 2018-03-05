@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import fi.bizhop.kiekkohamsteri.dto.UserDto;
 import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 
@@ -20,7 +19,7 @@ public class AuthController extends BaseController {
 	AuthService authService;
 	
 	@RequestMapping(value = "/auth/login", method = RequestMethod.GET)
-	public @ResponseBody UserDto login(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public @ResponseBody Members login(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Members user = authService.login(request);
 		if(user == null) {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -28,7 +27,7 @@ public class AuthController extends BaseController {
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_ACCEPTED);
-			return new UserDto(user.getId(), user.getEmail(), user.getLevel());
+			return user;
 		}
 	}
 }
