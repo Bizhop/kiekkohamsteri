@@ -172,20 +172,15 @@ public class RatingService {
 		int doubleRounds = rounds.size() > 7 ? rounds.size() / 4 : 0;
 		int totalRating = 0;
 		int totalHoles = 0;
-		int roundsDoubled = 0;
 
 		for(int i=0; i<rounds.size(); i++) {
 			if(rounds.get(i).isIncluded()) {
 				int multiplier = i + doubleRounds >= rounds.size() ? 2 : 1;
 				totalRating += rounds.get(i).getRating() * rounds.get(i).getHoles() * multiplier;
 				totalHoles += rounds.get(i).getHoles() * multiplier;
-				if(multiplier == 2) {
-					roundsDoubled++;
-				}
 			}
 		}
 
-		System.out.println(String.format("Double rounds: %d, rounds doubled: %d", doubleRounds, roundsDoubled));
-		return totalRating / totalHoles;
+		return Math.round((float)totalRating / (float)totalHoles);
 	}
 }

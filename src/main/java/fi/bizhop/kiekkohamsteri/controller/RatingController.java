@@ -16,7 +16,7 @@ public class RatingController extends BaseController {
 	@Autowired
 	RatingService ratingService;
 	
-	@RequestMapping(value = "/rating/{pdga}/rounds", method = RequestMethod.GET)
+	@RequestMapping(value = "/rating/{pdga}", method = RequestMethod.GET)
 	public RatingDto getRounds(@PathVariable String pdga, HttpServletResponse response) {
 		try {
 			return ratingService.getRounds(pdga);
