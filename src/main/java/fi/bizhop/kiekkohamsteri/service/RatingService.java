@@ -16,44 +16,57 @@ import fi.bizhop.kiekkohamsteri.dto.RoundDto;
 
 @Service
 public class RatingService {
-	
+
 	private static final String RATINGS_URL = "https://www.pdga.com/player/%s/details";
 	private static final String PLAYER_URL = "https://www.pdga.com/player/%s";
-	
-	public List<RoundDto> getRounds(String pdga_num) throws Exception {
-		Document doc = Jsoup.connect(String.format(RATINGS_URL, pdga_num)).get();
-		Elements rows = doc.getElementById("player-results-details").select("tbody").select("tr");
 
-		List<RoundDto> rounds = new ArrayList<>();
-		for(Element row : rows) {
-			Elements tds = row.select("td");
-			if(tds.size() == 6) {
-				rounds.add(new RoundDto(
-						getText(tds.get(0)),
-						getLink(tds.get(0)),
-						getDate(tds.get(1)),
-						getInt(tds.get(2)),
-						getInt(tds.get(3)),
-						getInt(tds.get(4)),
-						getHoles(getLink(tds.get(0))),
-						getBoolean(tds.get(5))
-						));
+	public List<RoundDto> getRounds(String pdga_num) throws Exception {
+		List<RoundDto> rounds = new ArrayList<>();		
+
+		try {
+			Document doc = Jsoup.connect(String.format(RATINGS_URL, pdga_num)).get();
+			Elements rows = doc.getElementById("player-results-details").select("tbody").select("tr");
+			for(Element row : rows) {
+				Elements tds = row.select("td");
+				if(tds.size() == 6) {
+					rounds.add(new RoundDto(
+							getText(tds.get(0)),
+							getLink(tds.get(0)),
+							getDate(tds.get(1)),
+							getInt(tds.get(2)),
+							getInt(tds.get(3)),
+							getInt(tds.get(4)),
+							getHoles(getLink(tds.get(0))),
+							getBoolean(tds.get(5))
+							));
+				}
 			}
+		} catch (Exception e) {
+			System.out.println("Virallisten kierrosten haku epäonnistui");
+			e.printStackTrace();
+			throw new Exception("Internal error");
 		}
-		
-		Document info = Jsoup.connect(String.format(PLAYER_URL, pdga_num)).get();
-		Element recent = info.getElementsByClass("recent-events").first();
-		Elements links = recent.select("a");
-		for(Element l : links) {
-			List<RoundDto> unofficial = getUnofficial(l.attr("abs:href"), pdga_num);
-			if(unofficial != null) {
-				rounds.addAll(unofficial);
+
+		try {
+			Document info = Jsoup.connect(String.format(PLAYER_URL, pdga_num)).get();
+			Element recent = info.getElementsByClass("recent-events").first();
+			if(recent != null) {
+				Elements links = recent.select("a");
+				for(Element l : links) {
+					List<RoundDto> unofficial = getUnofficial(l.attr("abs:href"), pdga_num);
+					if(unofficial != null) {
+						rounds.addAll(unofficial);
+					}
+				}
 			}
+		} catch (Exception e) {
+			System.out.println("Epävirallisten kierrosten haku epäonnistui");
+			e.printStackTrace();
 		}
-		
+
 		return rounds;
 	}
-	
+
 	private static List<RoundDto> getUnofficial(String url, String pdga) {
 		try {
 			List<RoundDto> rounds = new ArrayList<>();
@@ -81,17 +94,17 @@ public class RatingService {
 					}
 				}
 			}
-			
+
 			return rounds;
 		} catch (IOException e) {
 			return null;
 		}
 	}
-	
+
 	private static String getText(Element e) {
 		return e.text().trim();
 	}
-	
+
 	private static String getLink(Element e) {
 		return e.select("a").first().attr("abs:href");
 	}
@@ -113,7 +126,7 @@ public class RatingService {
 			return false;
 		}
 	}
-	
+
 	private static LocalDate getDate(Element e) {
 		try {
 			e.select("span").remove();
@@ -128,7 +141,7 @@ public class RatingService {
 			return null;
 		}
 	}
-	
+
 	private static int getHoles(String link) {
 		try {
 			Document doc = Jsoup.connect(link).get();
@@ -138,7 +151,7 @@ public class RatingService {
 		}
 		return 18;
 	}
-	
+
 	private static int getHoles(Document doc) {
 		try {
 			Element template = doc.getElementsByClass("tooltip-templates").first();
