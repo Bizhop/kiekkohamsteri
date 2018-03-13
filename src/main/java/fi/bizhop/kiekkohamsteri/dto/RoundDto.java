@@ -1,9 +1,10 @@
 package fi.bizhop.kiekkohamsteri.dto;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public class RoundDto {
-	private int id;
+	private String id;
 	private String tournament;
 	private String link;
 	private LocalDate date;
@@ -45,12 +46,12 @@ public class RoundDto {
 		return included;
 	}
 	
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
 	public RoundDto(String tournament, String link, LocalDate date, int round, int score, int rating, int holes, boolean included) {
-		this.id = tournament.hashCode() + round;
+		this.id = UUID.randomUUID().toString();
 		this.tournament = tournament;
 		this.link = link;
 		this.date = date;
