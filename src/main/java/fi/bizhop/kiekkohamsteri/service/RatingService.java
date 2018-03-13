@@ -12,6 +12,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
+import fi.bizhop.kiekkohamsteri.dto.RatingDto;
 import fi.bizhop.kiekkohamsteri.dto.RoundDto;
 
 @Service
@@ -20,7 +21,7 @@ public class RatingService {
 	private static final String RATINGS_URL = "https://www.pdga.com/player/%s/details";
 	private static final String PLAYER_URL = "https://www.pdga.com/player/%s";
 
-	public List<RoundDto> getRounds(String pdga_num) throws Exception {
+	public RatingDto getRounds(String pdga_num) throws Exception {
 		List<RoundDto> rounds = new ArrayList<>();		
 
 		try {
@@ -64,7 +65,9 @@ public class RatingService {
 			e.printStackTrace();
 		}
 
-		return rounds;
+		int nextRating = calculateNextRating(rounds);
+
+		return new RatingDto(rounds, nextRating);
 	}
 
 	private static List<RoundDto> getUnofficial(String url, String pdga) {
@@ -88,7 +91,7 @@ public class RatingService {
 								getInt(roundElements.get(i)),
 								getInt(ratingElements.get(i)),
 								getHoles(uo),
-								false
+								true
 								);
 						rounds.add(round);
 					}
@@ -163,5 +166,26 @@ public class RatingService {
 			System.out.println(e);
 		}
 		return 18;
+	}
+
+	private static int calculateNextRating(List<RoundDto> rounds) {
+		int doubleRounds = rounds.size() > 7 ? rounds.size() / 4 : 0;
+		int totalRating = 0;
+		int totalHoles = 0;
+		int roundsDoubled = 0;
+
+		for(int i=0; i<rounds.size(); i++) {
+			if(rounds.get(i).isIncluded()) {
+				int multiplier = i + doubleRounds >= rounds.size() ? 2 : 1;
+				totalRating += rounds.get(i).getRating() * rounds.get(i).getHoles() * multiplier;
+				totalHoles += rounds.get(i).getHoles() * multiplier;
+				if(multiplier == 2) {
+					roundsDoubled++;
+				}
+			}
+		}
+
+		System.out.println(String.format("Double rounds: %d, rounds doubled: %d", doubleRounds, roundsDoubled));
+		return totalRating / totalHoles;
 	}
 }
