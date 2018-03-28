@@ -2,13 +2,16 @@ version: '3'
 
 services:
   db:
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    image: hamsteri/hamsteri-database
+    image: postgres:9.5
     container_name: hamsteri-database
     ports:
      - "5432:5432"
+    volumes:
+     - ./hamsteri.sql:/docker-entrypoint-initdb.d/hamsteri.sql
+    environment:
+     - POSTGRES_USER=hamsteri
+     - POSTGRES_PASSWORD=hamsteri
+     - POSTGRES_DB=hamsteri
   backend:
     image: kiekkohamsteri-backend
     ports:

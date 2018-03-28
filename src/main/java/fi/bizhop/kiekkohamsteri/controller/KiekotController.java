@@ -82,6 +82,12 @@ public class KiekotController extends BaseController {
 				return kiekko;
 			} 
 			catch (IOException e) {
+				try {
+					kiekkoService.poistaKiekko(kiekko.getId(), owner);
+				} catch (AuthorizationException e1) {
+					//pitäisi onnistua aina, ei tehdä mitään
+				}
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				return null;
 			}
 		}
