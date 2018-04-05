@@ -63,6 +63,7 @@ public class OstoService {
 			Kiekot kiekko = osto.getKiekko();
 			kiekko.setMember(osto.getOstaja());
 			kiekko.setMyynnissa(false);
+			kiekko.setItb(false);
 			kiekkoRepo.save(kiekko);
 			
 			//set status to confirmed
