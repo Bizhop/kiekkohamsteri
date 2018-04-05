@@ -22,6 +22,7 @@ import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.projection.KiekkoProjection;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.KiekkoService;
+import fi.bizhop.kiekkohamsteri.service.OstoService;
 import fi.bizhop.kiekkohamsteri.service.UploadService;
 
 @RestController
@@ -32,6 +33,8 @@ public class KiekotController extends BaseController {
 	AuthService authService;
 	@Autowired
 	UploadService uploadService;
+	@Autowired
+	OstoService ostoService;
 	
 	@RequestMapping(value = "/kiekot", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody Page<KiekkoProjection> haeKiekot(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
@@ -116,7 +119,7 @@ public class KiekotController extends BaseController {
 	
 	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.DELETE)
 	public void poistaKiekko(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
-		LOG.debug("KiekotController.poistaKiekko()...");
+		LOG.debug(String.format("KiekotController.poistaKiekko(%d)...", id));
 		
 		Members owner = authService.getUser(request);
 		if(owner == null) {
@@ -129,6 +132,19 @@ public class KiekotController extends BaseController {
 			catch(AuthorizationException ae) {
 				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			}
+		}
+	}
+	
+	@RequestMapping(value = "/kiekot/{id}/buy", method = RequestMethod.POST)
+	public void ostaKiekko(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
+		LOG.debug(String.format("KiekotController.ostaKiekko(%d)...", id));
+		
+		Members user = authService.getUser(request);
+		if(user == null) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		}
+		else {
+			ostoService.ostaKiekko(id, user);
 		}
 	}
 }

@@ -153,6 +153,41 @@ ALTER TABLE kirppis_id_seq OWNER TO hamsteri;
 
 ALTER SEQUENCE kirppis_id_seq OWNED BY kirppis.id;
 
+--
+-- Name: ostot; Type: TABLE; Schema: public; Owner: hamsteri
+--
+
+CREATE TABLE ostot (
+    id integer NOT NULL,
+    kiekko_id integer NOT NULL,
+    myyja integer NOT NULL,
+    ostaja integer NOT NULL,
+    status integer NOT NULL DEFAULT 0
+);
+
+
+ALTER TABLE ostot OWNER TO hamsteri;
+
+--
+-- Name: ostot_id_seq; Type: SEQUENCE; Schema: public; Owner: hamsteri
+--
+
+CREATE SEQUENCE ostot_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE ostot_id_seq OWNER TO hamsteri;
+
+--
+-- Name: ostot_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: hamsteri
+--
+
+ALTER SEQUENCE ostot_id_seq OWNED BY ostot.id;
+
 
 --
 -- Name: members; Type: TABLE; Schema: public; Owner: hamsteri
@@ -387,6 +422,12 @@ ALTER TABLE ONLY kiekot ALTER COLUMN id SET DEFAULT nextval('kiekot_id_seq'::reg
 --
 
 ALTER TABLE ONLY kirppis ALTER COLUMN id SET DEFAULT nextval('kirppis_id_seq'::regclass);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: hamsteri
+--
+
+ALTER TABLE ONLY ostot ALTER COLUMN id SET DEFAULT nextval('ostot_id_seq'::regclass);
 
 
 --
@@ -644,6 +685,12 @@ COPY kirppis (id, kiekko_id, member_id, loytopaikka, puhelin, hakupaikka) FROM s
 --
 
 SELECT pg_catalog.setval('kirppis_id_seq', 1, false);
+
+--
+-- Name: ostot_id_seq; Type: SEQUENCE SET; Schema: public; Owner: hamsteri
+--
+
+SELECT pg_catalog.setval('ostot_id_seq', 1, false);
 
 
 --
@@ -1429,6 +1476,13 @@ ALTER TABLE ONLY kiekot
 
 ALTER TABLE ONLY kirppis
     ADD CONSTRAINT kirppis_pkey PRIMARY KEY (id);
+    
+--
+-- Name: ostot_pkey; Type: CONSTRAINT; Schema: public; Owner: hamsteri
+--
+
+ALTER TABLE ONLY ostot
+    ADD CONSTRAINT ostot_pkey PRIMARY KEY (id);
 
 
 --
@@ -1565,6 +1619,27 @@ ALTER TABLE ONLY wanted
 
 ALTER TABLE ONLY wanted
     ADD CONSTRAINT wanted_ibfk_3 FOREIGN KEY (muovi_id) REFERENCES r_muovi(id) ON UPDATE CASCADE;
+    
+--
+-- Name: ostot_ibfk_1; Type: FK CONSTRAINT; Schema: public; Owner: hamsteri
+--
+
+ALTER TABLE ONLY ostot
+    ADD CONSTRAINT ostot_ibfk_1 FOREIGN KEY (myyja) REFERENCES members(id) ON UPDATE CASCADE;
+    
+--
+-- Name: ostot_ibfk_2; Type: FK CONSTRAINT; Schema: public; Owner: hamsteri
+--
+
+ALTER TABLE ONLY ostot
+    ADD CONSTRAINT ostot_ibfk_2 FOREIGN KEY (ostaja) REFERENCES members(id) ON UPDATE CASCADE;
+    
+--
+-- Name: ostot_ibfk_3; Type: FK CONSTRAINT; Schema: public; Owner: hamsteri
+--
+
+ALTER TABLE ONLY ostot
+    ADD CONSTRAINT ostot_ibfk_3 FOREIGN KEY (kiekko_id) REFERENCES kiekot(id) ON UPDATE CASCADE;
 
 
 --
@@ -1602,6 +1677,15 @@ GRANT ALL ON TABLE kiekot TO hamsteri;
 REVOKE ALL ON TABLE kirppis FROM PUBLIC;
 REVOKE ALL ON TABLE kirppis FROM hamsteri;
 GRANT ALL ON TABLE kirppis TO hamsteri;
+
+
+--
+-- Name: ostot; Type: ACL; Schema: public; Owner: hamsteri
+--
+
+REVOKE ALL ON TABLE ostot FROM PUBLIC;
+REVOKE ALL ON TABLE ostot FROM hamsteri;
+GRANT ALL ON TABLE ostot TO hamsteri;
 
 
 --
