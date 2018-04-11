@@ -1,9 +1,7 @@
 target/
-*.properties
 .settings/
 .classpath
 .project
 *.log
-fribahamsteri.*.sql
 *.http
 

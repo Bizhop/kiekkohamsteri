@@ -1,10 +1,12 @@
 package fi.bizhop.kiekkohamsteri.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "members")
@@ -20,6 +22,13 @@ public class Members {
 	private String sukunimi;
 	private Integer pdga_num;
 	
+	@Column(name="public_list")
+	@NotNull
+	private Boolean publicList;
+	
+	@Column(name="public_disc_count")
+	private Boolean publicDiscCount;
+	
 	public Members() {}
 	
 	public Members(String userEmail) {
@@ -29,6 +38,8 @@ public class Members {
 		this.etunimi = "Uusi";
 		this.sukunimi = "Käyttäjä";
 		this.pdga_num = 0;
+		this.publicList = false;
+		this.publicDiscCount = false;
 	}
 	public Long getId() {
 		return id;
@@ -71,5 +82,17 @@ public class Members {
 	}
 	public void setPdga_num(Integer pdga_num) {
 		this.pdga_num = pdga_num;
+	}
+	public Boolean getPublicList() {
+		return publicList;
+	}
+	public void setPublicList(Boolean publicList) {
+		this.publicList = publicList;
+	}
+	public Boolean getPublicDiscCount() {
+		return publicDiscCount;
+	}
+	public void setPublicDiscCount(Boolean publicDiscCount) {
+		this.publicDiscCount = publicDiscCount;
 	}
 }

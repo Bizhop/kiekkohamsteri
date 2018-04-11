@@ -1,0 +1,304 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	<changeSet author="ville (generated)" id="1523445880553-1">
+		<createTable tableName="dd_arvot">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="dd_arvot_pkey" />
+			</column>
+			<column defaultValue="" name="valikko" type="VARCHAR(15)" />
+			<column name="nimi" type="VARCHAR(20)">
+				<constraints nullable="false" />
+			</column>
+			<column name="arvo" type="INT" />
+		</createTable>
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-2">
+		<createTable tableName="kiekot">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="kiekot_pkey" />
+			</column>
+			<column name="member_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="mold_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="muovi_id" type="INT" />
+			<column name="vari_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="kuva" type="VARCHAR(50)">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueNumeric="100" name="paino" type="INT" />
+			<column defaultValueNumeric="0" name="kunto" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="hohto" type="BOOLEAN" />
+			<column name="spessu" type="BOOLEAN" />
+			<column name="dyed" type="BOOLEAN">
+				<constraints nullable="false" />
+			</column>
+			<column name="swirly" type="BOOLEAN">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueNumeric="0" name="tussit" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="myynnissa" type="BOOLEAN" />
+			<column defaultValueNumeric="0" name="hinta" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValue="NULL::character varying" name="muuta"
+				type="VARCHAR(500)" />
+			<column name="loytokiekko" type="BOOLEAN" />
+			<column name="itb" type="BOOLEAN">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueBoolean="false" name="public" type="BOOLEAN">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-3">
+		<createTable tableName="kirppis">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="kirppis_pkey" />
+			</column>
+			<column name="kiekko_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="member_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValue="NULL::character varying" name="loytopaikka"
+				type="VARCHAR(100)" />
+			<column name="puhelin" type="VARCHAR(15)">
+				<constraints nullable="false" />
+			</column>
+			<column name="hakupaikka" type="VARCHAR(25)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-4">
+		<createTable tableName="members">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="members_pkey" />
+			</column>
+			<column name="username" type="VARCHAR(50)">
+				<constraints nullable="false" />
+			</column>
+			<column name="email" type="VARCHAR(50)">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueNumeric="1" name="level" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValue="-" name="etunimi" type="VARCHAR(20)">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValue="-" name="sukunimi" type="VARCHAR(20)">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueNumeric="0" name="pdga_num" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueBoolean="false" name="public_list" type="BOOLEAN">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueBoolean="false" name="public_disc_count"
+				type="BOOLEAN">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-5">
+		<createTable tableName="ostot">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="ostot_pkey" />
+			</column>
+			<column name="kiekko_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="myyja" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="ostaja" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueNumeric="0" name="status" type="INT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-6">
+		<createTable tableName="r_mold">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="r_mold_pkey" />
+			</column>
+			<column defaultValueNumeric="1" name="valmistaja_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="kiekko" type="VARCHAR(25)">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueNumeric="0" name="nopeus" type="numeric(5, 1)">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueNumeric="0" name="liito" type="numeric(5, 1)">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueNumeric="0" name="vakaus" type="numeric(5, 1)">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueNumeric="0" name="feidi" type="numeric(5, 1)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-7">
+		<createTable tableName="r_muovi">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="r_muovi_pkey" />
+			</column>
+			<column name="muovi" type="VARCHAR(25)">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueNumeric="1" name="valmistaja_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-8">
+		<createTable tableName="r_valm">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="r_valm_pkey" />
+			</column>
+			<column name="valmistaja" type="VARCHAR(25)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-9">
+		<createTable tableName="r_vari">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="r_vari_pkey" />
+			</column>
+			<column name="vari" type="VARCHAR(25)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-10">
+		<createTable tableName="wanted">
+			<column autoIncrement="true" name="wanted_id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="wanted_pkey" />
+			</column>
+			<column name="member_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="mold_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueNumeric="1" name="muovi_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="vari" type="VARCHAR(20)">
+				<constraints nullable="false" />
+			</column>
+			<column name="paino" type="VARCHAR(7)">
+				<constraints nullable="false" />
+			</column>
+			<column name="muuta" type="VARCHAR(100)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-11">
+		<addForeignKeyConstraint baseColumnNames="member_id"
+			baseTableName="kiekot" constraintName="kiekot_ibfk_1" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
+			referencedColumnNames="id" referencedTableName="members" />
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-12">
+		<addForeignKeyConstraint baseColumnNames="mold_id"
+			baseTableName="kiekot" constraintName="kiekot_ibfk_2" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
+			referencedColumnNames="id" referencedTableName="r_mold" />
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-13">
+		<addForeignKeyConstraint baseColumnNames="muovi_id"
+			baseTableName="kiekot" constraintName="kiekot_ibfk_3" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
+			referencedColumnNames="id" referencedTableName="r_muovi" />
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-14">
+		<addForeignKeyConstraint baseColumnNames="vari_id"
+			baseTableName="kiekot" constraintName="kiekot_ibfk_4" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
+			referencedColumnNames="id" referencedTableName="r_vari" />
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-15">
+		<addForeignKeyConstraint baseColumnNames="kiekko_id"
+			baseTableName="kirppis" constraintName="kirppis_ibfk_1" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
+			referencedColumnNames="id" referencedTableName="kiekot" />
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-16">
+		<addForeignKeyConstraint baseColumnNames="member_id"
+			baseTableName="kirppis" constraintName="kirppis_ibfk_2" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
+			referencedColumnNames="id" referencedTableName="members" />
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-17">
+		<addForeignKeyConstraint baseColumnNames="myyja"
+			baseTableName="ostot" constraintName="ostot_ibfk_1" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
+			referencedColumnNames="id" referencedTableName="members" />
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-18">
+		<addForeignKeyConstraint baseColumnNames="ostaja"
+			baseTableName="ostot" constraintName="ostot_ibfk_2" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
+			referencedColumnNames="id" referencedTableName="members" />
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-19">
+		<addForeignKeyConstraint baseColumnNames="kiekko_id"
+			baseTableName="ostot" constraintName="ostot_ibfk_3" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
+			referencedColumnNames="id" referencedTableName="kiekot" />
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-20">
+		<addForeignKeyConstraint baseColumnNames="valmistaja_id"
+			baseTableName="r_mold" constraintName="r_mold_ibfk_1" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
+			referencedColumnNames="id" referencedTableName="r_valm" />
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-21">
+		<addForeignKeyConstraint baseColumnNames="valmistaja_id"
+			baseTableName="r_muovi" constraintName="r_muovi_ibfk_1" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
+			referencedColumnNames="id" referencedTableName="r_valm" />
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-22">
+		<addForeignKeyConstraint baseColumnNames="member_id"
+			baseTableName="wanted" constraintName="wanted_ibfk_1" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
+			referencedColumnNames="id" referencedTableName="members" />
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-23">
+		<addForeignKeyConstraint baseColumnNames="mold_id"
+			baseTableName="wanted" constraintName="wanted_ibfk_2" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
+			referencedColumnNames="id" referencedTableName="r_mold" />
+	</changeSet>
+	<changeSet author="ville (generated)" id="1523445880553-24">
+		<addForeignKeyConstraint baseColumnNames="muovi_id"
+			baseTableName="wanted" constraintName="wanted_ibfk_3" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
+			referencedColumnNames="id" referencedTableName="r_muovi" />
+	</changeSet>
+</databaseChangeLog>

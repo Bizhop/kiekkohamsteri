@@ -1,5 +1,6 @@
 package fi.bizhop.kiekkohamsteri.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -56,6 +57,10 @@ public class Kiekot {
 	@NotNull
 	private Boolean itb;
 	
+	@Column(name="public")
+	@NotNull
+	private Boolean publicDisc;
+	
 	public Kiekot() {} //default constructor
 	
 	public Kiekot(Members user, R_mold defaultMold, R_muovi defaultMuovi, R_vari defaultVari) {
@@ -76,6 +81,7 @@ public class Kiekot {
 		this.muuta = "";
 		this.loytokiekko = false;
 		this.itb = false;
+		this.publicDisc = false;
 	}
 	
 	public Long getId() {
@@ -203,5 +209,13 @@ public class Kiekot {
 	public Kiekot setItb(Boolean itb) {
 		this.itb = itb;
 		return this;
+	}
+
+	public Boolean getPublicDisc() {
+		return publicDisc;
+	}
+
+	public void setPublicDisc(Boolean publicDisc) {
+		this.publicDisc = publicDisc;
 	}
 }
