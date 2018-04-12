@@ -30,6 +30,9 @@ public class Members {
 	@NotNull
 	private Boolean publicDiscCount;
 	
+	@Column(name="disc_count")
+	private Integer discCount;
+	
 	public Members() {}
 	
 	public Members(String userEmail) {
@@ -41,6 +44,7 @@ public class Members {
 		this.pdga_num = 0;
 		this.publicList = false;
 		this.publicDiscCount = false;
+		this.discCount = 0;
 	}
 	public Long getId() {
 		return id;
@@ -95,5 +99,21 @@ public class Members {
 	}
 	public void setPublicDiscCount(Boolean publicDiscCount) {
 		this.publicDiscCount = publicDiscCount;
+	}
+
+	public Integer getDiscCount() {
+		return discCount;
+	}
+
+	public void setDiscCount(Integer discCount) {
+		this.discCount = discCount;
+	}
+	
+	public void addDisc() {
+		this.discCount++;
+	}
+	
+	public void removeDisc() {
+		this.discCount--;
 	}
 }

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import fi.bizhop.kiekkohamsteri.db.KiekkoRepository;
+import fi.bizhop.kiekkohamsteri.db.MembersRepository;
 import fi.bizhop.kiekkohamsteri.db.MoldRepository;
 import fi.bizhop.kiekkohamsteri.db.MuoviRepository;
 import fi.bizhop.kiekkohamsteri.db.VariRepository;
@@ -34,6 +35,8 @@ public class KiekkoService {
 	private MuoviRepository muoviRepo;
 	@Autowired
 	private VariRepository variRepo;
+	@Autowired
+	private MembersRepository membersRepo;
 
 	public Page<KiekkoProjection> haeKiekot(Members owner, Pageable pageable) {
 		return kiekkoRepo.findByMember(owner, pageable);
@@ -47,6 +50,9 @@ public class KiekkoService {
 		Kiekot kiekko = new Kiekot(owner, defaultMold, defaultMuovi, defaultVari);
 		kiekko.setTussit(1);
 		kiekko = kiekkoRepo.save(kiekko);
+		
+		owner.addDisc();
+		membersRepo.save(owner);
 		
 		return kiekkoRepo.findById(kiekko.getId());
 	}
@@ -66,6 +72,9 @@ public class KiekkoService {
 		}
 		
 		kiekkoRepo.delete(id);
+		
+		owner.removeDisc();
+		membersRepo.save(owner);
 	}
 	
 	public KiekkoProjection paivitaKiekko(KiekkoDto dto, Long id, Members owner) throws AuthorizationException {

@@ -301,4 +301,9 @@
 			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="CASCADE"
 			referencedColumnNames="id" referencedTableName="r_muovi" />
 	</changeSet>
+	<changeSet id="addMembersDiscCount" author="Ville">
+		<addColumn tableName="members">
+			<column name="disc_count" type="INT" defaultValue="0"/>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>

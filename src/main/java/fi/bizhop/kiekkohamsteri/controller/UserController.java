@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fi.bizhop.kiekkohamsteri.dto.UserUpdateDto;
 import fi.bizhop.kiekkohamsteri.model.Members;
+import fi.bizhop.kiekkohamsteri.projection.LeaderProjection;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.MemberService;
 
@@ -74,7 +75,7 @@ public class UserController extends BaseController {
 		}
 	}
 	
-	@RequestMapping(value = "/user/{id}/level/{level}", method = RequestMethod.PATCH, produces= "application/json") 
+	@RequestMapping(value = "/user/{id}/level/{level}", method = RequestMethod.PATCH, produces = "application/json") 
 	public @ResponseBody Members setUserLevel(@PathVariable Long id, @PathVariable Integer level, HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug(String.format("UserController.setUserLevel(%d, %d)...", id, level));
 		
@@ -87,6 +88,21 @@ public class UserController extends BaseController {
 		else {
 			response.setStatus(HttpServletResponse.SC_OK);
 			return memberService.setUserLevel(id, level);
+		}
+	}
+	
+	@RequestMapping(value = "/user/leaders", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody List<LeaderProjection> getLeaders(HttpServletRequest request, HttpServletResponse response) {
+		LOG.debug("UserController.getLeaders(%d, %d)...");
+		
+		Members authUser = authService.getUser(request);
+		if(authUser == null) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return null;
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_OK);
+			return memberService.getLeaders();
 		}
 	}
 }

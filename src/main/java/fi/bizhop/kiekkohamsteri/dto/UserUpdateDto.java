@@ -5,6 +5,7 @@ public class UserUpdateDto {
 	private String etunimi;
 	private String sukunimi;
 	private Integer pdga_num;
+	private Boolean publicDiscCount;
 	
 	public String getUsername() {
 		return username;
@@ -33,6 +34,12 @@ public class UserUpdateDto {
 	public UserUpdateDto setPdga_num(Integer pdga_num) {
 		this.pdga_num = pdga_num;
 		return this;
+	}
+	public Boolean getPublicDiscCount() {
+		return publicDiscCount;
+	}
+	public void setPublicDiscCount(Boolean publicDiscCount) {
+		this.publicDiscCount = publicDiscCount;
 	}
 	
 
