@@ -27,6 +27,7 @@ public class Members {
 	private Boolean publicList;
 	
 	@Column(name="public_disc_count")
+	@NotNull
 	private Boolean publicDiscCount;
 	
 	public Members() {}
