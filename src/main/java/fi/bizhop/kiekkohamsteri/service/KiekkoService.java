@@ -110,6 +110,16 @@ public class KiekkoService {
 	public Page<KiekkoProjection> haeMyytavat(Pageable pageable) {
 		return kiekkoRepo.findByMyynnissaTrue(pageable);
 	}
+
+	public KiekkoProjection haeKiekko(Members owner, Long id) throws AuthorizationException {
+		KiekkoProjection kiekko = kiekkoRepo.findById(id);
+		if(owner.getUsername().equals(kiekko.getOmistaja()) || kiekko.getPublicDisc()) {
+			return kiekko;
+		}
+		else {
+			throw new AuthorizationException();
+		}
+	}
 	
 	
 

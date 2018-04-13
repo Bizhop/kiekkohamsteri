@@ -96,6 +96,27 @@ public class KiekotController extends BaseController {
 		}
 	}
 	
+	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody KiekkoProjection haeKiekko(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
+		LOG.debug(String.format("KiekotController.haeKiekko(%d)...", id));
+		
+		Members owner = authService.getUser(request);
+		if(owner == null) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return null;
+		}
+		else {
+			try {
+				response.setStatus(HttpServletResponse.SC_OK);
+				return kiekkoService.haeKiekko(owner, id);
+			}
+			catch (AuthorizationException ae) {
+				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+				return null;
+			}
+		}
+	}
+	
 	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
 	public @ResponseBody KiekkoProjection paivitaKiekko(@PathVariable Long id, @RequestBody KiekkoDto dto, HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug(String.format("KiekotController.paivitaKiekko(%d)...", id));

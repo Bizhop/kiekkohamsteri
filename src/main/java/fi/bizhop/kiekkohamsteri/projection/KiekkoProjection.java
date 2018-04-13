@@ -43,4 +43,5 @@ public interface KiekkoProjection {
 	String getMuuta();
 	Boolean getLoytokiekko();
 	Boolean getItb();
+	Boolean getPublicDisc();
 }
