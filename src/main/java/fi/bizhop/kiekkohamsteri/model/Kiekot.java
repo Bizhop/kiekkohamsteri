@@ -75,7 +75,7 @@ public class Kiekot {
 		this.spessu = false;
 		this.dyed = false;
 		this.swirly = false;
-		this.tussit = 0;
+		this.tussit = 1;
 		this.myynnissa = false;
 		this.hinta = 0;
 		this.muuta = "";
