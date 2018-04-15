@@ -2,6 +2,7 @@ package fi.bizhop.kiekkohamsteri.service;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,18 +10,22 @@ import org.springframework.stereotype.Service;
 import fi.bizhop.kiekkohamsteri.db.KiekkoRepository;
 import fi.bizhop.kiekkohamsteri.db.MembersRepository;
 import fi.bizhop.kiekkohamsteri.dto.UserUpdateDto;
+import fi.bizhop.kiekkohamsteri.model.Kiekot;
 import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.projection.LeaderProjection;
 import fi.bizhop.kiekkohamsteri.util.Utils;
 
 @Service
 public class MemberService {
+	private static final Logger LOG = Logger.getLogger(MemberService.class);
+	
 	@Autowired
 	MembersRepository membersRepo;
 	@Autowired
 	KiekkoRepository kiekkoRepo;
 
 	public List<Members> getUsers() {
+		updateDiscCounts();
 		return membersRepo.findAllByOrderById();
 	}
 
@@ -58,4 +63,13 @@ public class MemberService {
 		return membersRepo.findByPublicDiscCountTrueOrderByDiscCountDesc();
 	}
 
+	private void updateDiscCounts() {
+		Iterable<Members> members = membersRepo.findAll();
+		for(Members m : members) {
+			List<Kiekot> kiekot = kiekkoRepo.findByMember(m);
+			m.setDiscCount(kiekot.size());
+			membersRepo.save(m);
+			LOG.debug(String.format("Updated member %d disc count to %d", m.getId(), kiekot.size()));
+		}
+	}
 }
