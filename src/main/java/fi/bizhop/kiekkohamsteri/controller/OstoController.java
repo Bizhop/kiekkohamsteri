@@ -29,19 +29,28 @@ public class OstoController extends BaseController {
 	AuthService authService;
 
 	@RequestMapping(value = "/ostot", method = RequestMethod.GET)
-	public @ResponseBody List<Ostot> list(@RequestParam(value = "status", required = false) Status status ) {
-		if(status == null) {
-			return ostoService.list();
+	public @ResponseBody List<Ostot> list(@RequestParam(value = "status", required = false) Status status, HttpServletRequest request, HttpServletResponse response ) {
+		LOG.debug(String.format("OstoController.list(%s)...", status == null ? null : status.toString()));
+
+		Members user = authService.getUser(request);
+		if(user == null) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return null;
 		}
 		else {
-			return ostoService.list(status);
+			if(status == null) {
+				return ostoService.list();
+			}
+			else {
+				return ostoService.list(status);
+			}
 		}
 	}
-	
+
 	@RequestMapping(value = "/ostot/omat", method = RequestMethod.GET)
 	public @ResponseBody OstotDto omat(HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug("OstoController.omat()...");
-		
+
 		Members user = authService.getUser(request);
 		if(user == null) {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -69,7 +78,7 @@ public class OstoController extends BaseController {
 			}
 		}
 	}
-	
+
 	@RequestMapping(value = "/ostot/{id}/reject", method = RequestMethod.POST)
 	public void reject(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug(String.format("OstoController.reject(%d)...", id));

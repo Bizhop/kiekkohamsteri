@@ -14,6 +14,8 @@ COPY dd_arvot (id, valikko, nimi, arvo) FROM stdin;
 29	kunto	Jätettä (4)	4
 \.
 
+SELECT pg_catalog.setval('dd_arvot_id_seq', 30, false);
+
 COPY members (id, username, email, level, etunimi, sukunimi, pdga_num) FROM stdin;
 2	pekkanyk	qru1982@gmail.com	2	Pekka	Nykänen	90313
 28	kkiki	kiti.eerola@gmail.com	1	Kiti	Eerola	79819
@@ -21,6 +23,8 @@ COPY members (id, username, email, level, etunimi, sukunimi, pdga_num) FROM stdi
 27	kurre	juha.orava@gmail.com	1	Juha	Orava	79889
 1	Bisse	ville.piispa@gmail.com	2	Ville	Piispa	90315
 \.
+
+SELECT pg_catalog.setval('members_id_seq', 28, true);
 
 COPY r_valm (id, valmistaja) FROM stdin;
 1	ABC Discs
@@ -48,6 +52,8 @@ COPY r_valm (id, valmistaja) FROM stdin;
 23	Westside Discs
 24	Yikun Sports
 \.
+
+SELECT pg_catalog.setval('r_valm_id_seq', 25, false);
 
 COPY r_mold (id, valmistaja_id, kiekko, nopeus, liito, vakaus, feidi) FROM stdin;
 568	11	Tern (star)	12.0	6.0	-3.0	2.0
@@ -534,6 +540,7 @@ COPY r_mold (id, valmistaja_id, kiekko, nopeus, liito, vakaus, feidi) FROM stdin
 1051	11	AviarX3	3.0	2.0	0.0	3.0
 \.
 
+SELECT pg_catalog.setval('r_mold_id_seq', 1051, true);
 
 COPY r_muovi (id, muovi, valmistaja_id) FROM stdin;
 1	 Eclipse Proton	17
@@ -681,6 +688,8 @@ COPY r_muovi (id, muovi, valmistaja_id) FROM stdin;
 146	Cryztal Z	7
 \.
 
+SELECT pg_catalog.setval('r_muovi_id_seq', 146, true);
+
 COPY r_vari (id, vari) FROM stdin;
 1	ANY
 2	Harmaa
@@ -698,6 +707,8 @@ COPY r_vari (id, vari) FROM stdin;
 14	Valkoinen
 15	Vihreä
 \.
+
+SELECT pg_catalog.setval('r_vari_id_seq', 16, false);
 
 COPY kiekot (id, member_id, mold_id, muovi_id, vari_id, kuva, paino, kunto, hohto, spessu, dyed, swirly, tussit, myynnissa, hinta, muuta, loytokiekko, itb) FROM stdin;
 3	2	844	24	9	kiekko_1490124214.jpg	168	10	f	t	f	f	1	t	40		f	f
@@ -859,7 +870,11 @@ COPY kiekot (id, member_id, mold_id, muovi_id, vari_id, kuva, paino, kunto, hoht
 216	1	869	56	14	Bizhop-216	173	10	t	f	f	f	1	f	0		f	f
 \.
 
+SELECT pg_catalog.setval('kiekot_id_seq', 237, true);
+
 COPY wanted (wanted_id, member_id, mold_id, muovi_id, vari, paino, muuta) FROM stdin;
 2	27	596	25	Oranssi	168-171	
 8	2	854	31	ANY	170-175	Halvalla
 \.
+
+SELECT pg_catalog.setval('wanted_wanted_id_seq', 9, false);

@@ -17,6 +17,7 @@ public class KiekkoDto {
 	private String muuta;
 	private Boolean loytokiekko;
 	private Boolean itb;
+	private Boolean publicDisc;
 	
 	public Long getMoldId() {
 		return moldId;
@@ -128,6 +129,13 @@ public class KiekkoDto {
 	}
 	public KiekkoDto setItb(Boolean itb) {
 		this.itb = itb;
+		return this;
+	}
+	public Boolean getPublicDisc() {
+		return publicDisc;
+	}
+	public KiekkoDto setPublicDisc(Boolean publicDisc) {
+		this.publicDisc = publicDisc;
 		return this;
 	}
 	

@@ -96,6 +96,29 @@ public class KiekotController extends BaseController {
 		}
 	}
 	
+	@RequestMapping(value = "/kiekot/{id}/update-image", method = RequestMethod.PATCH, produces = "application/json", consumes = "application/json")
+	public void paivitaKuva(@PathVariable Long id, @RequestBody UploadDto dto, HttpServletRequest request, HttpServletResponse response) {
+		LOG.debug(String.format("KiekotController.paivitaKuva(%d)...", id));
+		
+		Members owner = authService.getUser(request);
+		if(owner == null) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		}
+		else {
+			try {
+				KiekkoProjection kiekko = kiekkoService.haeKiekko(owner, id);
+				uploadService.upload(dto, kiekko.getKuva());
+				response.setStatus(HttpServletResponse.SC_OK);
+			}
+			catch (AuthorizationException e) {
+				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			}
+			catch (IOException e) {
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
+		}
+	}
+	
 	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody KiekkoProjection haeKiekko(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug(String.format("KiekotController.haeKiekko(%d)...", id));
