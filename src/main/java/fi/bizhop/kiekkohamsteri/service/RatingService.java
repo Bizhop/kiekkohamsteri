@@ -169,7 +169,7 @@ public class RatingService {
 	}
 
 	private static int calculateNextRating(List<RoundDto> rounds) {
-		int doubleRounds = rounds.size() > 7 ? rounds.size() / 4 : 0;
+		int doubleRounds = rounds.size() > 7 ? (int) Math.ceil(rounds.size() * 0.25) : 0;
 		int totalRating = 0;
 		int totalHoles = 0;
 

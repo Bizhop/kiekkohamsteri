@@ -93,7 +93,7 @@ public class UserController extends BaseController {
 	
 	@RequestMapping(value = "/user/leaders", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody List<LeaderProjection> getLeaders(HttpServletRequest request, HttpServletResponse response) {
-		LOG.debug("UserController.getLeaders(%d, %d)...");
+		LOG.debug("UserController.getLeaders()...");
 		
 		Members authUser = authService.getUser(request);
 		if(authUser == null) {
