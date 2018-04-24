@@ -1,6 +1,7 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -8,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -107,7 +109,13 @@ public class KiekotController extends BaseController {
 		else {
 			try {
 				KiekkoProjection kiekko = kiekkoService.haeKiekko(owner, id);
-				uploadService.upload(dto, kiekko.getKuva());
+				String kuva = kiekko.getKuva();
+				String uusiKuva = kuva + "-" + new Date().getTime();
+				if(StringUtils.countOccurrencesOf(kuva, "-") > 1) {
+					uusiKuva = kuva.substring(0, kuva.lastIndexOf("-")) + "-" + new Date().getTime();
+				}
+				uploadService.upload(dto, uusiKuva);
+				kiekkoService.paivitaKuva(kiekko.getId(), uusiKuva);
 				response.setStatus(HttpServletResponse.SC_OK);
 			}
 			catch (AuthorizationException e) {

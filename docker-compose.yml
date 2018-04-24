@@ -19,3 +19,5 @@ services:
     links:
      - db
     container_name: kiekkohamsteri-backend
+    environment:
+     - CLOUDINARY_URL
