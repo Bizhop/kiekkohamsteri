@@ -2,6 +2,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <property name="now" value="now()" dbms="postgresql"/>
 	<changeSet author="ville (generated)" id="1523445880553-1">
 		<createTable tableName="dd_arvot">
 			<column autoIncrement="true" name="id" type="SERIAL">
@@ -304,6 +305,54 @@
 	<changeSet id="addMembersDiscCount" author="Ville">
 		<addColumn tableName="members">
 			<column name="disc_count" type="INT" defaultValue="0"/>
+		</addColumn>
+	</changeSet>
+	<changeSet id="addKiekotTimestamps" author="Ville">
+		<addColumn tableName="kiekot">
+			<column name="created_at" type="DATETIME" defaultValueDate="${now}"  >
+				<constraints nullable="false" />
+			</column>
+			<column name="updated_at" type="DATETIME" />
+		</addColumn>
+	</changeSet>
+	<changeSet id="addOtherTimestamps" author="ville">
+		<addColumn tableName="members">
+			<column name="created_at" type="DATETIME" defaultValueDate="${now}"  >
+				<constraints nullable="false" />
+			</column>
+			<column name="updated_at" type="DATETIME" />
+		</addColumn>
+		<addColumn tableName="r_mold">
+			<column name="created_at" type="DATETIME" defaultValueDate="${now}"  >
+				<constraints nullable="false" />
+			</column>
+			<column name="updated_at" type="DATETIME" />
+		</addColumn>
+		<addColumn tableName="r_muovi">
+			<column name="created_at" type="DATETIME" defaultValueDate="${now}"  >
+				<constraints nullable="false" />
+			</column>
+			<column name="updated_at" type="DATETIME" />
+		</addColumn>
+		<addColumn tableName="r_valm">
+			<column name="created_at" type="DATETIME" defaultValueDate="${now}"  >
+				<constraints nullable="false" />
+			</column>
+			<column name="updated_at" type="DATETIME" />
+		</addColumn>
+		<addColumn tableName="r_vari">
+			<column name="created_at" type="DATETIME" defaultValueDate="${now}"  >
+				<constraints nullable="false" />
+			</column>
+			<column name="updated_at" type="DATETIME" />
+		</addColumn>
+	</changeSet>
+	<changeSet id="addOstotTimestamps" author="Ville">
+		<addColumn tableName="ostot">
+			<column name="created_at" type="DATETIME" defaultValueDate="${now}"  >
+				<constraints nullable="false" />
+			</column>
+			<column name="updated_at" type="DATETIME" />
 		</addColumn>
 	</changeSet>
 </databaseChangeLog>

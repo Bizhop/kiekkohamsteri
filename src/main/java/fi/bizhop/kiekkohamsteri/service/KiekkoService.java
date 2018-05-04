@@ -1,6 +1,8 @@
 package fi.bizhop.kiekkohamsteri.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.springframework.beans.BeanUtils;
@@ -15,6 +17,7 @@ import fi.bizhop.kiekkohamsteri.db.MoldRepository;
 import fi.bizhop.kiekkohamsteri.db.MuoviRepository;
 import fi.bizhop.kiekkohamsteri.db.VariRepository;
 import fi.bizhop.kiekkohamsteri.dto.KiekkoDto;
+import fi.bizhop.kiekkohamsteri.dto.ListausDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.model.Kiekot;
 import fi.bizhop.kiekkohamsteri.model.Members;
@@ -48,6 +51,9 @@ public class KiekkoService {
 		R_vari defaultVari = variRepo.findOne(1L);
 		
 		Kiekot kiekko = new Kiekot(owner, defaultMold, defaultMuovi, defaultVari);
+		if(owner.getPublicList()) {
+			kiekko.setPublicDisc(true);
+		}
 		kiekko = kiekkoRepo.save(kiekko);
 		
 		owner.addDisc();
@@ -119,7 +125,19 @@ public class KiekkoService {
 			throw new AuthorizationException();
 		}
 	}
-	
-	
 
+	public List<ListausDto> haeJulkisetListat() {
+		List<Members> julkiset = membersRepo.findByPublicListTrue();
+		
+		List<ListausDto> response = new ArrayList<ListausDto>();
+		
+		for(Members m : julkiset) {
+			Page<KiekkoProjection> pages = kiekkoRepo.findByMember(m, null);
+			ListausDto listaus = new ListausDto(pages.getContent());
+			listaus.setUsername(m.getUsername());
+			response.add(listaus);
+		}
+		
+		return response;
+	}
 }

@@ -39,6 +39,10 @@ public class MemberService {
 		String[] ignoreNulls = Utils.getNullPropertyNames(dto);
 		BeanUtils.copyProperties(dto, user, ignoreNulls);
 		
+		if(dto.getPublicList()) {
+			membersRepo.makeDiscsPublic(user);
+		}
+		
 		membersRepo.save(user);
 		return membersRepo.findOne(id);
 	}

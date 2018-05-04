@@ -2,6 +2,7 @@ package fi.bizhop.kiekkohamsteri.controller;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import fi.bizhop.kiekkohamsteri.dto.KiekkoDto;
+import fi.bizhop.kiekkohamsteri.dto.ListausDto;
 import fi.bizhop.kiekkohamsteri.dto.UploadDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.model.Members;
@@ -197,6 +199,20 @@ public class KiekotController extends BaseController {
 		}
 		else {
 			ostoService.ostaKiekko(id, user);
+		}
+	}
+	
+	@RequestMapping(value = "/kiekot/public-lists", method = RequestMethod.GET)
+	public List<ListausDto> haeJulkisetListat(HttpServletRequest request, HttpServletResponse response) {
+		LOG.debug("KiekotController.haeJulkisetListat()");
+		
+		Members user = authService.getUser(request);
+		if(user == null) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return null;
+		}
+		else {
+			return kiekkoService.haeJulkisetListat();
 		}
 	}
 }
