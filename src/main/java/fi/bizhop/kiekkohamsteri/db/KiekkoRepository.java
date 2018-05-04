@@ -12,6 +12,7 @@ import fi.bizhop.kiekkohamsteri.projection.KiekkoProjection;
 
 public interface KiekkoRepository extends PagingAndSortingRepository<Kiekot, Long> {
 	Page<KiekkoProjection> findByMember(Members member, Pageable pageable);
+	Page<KiekkoProjection> findByMemberAndPublicDiscTrue(Members member, Pageable pageable);
 	List<Kiekot> findByMember(Members member);
 
 	KiekkoProjection findById(Long id);

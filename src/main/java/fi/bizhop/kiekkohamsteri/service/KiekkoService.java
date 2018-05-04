@@ -8,7 +8,9 @@ import java.util.stream.Stream;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import fi.bizhop.kiekkohamsteri.db.KiekkoRepository;
@@ -131,8 +133,10 @@ public class KiekkoService {
 		
 		List<ListausDto> response = new ArrayList<ListausDto>();
 		
+		Pageable pageable = new PageRequest(0, 1000, Sort.Direction.ASC, "mold.valmistaja.valmistaja", "mold.nopeus", "mold.kiekko", "muovi.muovi");
+		
 		for(Members m : julkiset) {
-			Page<KiekkoProjection> pages = kiekkoRepo.findByMember(m, null);
+			Page<KiekkoProjection> pages = kiekkoRepo.findByMemberAndPublicDiscTrue(m, pageable);
 			ListausDto listaus = new ListausDto(pages.getContent());
 			listaus.setUsername(m.getUsername());
 			response.add(listaus);
