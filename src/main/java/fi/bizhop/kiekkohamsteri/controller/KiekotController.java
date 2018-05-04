@@ -203,8 +203,8 @@ public class KiekotController extends BaseController {
 	}
 	
 	@RequestMapping(value = "/kiekot/public-lists", method = RequestMethod.GET)
-	public List<ListausDto> haeJulkisetListat(HttpServletRequest request, HttpServletResponse response) {
-		LOG.debug("KiekotController.haeJulkisetListat()");
+	public List<ListausDto> haeJulkisetListat(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
+		LOG.debug("KiekotController.haeJulkisetListat(pageable)");
 		
 		Members user = authService.getUser(request);
 		if(user == null) {
@@ -212,7 +212,7 @@ public class KiekotController extends BaseController {
 			return null;
 		}
 		else {
-			return kiekkoService.haeJulkisetListat();
+			return kiekkoService.haeJulkisetListat(pageable);
 		}
 	}
 }
