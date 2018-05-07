@@ -355,4 +355,27 @@
 			<column name="updated_at" type="DATETIME" />
 		</addColumn>
 	</changeSet>
+	<changeSet id="addStatsTable" author="Ville">
+		<createTable tableName="stats">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="stats_pkey" />
+			</column>
+			<column name="year" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="month" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="new_discs" type="INT" />
+			<column name="new_users" type="INT" />
+			<column name="new_manufacturers" type="INT" />
+			<column name="new_plastics" type="INT" />
+			<column name="new_molds" type="INT" />
+			<column name="sales_completed" type="INT" />
+			<column name="created_at" type="DATETIME" defaultValueDate="${now}"  >
+				<constraints nullable="false" />
+			</column>
+			<column name="updated_at" type="DATETIME" />
+		</createTable>
+	</changeSet>
 </databaseChangeLog>

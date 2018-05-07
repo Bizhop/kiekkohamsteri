@@ -1,5 +1,6 @@
 package fi.bizhop.kiekkohamsteri.db;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -21,4 +22,6 @@ public interface MembersRepository extends CrudRepository<Members, Long> {
 	@Modifying(clearAutomatically = true)
 	@Query("update Kiekot k set k.publicDisc = true where k.member = ?1")
 	void makeDiscsPublic(Members user);
+	
+	Integer countByCreatedAtBetween(Date beginDate, Date endDate);
 }

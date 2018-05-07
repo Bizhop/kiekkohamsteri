@@ -1,5 +1,6 @@
 package fi.bizhop.kiekkohamsteri.db;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
@@ -18,4 +19,6 @@ public interface OstoRepository extends CrudRepository<Ostot, Long> {
 	
 	List<Ostot> findByStatusAndMyyja(Status status, Members myyja);
 	List<Ostot> findByStatusAndOstaja(Status status, Members ostaja);
+
+	Integer countByUpdatedAtBetweenAndStatus(Date beginDate, Date endDate, Status confirmed);
 }

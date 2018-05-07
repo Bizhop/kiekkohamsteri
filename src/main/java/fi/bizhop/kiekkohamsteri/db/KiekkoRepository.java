@@ -1,5 +1,6 @@
 package fi.bizhop.kiekkohamsteri.db;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -18,4 +19,6 @@ public interface KiekkoRepository extends PagingAndSortingRepository<Kiekot, Lon
 	KiekkoProjection findById(Long id);
 
 	Page<KiekkoProjection> findByMyynnissaTrue(Pageable pageable);
+	
+	Integer countByCreatedAtBetween(Date begin, Date end);
 }
