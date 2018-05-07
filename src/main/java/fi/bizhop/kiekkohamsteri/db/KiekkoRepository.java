@@ -21,4 +21,5 @@ public interface KiekkoRepository extends PagingAndSortingRepository<Kiekot, Lon
 	Page<KiekkoProjection> findByMyynnissaTrue(Pageable pageable);
 	
 	Integer countByCreatedAtBetween(Date begin, Date end);
+	Integer countByMember(Members l);
 }

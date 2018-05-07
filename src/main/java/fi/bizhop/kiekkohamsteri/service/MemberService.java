@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import fi.bizhop.kiekkohamsteri.db.KiekkoRepository;
 import fi.bizhop.kiekkohamsteri.db.MembersRepository;
 import fi.bizhop.kiekkohamsteri.dto.UserUpdateDto;
-import fi.bizhop.kiekkohamsteri.model.Kiekot;
 import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.projection.LeaderProjection;
 import fi.bizhop.kiekkohamsteri.util.Utils;
@@ -60,7 +59,8 @@ public class MemberService {
 		List<Members> leaders = membersRepo.findByPublicDiscCountTrue();
 		for(Members l : leaders) {
 			if(l.getDiscCount() == 0) {
-				l.setDiscCount(kiekkoRepo.findByMember(l).size());
+				Integer count = kiekkoRepo.countByMember(l);
+				l.setDiscCount(count);
 				membersRepo.save(l);
 			}
 		}
@@ -70,10 +70,10 @@ public class MemberService {
 	private void updateDiscCounts() {
 		Iterable<Members> members = membersRepo.findAll();
 		for(Members m : members) {
-			List<Kiekot> kiekot = kiekkoRepo.findByMember(m);
-			m.setDiscCount(kiekot.size());
+			Integer count = kiekkoRepo.countByMember(m);
+			m.setDiscCount(count);
 			membersRepo.save(m);
-			LOG.debug(String.format("Updated member %d disc count to %d", m.getId(), kiekot.size()));
+			LOG.debug(String.format("Updated member %d disc count to %d", m.getId(), count));
 		}
 	}
 }
