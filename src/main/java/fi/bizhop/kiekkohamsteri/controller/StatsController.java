@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -23,30 +22,6 @@ public class StatsController extends BaseController {
 	StatsService statsService;
 	@Autowired
 	AuthService authService;
-	
-	@RequestMapping(value="/stats/generate", method = RequestMethod.POST)
-	public void generateStats(HttpServletRequest request, HttpServletResponse response) {
-		LOG.info("StatsController.generateStats()");
-		
-		if(statsService.generateStats()) {
-			response.setStatus(HttpServletResponse.SC_OK);
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
-	}
-	
-	@RequestMapping(value="/stats/generate/{year}/{month}", method = RequestMethod.POST)
-	public void generateStatsByYearAndMonth(@PathVariable int year, @PathVariable int month, HttpServletRequest request, HttpServletResponse response) {
-		LOG.info(String.format("StatsController.generateStatsByYearAndMonth(%d,%d)", year, month));
-		
-		if(statsService.generateStatsByYearAndMonth(year, month)) {
-			response.setStatus(HttpServletResponse.SC_OK);
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
-	}
 	
 	@RequestMapping(value="/stats", method=RequestMethod.GET, produces = "application/json")
 	public @ResponseBody Page<Stats> getStats(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {

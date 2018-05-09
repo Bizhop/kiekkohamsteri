@@ -16,25 +16,16 @@ public class Scheduler {
 	
 	private static final Logger LOG = Logger.getLogger(Scheduler.class);
 	
-	@Scheduled(cron="0 0 5 1 * *")
-	public void updateLastMonthStats() {
-		LOG.info("Scheduler updating last month stats...");
-		
-		if(statsService.generateStats()) {
-			LOG.info("Scheduled update done");
-		}
-		else {
-			LOG.error("Scheduled update failed");
-		}
-	}
-	
-	@Scheduled(cron="0 0 6 * * *")
-	public void updateCurrentMonthStats() {
+	@Scheduled(cron="0 0 5 * * *")
+	public void updateStats() {
 		LocalDate now = LocalDate.now();
 		int year = now.getYear();
 		int month = now.getMonthValue();
+		if(now.getDayOfMonth() == 1) {
+			month--;
+		}
 		
-		LOG.info(String.format("Scheduler updating current month stats (%d-%d)...", month, year));
+		LOG.info(String.format("Scheduler updating stats (%d-%d)...", month, year));
 		
 		if(statsService.generateStatsByYearAndMonth(year, month)) {
 			LOG.info("Scheduled update done");
@@ -43,5 +34,4 @@ public class Scheduler {
 			LOG.error("Scheduled update failed");
 		}
 	}
-
 }

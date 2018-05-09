@@ -36,13 +36,6 @@ public class StatsService {
 	@Autowired
 	OstoRepository ostoRepo;
 
-	public boolean generateStats() {
-		//last month
-		LocalDate monthBegin = LocalDate.now().minusMonths(1).withDayOfMonth(1);
-		LocalDate monthEnd = LocalDate.now().withDayOfMonth(1);
-		return generateStats(monthBegin, monthEnd);
-	}
-
 	public Page<Stats> getStats(Pageable pageable) {
 		return statsRepo.findAll(pageable);
 	}
@@ -53,13 +46,7 @@ public class StatsService {
 		}
 		LocalDate begin = LocalDate.of(year, month, 1);
 		LocalDate end = begin.plusMonths(1).withDayOfMonth(1);
-		return generateStats(begin, end);
-	}
-	
-	private boolean generateStats(LocalDate begin, LocalDate end) {
-		int year = begin.getYear();
-		int month = begin.getMonthValue();
-		
+				
 		Stats stats = statsRepo.findByYearAndMonth(year, month);
 		if(stats == null) {
 			stats = new Stats(year, month);
