@@ -2,9 +2,10 @@ package fi.bizhop.kiekkohamsteri.service;
 
 import java.time.LocalDate;
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import fi.bizhop.kiekkohamsteri.db.KiekkoRepository;
@@ -42,8 +43,8 @@ public class StatsService {
 		return generateStats(monthBegin, monthEnd);
 	}
 
-	public List<Stats> getStats() {
-		return statsRepo.findAll();
+	public Page<Stats> getStats(Pageable pageable) {
+		return statsRepo.findAll(pageable);
 	}
 
 	public boolean generateStatsByYearAndMonth(int year, int month) {

@@ -1,11 +1,11 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,7 +49,7 @@ public class StatsController extends BaseController {
 	}
 	
 	@RequestMapping(value="/stats", method=RequestMethod.GET, produces = "application/json")
-	public @ResponseBody List<Stats> getStats(HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody Page<Stats> getStats(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
 		LOG.info("StatsController.getStats()");
 		
 		Members user = authService.getUser(request);
@@ -59,7 +59,7 @@ public class StatsController extends BaseController {
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_OK);
-			return statsService.getStats();
+			return statsService.getStats(pageable);
 		}
 	}
 }

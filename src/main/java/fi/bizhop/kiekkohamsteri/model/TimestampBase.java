@@ -10,6 +10,8 @@ import javax.persistence.TemporalType;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @MappedSuperclass
 public class TimestampBase {
 	  @Column(name = "created_at")
@@ -24,6 +26,7 @@ public class TimestampBase {
 
 	  public TimestampBase() {}
 
+	  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSZ", locale = "fi_FI")
 	  public Date getCreatedAt() {
 	    return createdAt;
 	  }
@@ -32,6 +35,7 @@ public class TimestampBase {
 	    this.createdAt = createdAt;
 	  }
 
+	  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSZ", locale = "fi_FI")
 	  public Date getUpdatedAt() {
 	    return updatedAt;
 	  }
