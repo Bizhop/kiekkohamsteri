@@ -155,6 +155,8 @@ public class KiekkoService {
 		}
 		else {
 			k.setLost(false);
+			k.setMyynnissa(false);
+			k.setItb(false);
 			kiekkoRepo.save(k);
 			return DiscFoundStatus.COMPLETED;
 		}
