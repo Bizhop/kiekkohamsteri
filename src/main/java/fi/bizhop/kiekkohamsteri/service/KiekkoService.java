@@ -42,7 +42,7 @@ public class KiekkoService {
 	private MembersRepository membersRepo;
 
 	public Page<KiekkoProjection> haeKiekot(Members owner, Pageable pageable) {
-		return kiekkoRepo.findByMember(owner, pageable);
+		return kiekkoRepo.findByMemberAndLostFalse(owner, pageable);
 	}
 	
 	public KiekkoProjection uusiKiekko(Members owner) {
@@ -139,5 +139,28 @@ public class KiekkoService {
 		}
 		
 		return response;
+	}
+	
+	public Page<KiekkoProjection> getLost(Pageable pageable) {
+		return kiekkoRepo.findByLostTrue(pageable);
+	}
+	
+	public DiscFoundStatus found(Members user, Long id) {
+		Kiekot k = kiekkoRepo.findOne(id);
+		if(k.getMember() != user) {
+			return DiscFoundStatus.NOT_OWNED;
+		}
+		else if(!k.getLost()) {
+			return DiscFoundStatus.NOT_LOST;
+		}
+		else {
+			k.setLost(false);
+			kiekkoRepo.save(k);
+			return DiscFoundStatus.COMPLETED;
+		}
+	}
+	
+	public enum DiscFoundStatus {
+		NOT_LOST, NOT_OWNED, COMPLETED
 	}
 }

@@ -1,6 +1,10 @@
 package fi.bizhop.kiekkohamsteri.projection;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Value;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public interface KiekkoProjection {
 	Long getId();	
@@ -44,4 +48,9 @@ public interface KiekkoProjection {
 	Boolean getLoytokiekko();
 	Boolean getItb();
 	Boolean getPublicDisc();
+	Boolean getLost();
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", locale = "fi_FI")
+	Date getCreatedAt();
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", locale = "fi_FI")
+	Date getUpdatedAt();
 }

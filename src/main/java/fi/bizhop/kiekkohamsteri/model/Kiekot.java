@@ -61,6 +61,9 @@ public class Kiekot extends TimestampBase {
 	@NotNull
 	private Boolean publicDisc;
 	
+	@NotNull
+	private Boolean lost;
+	
 	public Kiekot() {} //default constructor
 	
 	public Kiekot(Members user, R_mold defaultMold, R_muovi defaultMuovi, R_vari defaultVari) {
@@ -82,6 +85,7 @@ public class Kiekot extends TimestampBase {
 		this.loytokiekko = false;
 		this.itb = false;
 		this.publicDisc = false;
+		this.lost = false;
 	}
 	
 	public Long getId() {
@@ -217,5 +221,13 @@ public class Kiekot extends TimestampBase {
 
 	public void setPublicDisc(Boolean publicDisc) {
 		this.publicDisc = publicDisc;
+	}
+
+	public Boolean getLost() {
+		return lost;
+	}
+
+	public void setLost(Boolean lost) {
+		this.lost = lost;
 	}
 }

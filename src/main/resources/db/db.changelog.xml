@@ -378,4 +378,11 @@
 			<column name="updated_at" type="DATETIME" />
 		</createTable>
 	</changeSet>
+	<changeSet id="addLostDisc" author="Ville">
+		<addColumn tableName="kiekot">
+			<column defaultValueBoolean="false" name="lost" type="BOOLEAN">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>

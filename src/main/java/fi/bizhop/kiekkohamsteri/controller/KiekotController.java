@@ -215,4 +215,43 @@ public class KiekotController extends BaseController {
 			return kiekkoService.haeJulkisetListat(pageable);
 		}
 	}
+	
+	@RequestMapping(value = "/kiekot/lost", method = RequestMethod.GET)
+	public Page<KiekkoProjection> getLost(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
+		LOG.debug("KiekotController.getLost(pageable)");
+		
+		Members user = authService.getUser(request);
+		if(user == null) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return null;
+		}
+		else {
+			return kiekkoService.getLost(pageable);
+		}
+	}
+	
+	@RequestMapping(value = "/kiekot/{id}/found", method = RequestMethod.PATCH)
+	public void found(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
+		LOG.debug(String.format("KiekotController.found(%d)", id));
+		
+		Members user = authService.getUser(request);
+		if(user == null) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		}
+		else {
+			switch (kiekkoService.found(user, id)) {
+			case NOT_OWNED:
+				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+				break;
+			case NOT_LOST:
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				break;
+			case COMPLETED:
+				response.setStatus(HttpServletResponse.SC_OK);
+				break;
+			default:
+				break;
+			}
+		}
+	}
 }

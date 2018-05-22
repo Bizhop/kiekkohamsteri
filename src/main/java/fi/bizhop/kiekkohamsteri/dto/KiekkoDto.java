@@ -18,6 +18,7 @@ public class KiekkoDto {
 	private Boolean loytokiekko;
 	private Boolean itb;
 	private Boolean publicDisc;
+	private Boolean lost;
 	
 	public Long getMoldId() {
 		return moldId;
@@ -136,6 +137,13 @@ public class KiekkoDto {
 	}
 	public KiekkoDto setPublicDisc(Boolean publicDisc) {
 		this.publicDisc = publicDisc;
+		return this;
+	}
+	public Boolean getLost() {
+		return lost;
+	}
+	public KiekkoDto setLost(Boolean lost) {
+		this.lost = lost;
 		return this;
 	}
 	
