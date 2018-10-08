@@ -16,8 +16,6 @@ services:
      - "8181:8181"
     depends_on:
      - db
-    links:
-     - db
     container_name: kiekkohamsteri-backend
     environment:
      - CLOUDINARY_URL
