@@ -107,7 +107,12 @@ public class KiekkoService {
 			R_vari vari = variRepo.findOne(dto.getVariId());
 			kiekko.setVari(vari);
 		}
-		
+
+		if(dto.getLost() != null && dto.getLost()) {
+			kiekko.setItb(false);
+			kiekko.setMyynnissa(false);
+		}
+
 		kiekkoRepo.save(kiekko);
 		return kiekkoRepo.findById(id);
 	}
