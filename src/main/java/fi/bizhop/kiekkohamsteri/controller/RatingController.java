@@ -29,7 +29,7 @@ public class RatingController extends BaseController {
 	@RequestMapping(value = "/rating", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
     public Integer getRating(@RequestBody List<RoundDto> rounds, HttpServletResponse response) {
 	    try {
-	        return ratingService.getRating(rounds).getNextRating();
+	        return ratingService.getRating(rounds, false).getNextRating();
 	    } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return null;

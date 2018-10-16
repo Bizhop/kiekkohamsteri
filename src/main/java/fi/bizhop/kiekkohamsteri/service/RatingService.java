@@ -62,11 +62,11 @@ public class RatingService {
             LOG.error("Epävirallisten kierrosten haku epäonnistui", e);
         }
 
-        return getRating(rounds);
+        return getRating(rounds, true);
     }
 
-    public RatingDto getRating(List<RoundDto> rounds) {
-        int nextRating = calculateNextRating(rounds);
+    public RatingDto getRating(List<RoundDto> rounds, boolean calculateDoubles) {
+        int nextRating = calculateNextRating(rounds, calculateDoubles);
 
         return new RatingDto(rounds, nextRating);
     }
@@ -161,19 +161,19 @@ public class RatingService {
         return 18;
     }
 
-    private static int calculateNextRating(List<RoundDto> rounds) {
-        int doubleRounds = rounds.size() >= 8 ? (int) Math.ceil(rounds.size() * 0.25) : 0;
+    private static int calculateNextRating(List<RoundDto> rounds, boolean calculateDoubles) {
+        if(calculateDoubles) {
+            int doubleRounds = rounds.size() >= 8 ? (int) Math.ceil(rounds.size() * 0.25) : 0;
+            for (int i = 0; i < rounds.size(); i++) {
+                rounds.get(i).setDoubled(i + doubleRounds >= rounds.size());
+            }
+        }
         int totalRating = 0;
         int totalHoles = 0;
 
-        for (int i = 0; i < rounds.size(); i++) {
-            RoundDto r = rounds.get(i);
+        for (RoundDto r : rounds) {
             if (r.isIncluded()) {
-                int multiplier = 1;
-                if(i + doubleRounds >= rounds.size()) {
-                    multiplier = 2;
-                    r.setDoubled(true);
-                }
+                int multiplier = r.isDoubled() ? 2 : 1;
                 totalRating += r.getRating() * r.getHoles() * multiplier;
                 totalHoles += r.getHoles() * multiplier;
             }
