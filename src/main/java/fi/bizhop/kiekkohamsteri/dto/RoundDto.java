@@ -1,57 +1,19 @@
 package fi.bizhop.kiekkohamsteri.dto;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 public class RoundDto {
-	private String id;
 	private String tournament;
 	private String link;
-	private LocalDate date;
+	private String date;
 	private int round;
 	private int score;
 	private int rating;
 	private int holes;
 	private boolean included;
-	
-	public String getTournament() {
-		return tournament;
-	}
-	
-	public String getLink() {
-		return link;
-	}
+	private boolean doubled;
 
-	public LocalDate getDate() {
-		return date;
-	}
-
-	public int getRound() {
-		return round;
-	}
-
-	public int getScore() {
-		return score;
-	}
-
-	public int getRating() {
-		return rating;
-	}
-
-	public int getHoles() {
-		return holes;
-	}
-
-	public boolean isIncluded() {
-		return included;
-	}
-	
-	public String getId() {
-		return id;
-	}
-
-	public RoundDto(String tournament, String link, LocalDate date, int round, int score, int rating, int holes, boolean included) {
-		this.id = UUID.randomUUID().toString();
+	public RoundDto(String tournament, String link, String date, int round, int score, int rating, int holes, boolean included) {
 		this.tournament = tournament;
 		this.link = link;
 		this.date = date;
@@ -61,4 +23,78 @@ public class RoundDto {
 		this.holes = holes;
 		this.included = included;
 	}
+
+    public RoundDto() {}
+
+    public String getTournament() {
+        return tournament;
+    }
+
+    public void setTournament(String tournament) {
+        this.tournament = tournament;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public int getRound() {
+        return round;
+    }
+
+    public void setRound(int round) {
+        this.round = round;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    public int getHoles() {
+        return holes;
+    }
+
+    public void setHoles(int holes) {
+        this.holes = holes;
+    }
+
+    public boolean isIncluded() {
+        return included;
+    }
+
+    public void setIncluded(boolean included) {
+        this.included = included;
+    }
+
+    public boolean isDoubled() {
+        return doubled;
+    }
+
+    public void setDoubled(boolean doubled) {
+        this.doubled = doubled;
+    }
 }
