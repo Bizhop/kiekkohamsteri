@@ -1,11 +1,6 @@
 package fi.bizhop.kiekkohamsteri.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -21,6 +16,8 @@ public class Members extends TimestampBase {
 	private String etunimi;
 	private String sukunimi;
 	private Integer pdga_num;
+	@Transient
+	private String jwt; //do not persist
 	
 	@Column(name="public_list")
 	@NotNull
@@ -100,8 +97,10 @@ public class Members extends TimestampBase {
 	public void setPublicDiscCount(Boolean publicDiscCount) {
 		this.publicDiscCount = publicDiscCount;
 	}
+    public String getJwt() { return jwt; }
+    public void setJwt(String jwt) { this.jwt = jwt; }
 
-	public Integer getDiscCount() {
+    public Integer getDiscCount() {
 		return discCount;
 	}
 

@@ -19,3 +19,4 @@ services:
     container_name: kiekkohamsteri-backend
     environment:
      - CLOUDINARY_URL
+     - HAMSTERI_JWT_SECRET

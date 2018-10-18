@@ -9,12 +9,11 @@ import org.jsoup.Jsoup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class TokenAuthentication {
-	private static final String HEADER_STRING = "Authorization";
+public class GoogleAuthentication {
 	private static final String GOOGLE_PARSER_URL_TEMPLATE = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=%s";
 
-	public static String getUserEmail(HttpServletRequest request) throws Exception {
-		Map<String, String> claims = getClaims(request);
+	public static String getUserEmail(String token) throws Exception {
+		Map<String, String> claims = getClaims(token);
 
 		if (claims == null || claims.get("email") == null) {
 			return null;
@@ -24,9 +23,7 @@ public class TokenAuthentication {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static Map<String, String> getClaims(HttpServletRequest request) throws Exception {
-		String token = request.getHeader(HEADER_STRING);
-
+	public static Map<String, String> getClaims(String token) throws Exception {
 		if (token == null) {
 			return null;
 		}
