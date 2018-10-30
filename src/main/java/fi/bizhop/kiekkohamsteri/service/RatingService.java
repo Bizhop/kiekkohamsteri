@@ -1,10 +1,10 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -25,14 +25,16 @@ public class RatingService {
 
     public RatingDto getRounds(String pdga_num) throws Exception {
         List<RoundDto> rounds = new ArrayList<>();
+        Set<String> events = new HashSet<>();
 
+        //Viralliset kierrokset (RATINGS DETAIL)
         try {
             Document doc = Jsoup.connect(String.format(RATINGS_URL, pdga_num)).get();
             Elements rows = doc.getElementById("player-results-details").select("tbody").select("tr");
             for (Element row : rows) {
                 Elements tds = row.select("td");
                 if (tds.size() == 6) {
-                    rounds.add(new RoundDto(
+                    RoundDto round = new RoundDto(
                         getText(tds.get(0)),
                         getLink(tds.get(0)),
                         getDate(tds.get(1)),
@@ -41,7 +43,9 @@ public class RatingService {
                         getInt(tds.get(4)),
                         getHoles(getLink(tds.get(0))),
                         getBoolean(tds.get(5))
-                    ));
+                    );
+                    events.add(getEventNumber(round.getLink()));
+                    rounds.add(round);
                 }
             }
         } catch (Exception e) {
@@ -49,14 +53,31 @@ public class RatingService {
             throw new Exception("Internal error");
         }
 
+        //Epäviralliset kierrokset
         try {
             Document info = Jsoup.connect(String.format(PLAYER_URL, pdga_num)).get();
-            Element recent = info.getElementsByClass("recent-events").first();
-            if (recent != null) {
-                Elements links = recent.select("a");
-                for (Element l : links) {
-                    rounds.addAll(getUnofficial(l.attr("abs:href"), pdga_num));
+            //Pelaajan etusivulta
+            try {
+                Elements links = info.select("table[id]").select("a");
+                for(Element l : links) {
+                    String link = l.attr("abs:href");
+                    if(!events.contains(getEventNumber(link))) {
+                        rounds.addAll(getUnofficial(link, pdga_num));
+                    }
                 }
+            } catch (Exception e) {
+                LOG.error("Etusivun kierrosten haku epäonnistui", e);
+            }
+            try {
+                Element recent = info.getElementsByClass("recent-events").first();
+                if (recent != null) {
+                    Elements links = recent.select("a");
+                    for (Element l : links) {
+                        rounds.addAll(getUnofficial(l.attr("abs:href"), pdga_num));
+                    }
+                }
+            } catch (Exception e) {
+                LOG.error("Viimeisten kierrosten haku epäonnistui", e);
             }
         } catch (Exception e) {
             LOG.error("Epävirallisten kierrosten haku epäonnistui", e);
@@ -180,5 +201,10 @@ public class RatingService {
         }
 
         return Math.round((float) totalRating / (float) totalHoles);
+    }
+
+    private static String getEventNumber(String link) {
+        String event = link.substring(link.lastIndexOf('/') + 1, link.length());
+        return event.contains("#") ? event.substring(0, event.lastIndexOf('#')) : event;
     }
 }

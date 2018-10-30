@@ -1,7 +1,5 @@
 package fi.bizhop.kiekkohamsteri.dto;
 
-import java.util.UUID;
-
 public class RoundDto {
 	private String tournament;
 	private String link;
@@ -96,5 +94,22 @@ public class RoundDto {
 
     public void setDoubled(boolean doubled) {
         this.doubled = doubled;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj != null && obj instanceof RoundDto) {
+            RoundDto other = (RoundDto) obj;
+            return this.identifier().equals(other.identifier());
+        }
+        return false;
+    }
+
+    public String identifier() {
+	    StringBuilder sb = new StringBuilder();
+	    sb.append(this.tournament == null ? "" : this.tournament);
+	    sb.append(this.date == null ? "" : this.date);
+	    sb.append(this.round);
+	    return sb.toString();
     }
 }
