@@ -27,9 +27,9 @@ public class RatingController extends BaseController {
 	}
 
 	@RequestMapping(value = "/rating", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
-    public Integer getRating(@RequestBody List<RoundDto> rounds, HttpServletResponse response) {
+    public Integer getRating(@RequestBody List<RoundDto> rounds, @RequestParam(value = "byRoundsOnly", required = false, defaultValue = "false") boolean byRoundsOnly, HttpServletResponse response) {
 	    try {
-	        return ratingService.getRating(rounds, false).getNextRating();
+	        return ratingService.getRating(rounds, false, byRoundsOnly).getNextRating();
 	    } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return null;

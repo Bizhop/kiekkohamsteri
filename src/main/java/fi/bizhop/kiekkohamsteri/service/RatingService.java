@@ -42,8 +42,7 @@ public class RatingService {
                         getInt(tds.get(3)),
                         getInt(tds.get(4)),
                         getHoles(getLink(tds.get(0))),
-                        getBoolean(tds.get(5))
-                    );
+                        getBoolean(tds.get(5)));
                     events.add(getEventNumber(round.getLink()));
                     rounds.add(round);
                 }
@@ -61,6 +60,7 @@ public class RatingService {
                 Elements links = info.select("table[id]").select("a");
                 for(Element l : links) {
                     String link = l.attr("abs:href");
+                    //Lisätään tästä vain jos tapahtumaa ei lisätty jo Ratings Detail -sivulta
                     if(!events.contains(getEventNumber(link))) {
                         rounds.addAll(getUnofficial(link, pdga_num));
                     }
@@ -68,6 +68,7 @@ public class RatingService {
             } catch (Exception e) {
                 LOG.error("Etusivun kierrosten haku epäonnistui", e);
             }
+            //Viimeisimmät tapahtumat (recent events)
             try {
                 Element recent = info.getElementsByClass("recent-events").first();
                 if (recent != null) {
@@ -83,11 +84,11 @@ public class RatingService {
             LOG.error("Epävirallisten kierrosten haku epäonnistui", e);
         }
 
-        return getRating(rounds, true);
+        return getRating(rounds, true, false);
     }
 
-    public RatingDto getRating(List<RoundDto> rounds, boolean calculateDoubles) {
-        int nextRating = calculateNextRating(rounds, calculateDoubles);
+    public RatingDto getRating(List<RoundDto> rounds, boolean calculateDoubles, boolean byRoundsOnly) {
+        int nextRating = calculateNextRating(rounds, calculateDoubles, byRoundsOnly);
 
         return new RatingDto(rounds, nextRating);
     }
@@ -112,8 +113,7 @@ public class RatingService {
                         getInt(roundElements.get(i)),
                         getInt(ratingElements.get(i)),
                         getHoles(uo),
-                        true
-                    );
+                        true);
                     rounds.add(round);
                 }
             }
@@ -182,25 +182,28 @@ public class RatingService {
         return 18;
     }
 
-    private static int calculateNextRating(List<RoundDto> rounds, boolean calculateDoubles) {
+    private static int calculateNextRating(List<RoundDto> rounds, boolean calculateDoubles, boolean byRoundsOnly) {
         if(calculateDoubles) {
             int doubleRounds = rounds.size() >= 8 ? (int) Math.ceil(rounds.size() * 0.25) : 0;
             for (int i = 0; i < rounds.size(); i++) {
                 rounds.get(i).setDoubled(i + doubleRounds >= rounds.size());
             }
         }
-        int totalRating = 0;
-        int totalHoles = 0;
+        int ratingSum = 0;
+        int ratingCount = 0;
 
         for (RoundDto r : rounds) {
             if (r.isIncluded()) {
+                int holes = byRoundsOnly ? 1 : r.getHoles();
                 int multiplier = r.isDoubled() ? 2 : 1;
-                totalRating += r.getRating() * r.getHoles() * multiplier;
-                totalHoles += r.getHoles() * multiplier;
+                ratingSum += r.getRating() * holes * multiplier;
+                ratingCount += holes * multiplier;
             }
         }
 
-        return Math.round((float) totalRating / (float) totalHoles);
+        LOG.debug(String.format("ratingSum: %d, ratingCount: %d", ratingSum, ratingCount));
+
+        return Math.round((float) ratingSum / (float) ratingCount);
     }
 
     private static String getEventNumber(String link) {
