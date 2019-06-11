@@ -1,11 +1,9 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import antlr.collections.impl.IntRange;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -33,17 +31,18 @@ public class RatingService {
             Elements rows = doc.getElementById("player-results-details").select("tbody").select("tr");
             for (Element row : rows) {
                 Elements tds = row.select("td");
-                if (tds.size() == 6) {
+                if (tds.size() == 8) {
+                    String link = getLink(tds.get(0));
                     RoundDto round = new RoundDto(
                         getText(tds.get(0)),
-                        getLink(tds.get(0)),
-                        getDate(tds.get(1)),
-                        getInt(tds.get(2)),
+                        link,
+                        getDate(tds.get(2)),
                         getInt(tds.get(3)),
                         getInt(tds.get(4)),
-                        getHoles(getLink(tds.get(0))),
-                        getBoolean(tds.get(5)));
-                    events.add(getEventNumber(round.getLink()));
+                        getInt(tds.get(5)),
+                        getHoles(link),
+                        getBoolean(tds.get(7)));
+                    events.add(getEventNumber(link));
                     rounds.add(round);
                 }
             }
@@ -84,6 +83,7 @@ public class RatingService {
             LOG.error("Epävirallisten kierrosten haku epäonnistui", e);
         }
 
+        LOG.debug(String.format("Rating for PDGA #%s", pdga_num));
         return getRating(rounds, true, false);
     }
 
@@ -151,7 +151,7 @@ public class RatingService {
             e.select("span").remove();
             String text = e.text().trim();
             if (text.length() > 11) {
-                text = text.substring(text.lastIndexOf(' ') + 1, text.length());
+                text = text.substring(text.lastIndexOf(' ') + 1);
             }
             return text;
         } catch (Exception ex) {
@@ -183,11 +183,15 @@ public class RatingService {
     }
 
     private static int calculateNextRating(List<RoundDto> rounds, boolean calculateDoubles, boolean byRoundsOnly) {
+        Collections.sort(rounds);
+        int includedRoundsSize = Math.toIntExact(rounds.stream().filter(r -> r.isIncluded()).count());
+        LOG.debug(String.format("Included rounds: %d", includedRoundsSize));
         if(calculateDoubles) {
-            int doubleRounds = rounds.size() >= 8 ? (int) Math.ceil(rounds.size() * 0.25) : 0;
-            for (int i = 0; i < rounds.size(); i++) {
-                rounds.get(i).setDoubled(i + doubleRounds >= rounds.size());
-            }
+            int doubleRounds = includedRoundsSize >= 8 ? (int) Math.ceil(includedRoundsSize * 0.25) : 0;
+            LOG.debug(String.format("Doubled rounds: %d", doubleRounds));
+            List<RoundDto> lastRounds = rounds.subList(rounds.size() - doubleRounds, rounds.size());
+            LOG.debug(String.format("Last rounds size: %d", lastRounds.size()));
+            lastRounds.forEach(r -> r.setDoubled(true));
         }
         int ratingSum = 0;
         int ratingCount = 0;

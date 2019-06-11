@@ -1,13 +1,10 @@
 package fi.bizhop.kiekkohamsteri.security;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Jsoup;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GoogleAuthentication {
 	private static final String GOOGLE_PARSER_URL_TEMPLATE = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=%s";

@@ -1,6 +1,12 @@
 package fi.bizhop.kiekkohamsteri.dto;
 
-public class RoundDto {
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+public class RoundDto implements Comparable<RoundDto> {
 	private String tournament;
 	private String link;
 	private String date;
@@ -95,5 +101,17 @@ public class RoundDto {
 
     public void setDoubled(boolean doubled) {
         this.doubled = doubled;
+    }
+
+    @Override
+    public int compareTo(RoundDto o) {
+        try {
+            DateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
+            Date from = sdf.parse(this.date);
+            Date to = sdf.parse(o.date);
+            return from.compareTo(to);
+        } catch (ParseException e) {
+            return 0;
+        }
     }
 }
