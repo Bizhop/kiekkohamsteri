@@ -385,4 +385,15 @@
 			</column>
 		</addColumn>
 	</changeSet>
+    <changeSet id="cascadeDiscDelete" author="Ville">
+        <dropForeignKeyConstraint baseTableName="ostot" constraintName="ostot_ibfk_3" />
+        <addForeignKeyConstraint
+            baseTableName="ostot"
+            baseColumnNames="kiekko_id"
+            constraintName="kiekko_fk"
+            referencedTableName="kiekot"
+            referencedColumnNames="id"
+            onUpdate="CASCADE"
+            onDelete="CASCADE" />
+    </changeSet>
 </databaseChangeLog>
