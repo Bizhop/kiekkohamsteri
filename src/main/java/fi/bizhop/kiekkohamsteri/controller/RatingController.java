@@ -3,7 +3,8 @@ package fi.bizhop.kiekkohamsteri.controller;
 import javax.servlet.http.HttpServletResponse;
 
 import fi.bizhop.kiekkohamsteri.dto.RoundDto;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +15,7 @@ import java.util.List;
 
 @RestController
 public class RatingController extends BaseController {
-    private static final Logger LOG = Logger.getLogger(RatingController.class);
+    private static final Logger LOG = LogManager.getLogger(RatingController.class);
 	@Autowired
 	RatingService ratingService;
 	

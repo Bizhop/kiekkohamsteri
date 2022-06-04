@@ -22,7 +22,7 @@ public class OstoService {
 	KiekkoRepository kiekkoRepo;
 
 	public void ostaKiekko(Long id, Members user) {
-		Kiekot kiekko = kiekkoRepo.findOne(id);
+		Kiekot kiekko = kiekkoRepo.findById(id).orElseThrow();
 		
 		Ostot osto = new Ostot(kiekko, kiekko.getMember(), user, Status.REQUESTED);
 		ostoRepo.save(osto);
@@ -44,7 +44,7 @@ public class OstoService {
 	}
 
 	public void confirm(Long id, Members user) throws AuthorizationException {
-		Ostot osto = ostoRepo.findOne(id);
+		Ostot osto = ostoRepo.findById(id).orElseThrow();
 		if(user != osto.getMyyja()) {
 			throw new AuthorizationException();
 		}
@@ -56,7 +56,7 @@ public class OstoService {
 				for(Ostot o : ostot) {
 					o.setStatus(Status.REJECTED);
 				}
-				ostoRepo.save(ostot);
+				ostoRepo.saveAll(ostot);
 			}
 			
 			//change owner
@@ -73,7 +73,7 @@ public class OstoService {
 	}
 	
 	public void reject(Long id, Members user) throws AuthorizationException {
-		Ostot osto = ostoRepo.findOne(id);
+		Ostot osto = ostoRepo.findById(id).orElseThrow();
 		if(user != osto.getMyyja() && user != osto.getOstaja()) {
 			throw new AuthorizationException();
 		}

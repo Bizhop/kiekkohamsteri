@@ -17,7 +17,7 @@ public interface KiekkoRepository extends PagingAndSortingRepository<Kiekot, Lon
 	List<Kiekot> findByMember(Members member);
 	Page<KiekkoProjection> findByLostTrue(Pageable pageable);
 
-	KiekkoProjection findById(Long id);
+	KiekkoProjection getKiekotById(Long id);
 
 	Page<KiekkoProjection> findByMyynnissaTrue(Pageable pageable);
 	

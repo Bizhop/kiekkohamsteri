@@ -25,18 +25,14 @@ public class MoldService {
 			return moldRepo.findAllProjectedBy(pageable);
 		}
 		else {
-			R_valm valm = valmRepo.findOne(valmId);
-			if(valm == null) {
-				return null;
-			}
-			else {
-				return moldRepo.findByValmistaja(valm, pageable);
-			}
+			return valmRepo.findById(valmId)
+					.map(valm -> moldRepo.findByValmistaja(valm, pageable))
+					.orElse(null);
 		}
 	}
 
 	public void createMold(MoldCreateDto dto) {
-		R_valm valm = valmRepo.findOne(dto.getValmId());
+		R_valm valm = valmRepo.findById(dto.getValmId()).orElseThrow();
 		
 		R_mold mold = new R_mold();
 		mold.setValmistaja(valm);

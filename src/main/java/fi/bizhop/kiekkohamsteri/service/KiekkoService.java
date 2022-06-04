@@ -46,9 +46,9 @@ public class KiekkoService {
 	}
 	
 	public KiekkoProjection uusiKiekko(Members owner) {
-		R_mold defaultMold = moldRepo.findOne(893L);
-		R_muovi defaultMuovi = muoviRepo.findOne(13L);
-		R_vari defaultVari = variRepo.findOne(1L);
+		R_mold defaultMold = moldRepo.findById(893L).orElseThrow();
+		R_muovi defaultMuovi = muoviRepo.findById(13L).orElseThrow();
+		R_vari defaultVari = variRepo.findById(1L).orElseThrow();
 		
 		Kiekot kiekko = new Kiekot(owner, defaultMold, defaultMuovi, defaultVari);
 		if(owner.getPublicList()) {
@@ -59,31 +59,31 @@ public class KiekkoService {
 		owner.addDisc();
 		membersRepo.save(owner);
 		
-		return kiekkoRepo.findById(kiekko.getId());
+		return kiekkoRepo.getKiekotById(kiekko.getId());
 	}
 	
 	public KiekkoProjection paivitaKuva(Long id, String kuva) {
-		Kiekot kiekko = kiekkoRepo.findOne(id);
+		Kiekot kiekko = kiekkoRepo.findById(id).orElseThrow();
 		kiekko.setKuva(kuva);
 		kiekko = kiekkoRepo.save(kiekko);
-		return kiekkoRepo.findById(kiekko.getId());
+		return kiekkoRepo.getKiekotById(kiekko.getId());
 	}
 	
 	public void poistaKiekko(Long id, Members owner) throws AuthorizationException {
-		Kiekot kiekko = kiekkoRepo.findOne(id);
+		Kiekot kiekko = kiekkoRepo.findById(id).orElse(null);
 		
 		if(kiekko == null || !kiekko.getMember().equals(owner)) {
 			throw new AuthorizationException();
 		}
 		
-		kiekkoRepo.delete(id);
+		kiekkoRepo.deleteById(id);
 		
 		owner.removeDisc();
 		membersRepo.save(owner);
 	}
 	
 	public KiekkoProjection paivitaKiekko(KiekkoDto dto, Long id, Members owner) throws AuthorizationException {
-		Kiekot kiekko = kiekkoRepo.findOne(id);
+		Kiekot kiekko = kiekkoRepo.findById(id).orElse(null);
 		
 		if(kiekko == null || !kiekko.getMember().equals(owner)) {
 			throw new AuthorizationException();
@@ -96,15 +96,15 @@ public class KiekkoService {
 		BeanUtils.copyProperties(dto, kiekko, ignores);
 		
 		if(dto.getMoldId() != null) {
-			R_mold mold = moldRepo.findOne(dto.getMoldId());
+			R_mold mold = moldRepo.findById(dto.getMoldId()).orElse(null);
 			kiekko.setMold(mold);
 		}
 		if(dto.getMuoviId() != null) {
-			R_muovi muovi = muoviRepo.findOne(dto.getMuoviId());
+			R_muovi muovi = muoviRepo.findById(dto.getMuoviId()).orElse(null);
 			kiekko.setMuovi(muovi);
 		}
 		if(dto.getVariId() != null) {
-			R_vari vari = variRepo.findOne(dto.getVariId());
+			R_vari vari = variRepo.findById(dto.getVariId()).orElse(null);
 			kiekko.setVari(vari);
 		}
 
@@ -114,7 +114,7 @@ public class KiekkoService {
 		}
 
 		kiekkoRepo.save(kiekko);
-		return kiekkoRepo.findById(id);
+		return kiekkoRepo.getKiekotById(id);
 	}
 
 	public Page<KiekkoProjection> haeMyytavat(Pageable pageable) {
@@ -122,7 +122,7 @@ public class KiekkoService {
 	}
 
 	public KiekkoProjection haeKiekko(Members owner, Long id) throws AuthorizationException {
-		KiekkoProjection kiekko = kiekkoRepo.findById(id);
+		KiekkoProjection kiekko = kiekkoRepo.getKiekotById(id);
 		if(owner.getUsername().equals(kiekko.getOmistaja()) || kiekko.getPublicDisc()) {
 			return kiekko;
 		}
@@ -151,7 +151,7 @@ public class KiekkoService {
 	}
 	
 	public DiscFoundStatus found(Members user, Long id) {
-		Kiekot k = kiekkoRepo.findOne(id);
+		Kiekot k = kiekkoRepo.findById(id).orElseThrow();
 		if(k.getMember() != user) {
 			return DiscFoundStatus.NOT_OWNED;
 		}

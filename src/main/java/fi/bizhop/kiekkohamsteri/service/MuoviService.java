@@ -24,7 +24,7 @@ public class MuoviService {
 			return muoviRepo.findAllProjectedBy(pageable);
 		}
 		else {
-			R_valm valm = valmRepo.findOne(valmId);
+			R_valm valm = valmRepo.findById(valmId).orElse(null);
 			if(valm == null) {
 				return null;
 			}
@@ -35,7 +35,7 @@ public class MuoviService {
 	}
 
 	public void createMuovi(MuoviCreateDto dto) {
-		R_valm valm = valmRepo.findOne(dto.getValmId());
+		R_valm valm = valmRepo.findById(dto.getValmId()).orElseThrow();
 		
 		R_muovi muovi = new R_muovi();
 		muovi.setValmistaja(valm);

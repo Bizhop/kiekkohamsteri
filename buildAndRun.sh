@@ -1,1 +1,1 @@
-mvn clean package docker:build && docker-compose up
+mvn clean package && docker build -t kiekkohamsteri-backend . && docker compose up

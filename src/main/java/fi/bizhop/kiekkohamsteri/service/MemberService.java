@@ -2,7 +2,8 @@ package fi.bizhop.kiekkohamsteri.service;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ import fi.bizhop.kiekkohamsteri.util.Utils;
 
 @Service
 public class MemberService {
-	private static final Logger LOG = Logger.getLogger(MemberService.class);
+	private static final Logger LOG = LogManager.getLogger(MemberService.class);
 	
 	@Autowired
 	MembersRepository membersRepo;
@@ -29,30 +30,30 @@ public class MemberService {
 	}
 
 	public Members getUser(Long id) {
-		return membersRepo.findOne(id);
+		return membersRepo.findById(id).orElseThrow();
 	}
 
 	public Members updateDetails(Long id, UserUpdateDto dto) {
-		Members user = membersRepo.findOne(id);
+		Members user = membersRepo.findById(id).orElseThrow();
 		
 		String[] ignoreNulls = Utils.getNullPropertyNames(dto);
 		BeanUtils.copyProperties(dto, user, ignoreNulls);
 		
-		if(dto.getPublicList()) {
+		if(dto.isPublicList()) {
 			membersRepo.makeDiscsPublic(user);
 		}
 		
 		membersRepo.save(user);
-		return membersRepo.findOne(id);
+		return membersRepo.findById(id).orElse(null);
 	}
 
 	public Members setUserLevel(Long id, Integer level) {
-		Members user = membersRepo.findOne(id);
+		Members user = membersRepo.findById(id).orElseThrow();
 		
 		user.setLevel(level);
 		
 		membersRepo.save(user);
-		return membersRepo.findOne(id);
+		return membersRepo.findById(id).orElse(null);
 	}
 
 	public List<LeaderProjection> getLeaders() {

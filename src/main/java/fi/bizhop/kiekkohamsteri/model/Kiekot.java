@@ -8,7 +8,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "kiekot")
@@ -17,51 +16,46 @@ public class Kiekot extends TimestampBase {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
-	@NotNull
 	@ManyToOne
 	@JoinColumn(name="member_id")
 	private Members member;
-	
-	@NotNull
+
 	@ManyToOne
 	@JoinColumn(name="mold_id")
 	private R_mold mold;
-	
-	@NotNull
+
 	@ManyToOne
 	@JoinColumn(name="muovi_id")
 	private R_muovi muovi;
-	
-	@NotNull
+
 	@ManyToOne
 	@JoinColumn(name="vari_id")
 	private R_vari vari;
 	
 	private String kuva;
 	private Integer paino;
-	@NotNull
+	@Column(nullable = false)
 	private Integer kunto;
 	private Boolean hohto;
 	private Boolean spessu;
-	@NotNull
+	@Column(nullable = false)
 	private Boolean dyed;
-	@NotNull
+	@Column(nullable = false)
 	private Boolean swirly;
-	@NotNull
+	@Column(nullable = false)
 	private Integer tussit;
 	private Boolean myynnissa;
-	@NotNull
+	@Column(nullable = false)
 	private Integer hinta;
 	private String muuta;
 	private Boolean loytokiekko;
-	@NotNull
+	@Column(nullable = false)
 	private Boolean itb;
 	
-	@Column(name="public")
-	@NotNull
+	@Column(name="public", nullable = false)
 	private Boolean publicDisc;
-	
-	@NotNull
+
+	@Column(nullable = false)
 	private Boolean lost;
 	
 	public Kiekot() {} //default constructor

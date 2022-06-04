@@ -1,7 +1,6 @@
 package fi.bizhop.kiekkohamsteri.model;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "members")
@@ -19,12 +18,10 @@ public class Members extends TimestampBase {
 	@Transient
 	private String jwt; //do not persist
 	
-	@Column(name="public_list")
-	@NotNull
+	@Column(name="public_list", nullable = false)
 	private Boolean publicList;
 	
-	@Column(name="public_disc_count")
-	@NotNull
+	@Column(name="public_disc_count", nullable = false)
 	private Boolean publicDiscCount;
 	
 	@Column(name="disc_count")

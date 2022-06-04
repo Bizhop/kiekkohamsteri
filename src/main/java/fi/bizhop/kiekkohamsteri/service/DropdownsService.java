@@ -55,7 +55,7 @@ public class DropdownsService {
 			return moldRepo.findAllByOrderByKiekkoAsc();
 		}
 		else {
-			R_valm valm = valmRepo.findOne(valmId);
+			R_valm valm = valmRepo.findById(valmId).orElseThrow();
 			return moldRepo.findByValmistajaOrderByKiekkoAsc(valm);
 		}
 	}
@@ -69,7 +69,7 @@ public class DropdownsService {
 			return muoviRepo.findAllByOrderByMuoviAsc();
 		}
 		else {
-			R_valm valm = valmRepo.findOne(valmId);
+			R_valm valm = valmRepo.findById(valmId).orElseThrow();
 			return muoviRepo.findByValmistajaOrderByMuoviAsc(valm);
 		}
 	}

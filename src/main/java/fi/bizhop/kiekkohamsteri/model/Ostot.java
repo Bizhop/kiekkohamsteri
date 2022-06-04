@@ -1,13 +1,6 @@
 package fi.bizhop.kiekkohamsteri.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "ostot")
@@ -15,18 +8,15 @@ public class Ostot extends TimestampBase {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
-	
-	@NotNull
+
 	@ManyToOne
 	@JoinColumn(name="kiekko_id")
 	Kiekot kiekko;
-	
-	@NotNull
+
 	@ManyToOne
 	@JoinColumn(name="myyja")
 	Members myyja;
-	
-	@NotNull
+
 	@ManyToOne
 	@JoinColumn(name="ostaja")
 	Members ostaja;

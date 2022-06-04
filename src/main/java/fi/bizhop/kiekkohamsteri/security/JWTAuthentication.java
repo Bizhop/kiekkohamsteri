@@ -4,12 +4,13 @@ import fi.bizhop.kiekkohamsteri.model.Members;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.Date;
 
 public class JWTAuthentication {
-    private static final Logger LOG = Logger.getLogger(JWTAuthentication.class);
+    private static final Logger LOG = LogManager.getLogger(JWTAuthentication.class);
     private static final long EXPIRATION_TIME = 1209600000l; //14 days
     private static final String JWT_SECRET = System.getenv("HAMSTERI_JWT_SECRET");
     public static final String JWT_TOKEN_PREFIX = "jwt";

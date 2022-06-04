@@ -3,8 +3,8 @@ package fi.bizhop.kiekkohamsteri.service;
 import java.io.IOException;
 import java.util.*;
 
-import antlr.collections.impl.IntRange;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,7 +16,7 @@ import fi.bizhop.kiekkohamsteri.dto.RoundDto;
 
 @Service
 public class RatingService {
-    private static final Logger LOG = Logger.getLogger(RatingService.class);
+    private static final Logger LOG = LogManager.getLogger(RatingService.class);
 
     private static final String RATINGS_URL = "https://www.pdga.com/player/%s/details";
     private static final String PLAYER_URL = "https://www.pdga.com/player/%s";

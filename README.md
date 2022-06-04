@@ -1,6 +1,19 @@
 # Kiekkohamsteri
-Sovellus kiekkojen hamstraamiseen
+App backend for disc golf catalogue
 
-## Tietokannan luonti
-Maven build: `mvn clean package docker:build`
-Käynnistä tietokanta ja backend dockerilla: `docker-compose up`
+# Tech
+- Java 11
+- Maven 3
+- Docker with compose plugin
+
+# Usage
+- build: `mvn clean package`
+- docker build: `docker build -t kiekkohamsteri-backend .`
+- run: `docker compose up`
+
+# Mandatory environment variables
+- `HAMSTERI_JWT_SECRET` 
+  - jwt encoding/decoding. Must be at least 512 bytes.
+- `CLOUDINARY_URL`
+  - for saving images
+  - see [cloudinary.com](https://cloudinary.com/) for more info

@@ -1,12 +1,6 @@
 package fi.bizhop.kiekkohamsteri.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "stats")
@@ -14,10 +8,10 @@ public class Stats extends TimestampBase {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
-	
-	@NotNull
+
+	@Column(nullable = false)
 	private Integer year;
-	@NotNull
+	@Column(nullable = false)
 	private Integer month;
 	
 	@Column(name="new_discs")
