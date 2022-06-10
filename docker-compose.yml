@@ -20,3 +20,4 @@ services:
     environment:
      - CLOUDINARY_URL
      - HAMSTERI_JWT_SECRET
+     - HAMSTERI_GOOGLE_CLIENT_ID

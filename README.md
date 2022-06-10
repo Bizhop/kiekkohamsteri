@@ -13,7 +13,7 @@ App backend for disc golf catalogue
 
 # Mandatory environment variables
 - `HAMSTERI_JWT_SECRET` 
-  - jwt encoding/decoding. Must be at least 512 bytes.
+  - jwt encoding/decoding. Must be at base64 encoded byte array, at least 512 bytes.
 - `CLOUDINARY_URL`
   - for saving images
   - see [cloudinary.com](https://cloudinary.com/) for more info
