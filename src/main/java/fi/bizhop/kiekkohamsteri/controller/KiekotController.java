@@ -7,6 +7,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
+import fi.bizhop.kiekkohamsteri.model.Ostot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -190,15 +192,21 @@ public class KiekotController extends BaseController {
 	}
 	
 	@RequestMapping(value = "/kiekot/{id}/buy", method = RequestMethod.POST)
-	public void ostaKiekko(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody Ostot ostaKiekko(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug(String.format("KiekotController.ostaKiekko(%d)...", id));
 		
 		Members user = authService.getUser(request);
 		if(user == null) {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return null;
 		}
 		else {
-			ostoService.ostaKiekko(id, user);
+			try {
+				return ostoService.ostaKiekko(id, user);
+			} catch (HttpResponseException e) {
+				response.setStatus(e.getStatusCode());
+				return null;
+			}
 		}
 	}
 	

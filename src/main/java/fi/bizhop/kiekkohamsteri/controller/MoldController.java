@@ -3,6 +3,7 @@ package fi.bizhop.kiekkohamsteri.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import fi.bizhop.kiekkohamsteri.model.R_mold;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,16 +43,17 @@ public class MoldController extends BaseController {
 	}
 	
 	@RequestMapping(value="/molds", method=RequestMethod.POST, consumes="application/json")
-	public void createMold(@RequestBody MoldCreateDto dto, HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody MoldProjection createMold(@RequestBody MoldCreateDto dto, HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug("MoldController.createMold()...");
 		
 		Members user = authService.getUser(request);
 		if(user == null || user.getLevel() != 2) {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return null;
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_OK);
-			moldService.createMold(dto);
+			return moldService.createMold(dto);
 		}
 	}
 }

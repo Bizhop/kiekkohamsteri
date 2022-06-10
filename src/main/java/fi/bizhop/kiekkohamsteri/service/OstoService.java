@@ -2,6 +2,7 @@ package fi.bizhop.kiekkohamsteri.service;
 
 import java.util.List;
 
+import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +22,14 @@ public class OstoService {
 	@Autowired
 	KiekkoRepository kiekkoRepo;
 
-	public void ostaKiekko(Long id, Members user) {
+	public Ostot ostaKiekko(Long id, Members user) throws HttpResponseException {
 		Kiekot kiekko = kiekkoRepo.findById(id).orElseThrow();
-		
+
+		Ostot existing = ostoRepo.findByKiekkoAndOstajaAndStatus(kiekko, user, Status.REQUESTED);
+		if(existing != null) throw new HttpResponseException(400, "Olet jo ostamassa tätä kiekkoa");
+
 		Ostot osto = new Ostot(kiekko, kiekko.getMember(), user, Status.REQUESTED);
-		ostoRepo.save(osto);
+		return ostoRepo.save(osto);
 	}
 
 	public List<Ostot> list() {

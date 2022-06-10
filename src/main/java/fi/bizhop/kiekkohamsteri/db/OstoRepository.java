@@ -11,6 +11,8 @@ import fi.bizhop.kiekkohamsteri.model.Ostot;
 import fi.bizhop.kiekkohamsteri.model.Ostot.Status;
 
 public interface OstoRepository extends CrudRepository<Ostot, Long> {
+	Ostot findByKiekkoAndOstajaAndStatus(Kiekot kiekko, Members ostaja, Status status);
+
 	List<Ostot> findAll();
 	
 	List<Ostot> findByStatus(Status status);

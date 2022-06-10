@@ -34,13 +34,15 @@ public class MuoviService {
 		}
 	}
 
-	public void createMuovi(MuoviCreateDto dto) {
+	public MuoviProjection createMuovi(MuoviCreateDto dto) {
 		R_valm valm = valmRepo.findById(dto.getValmId()).orElseThrow();
 		
 		R_muovi muovi = new R_muovi();
 		muovi.setValmistaja(valm);
 		muovi.setMuovi(dto.getMuovi());
 		
-		muoviRepo.save(muovi);
+		R_muovi saved = muoviRepo.save(muovi);
+
+		return muoviRepo.getR_muoviById(saved.getId());
 	}
 }

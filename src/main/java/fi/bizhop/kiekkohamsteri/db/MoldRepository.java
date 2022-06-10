@@ -2,6 +2,7 @@ package fi.bizhop.kiekkohamsteri.db;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,4 +20,6 @@ public interface MoldRepository extends PagingAndSortingRepository<R_mold, Long>
 	Page<MoldProjection> findAllProjectedBy(Pageable pageable);
 	Page<MoldProjection> findByValmistaja(R_valm valm, Pageable pageable);
 	Integer countByCreatedAtBetween(Date beginDate, Date endDate);
+
+	MoldProjection getR_moldById(Long id);
 }

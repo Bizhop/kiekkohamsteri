@@ -42,16 +42,17 @@ public class MuoviController extends BaseController {
 	}
 	
 	@RequestMapping(value="/muovit", method=RequestMethod.POST, consumes="application/json")
-	public void createMuovi(@RequestBody MuoviCreateDto dto, HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody MuoviProjection createMuovi(@RequestBody MuoviCreateDto dto, HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug("MuoviController.createMuovi()...");
 		
 		Members user = authService.getUser(request);
 		if(user == null || user.getLevel() != 2) {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return null;
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_OK);
-			muoviService.createMuovi(dto);
+			return muoviService.createMuovi(dto);
 		}
 	}
 }

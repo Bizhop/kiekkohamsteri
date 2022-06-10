@@ -19,4 +19,6 @@ public interface MuoviRepository extends PagingAndSortingRepository<R_muovi, Lon
 	Page<MuoviProjection> findAllProjectedBy(Pageable pageable);
 	Page<MuoviProjection> findByValmistaja(R_valm valm, Pageable pageable);
 	Integer countByCreatedAtBetween(Date beginDate, Date endDate);
+
+	MuoviProjection getR_muoviById(Long id);
 }

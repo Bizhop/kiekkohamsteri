@@ -31,13 +31,15 @@ public class MoldService {
 		}
 	}
 
-	public void createMold(MoldCreateDto dto) {
+	public MoldProjection createMold(MoldCreateDto dto) {
 		R_valm valm = valmRepo.findById(dto.getValmId()).orElseThrow();
 		
 		R_mold mold = new R_mold();
 		mold.setValmistaja(valm);
 		BeanUtils.copyProperties(dto, mold, "id", "valmistaja");
 		
-		moldRepo.save(mold);
+		R_mold saved = moldRepo.save(mold);
+
+		return moldRepo.getR_moldById(saved.getId());
 	}
 }
