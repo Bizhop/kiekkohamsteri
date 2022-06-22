@@ -1,7 +1,6 @@
 package fi.bizhop.kiekkohamsteri.security;
 
 import fi.bizhop.kiekkohamsteri.ShutdownManager;
-import fi.bizhop.kiekkohamsteri.model.Members;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -23,7 +22,7 @@ public class JWTAuthenticationTest {
     private static final String INVALID_KEY = "ABC";
 
     @Mock
-    KeyProvider keyProvider;
+    fi.bizhop.kiekkohamsteri.security.provider.JWTSecretKeyProvider JWTSecretKeyProvider;
 
     @Mock
     ShutdownManager shutdownManager;
@@ -35,7 +34,7 @@ public class JWTAuthenticationTest {
 
     @Test
     void givenInvalidKey_thenFailFast() {
-        given(keyProvider.getKey()).willReturn(INVALID_KEY);
+        given(JWTSecretKeyProvider.getKey()).willReturn(INVALID_KEY);
 
         getAuth();
 
@@ -44,7 +43,7 @@ public class JWTAuthenticationTest {
 
     @Test
     void givenNullKey_thenFailFast() {
-        given(keyProvider.getKey()).willReturn(null);
+        given(JWTSecretKeyProvider.getKey()).willReturn(null);
 
         getAuth();
 
@@ -74,7 +73,7 @@ public class JWTAuthenticationTest {
     @Test
     void givenValidToken_whenGetUserEmail_thenReturnEmailFromToken() {
         String key = getValidKey();
-        given(keyProvider.getKey()).willReturn(key);
+        given(JWTSecretKeyProvider.getKey()).willReturn(key);
 
         var token = getToken(TEST_EMAIL, key);
         var auth = getAuth();
@@ -105,11 +104,11 @@ public class JWTAuthenticationTest {
     }
 
     private JWTAuthentication getAuth() {
-        return new JWTAuthentication(shutdownManager, keyProvider);
+        return new JWTAuthentication(shutdownManager, JWTSecretKeyProvider);
     }
 
     private void provideValidKey() {
-        given(keyProvider.getKey()).willReturn(getValidKey());
+        given(JWTSecretKeyProvider.getKey()).willReturn(getValidKey());
     }
 
     private String getToken(String email, String key) {

@@ -1,4 +1,4 @@
-package fi.bizhop.kiekkohamsteri.projection;
+package fi.bizhop.kiekkohamsteri.projection.v1.dropdown;
 
 public interface MoldDropdownProjection {
 	Long getId();

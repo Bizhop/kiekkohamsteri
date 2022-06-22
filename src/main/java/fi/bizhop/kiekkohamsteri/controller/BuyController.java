@@ -5,7 +5,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import fi.bizhop.kiekkohamsteri.service.DiscService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,63 +16,52 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fi.bizhop.kiekkohamsteri.dto.OstotDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
-import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.model.Ostot;
 import fi.bizhop.kiekkohamsteri.model.Ostot.Status;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
-import fi.bizhop.kiekkohamsteri.service.OstoService;
+import fi.bizhop.kiekkohamsteri.service.BuyService;
 
 @RestController
-public class OstoController extends BaseController {
-	@Autowired
-	OstoService ostoService;
-	@Autowired
-	AuthService authService;
+@RequiredArgsConstructor
+public class BuyController extends BaseController {
+	final BuyService buyService;
+	final AuthService authService;
+	final DiscService discService;
 
 	@RequestMapping(value = "/ostot", method = RequestMethod.GET)
 	public @ResponseBody List<Ostot> list(@RequestParam(value = "status", required = false) Status status, HttpServletRequest request, HttpServletResponse response ) {
-		LOG.debug(String.format("OstoController.list(%s)...", status == null ? null : status.toString()));
-
-		Members user = authService.getUser(request);
+		var user = authService.getUser(request);
 		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return null;
 		}
 		else {
-			if(status == null) {
-				return ostoService.list();
-			}
-			else {
-				return ostoService.list(status);
-			}
+			return buyService.getListing(status);
 		}
 	}
 
 	@RequestMapping(value = "/ostot/omat", method = RequestMethod.GET)
 	public @ResponseBody OstotDto omat(HttpServletRequest request, HttpServletResponse response) {
-		LOG.debug("OstoController.omat()...");
-
-		Members user = authService.getUser(request);
+		var user = authService.getUser(request);
 		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return null;
 		}
 		else {
-			return ostoService.yhteenveto(user);
+			return buyService.getSummary(user);
 		}
 	}
 
 	@RequestMapping(value = "/ostot/{id}/confirm", method = RequestMethod.POST)
 	public void confirm(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
-		LOG.debug(String.format("OstoController.confirm(%d)...", id));
-
-		Members user = authService.getUser(request);
+		var user = authService.getUser(request);
 		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		}
 		else {
 			try {
-				ostoService.confirm(id, user);
+				var disc = buyService.confirm(id, user);
+				discService.saveDisc(disc);
 			}
 			catch (AuthorizationException e) {
 				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -81,15 +71,13 @@ public class OstoController extends BaseController {
 
 	@RequestMapping(value = "/ostot/{id}/reject", method = RequestMethod.POST)
 	public void reject(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
-		LOG.debug(String.format("OstoController.reject(%d)...", id));
-
-		Members user = authService.getUser(request);
+		var user = authService.getUser(request);
 		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		}
 		else {
 			try {
-				ostoService.reject(id, user);
+				buyService.reject(id, user);
 			}
 			catch (AuthorizationException e) {
 				response.setStatus(HttpServletResponse.SC_FORBIDDEN);

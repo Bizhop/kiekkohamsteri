@@ -15,19 +15,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fi.bizhop.kiekkohamsteri.dto.MuoviCreateDto;
 import fi.bizhop.kiekkohamsteri.model.Members;
-import fi.bizhop.kiekkohamsteri.projection.MuoviProjection;
+import fi.bizhop.kiekkohamsteri.projection.v1.PlasticProjection;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
-import fi.bizhop.kiekkohamsteri.service.MuoviService;
+import fi.bizhop.kiekkohamsteri.service.PlasticService;
 
 @RestController
 public class MuoviController extends BaseController {
 	@Autowired
 	AuthService authService;
 	@Autowired
-	MuoviService muoviService;
+	PlasticService plasticService;
 	
 	@RequestMapping(value="/muovit", method=RequestMethod.GET, produces="application/json")
-	public @ResponseBody Page<MuoviProjection> getMuovit(@RequestParam(required=false) Long valmId, Pageable pageable, HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody Page<PlasticProjection> getMuovit(@RequestParam(required=false) Long valmId, Pageable pageable, HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug("MuoviController.getMuovit()...");
 		
 		Members user = authService.getUser(request);
@@ -37,12 +37,13 @@ public class MuoviController extends BaseController {
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_OK);
-			return muoviService.getMuovit(valmId, pageable);
+			return plasticService.getPlastics(valmId, pageable);
 		}
 	}
 	
 	@RequestMapping(value="/muovit", method=RequestMethod.POST, consumes="application/json")
-	public @ResponseBody MuoviProjection createMuovi(@RequestBody MuoviCreateDto dto, HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody
+    PlasticProjection createMuovi(@RequestBody MuoviCreateDto dto, HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug("MuoviController.createMuovi()...");
 		
 		Members user = authService.getUser(request);
@@ -52,7 +53,7 @@ public class MuoviController extends BaseController {
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_OK);
-			return muoviService.createMuovi(dto);
+			return plasticService.createPlastic(dto);
 		}
 	}
 }

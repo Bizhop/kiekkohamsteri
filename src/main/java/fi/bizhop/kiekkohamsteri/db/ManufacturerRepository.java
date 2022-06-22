@@ -6,10 +6,10 @@ import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 
 import fi.bizhop.kiekkohamsteri.model.R_valm;
-import fi.bizhop.kiekkohamsteri.projection.ValmDropdownProjection;
+import fi.bizhop.kiekkohamsteri.projection.v1.dropdown.ManufacturerDropdownProjection;
 
-public interface ValmRepository extends CrudRepository<R_valm, Long> {
-	List<ValmDropdownProjection> findAllProjectedBy();
+public interface ManufacturerRepository extends CrudRepository<R_valm, Long> {
+	List<ManufacturerDropdownProjection> findAllProjectedBy();
 
 	R_valm findFirstByValmistaja(String valmistaja);
 

@@ -1,7 +1,7 @@
 package fi.bizhop.kiekkohamsteri.security;
 
 import fi.bizhop.kiekkohamsteri.ShutdownManager;
-import fi.bizhop.kiekkohamsteri.model.Members;
+import fi.bizhop.kiekkohamsteri.security.provider.JWTSecretKeyProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -22,9 +22,9 @@ public class JWTAuthentication {
     private final Key JWT_KEY;
     private final ShutdownManager shutdownManager;
 
-    public JWTAuthentication(ShutdownManager shutdownManager, KeyProvider keyProvider) {
+    public JWTAuthentication(ShutdownManager shutdownManager, JWTSecretKeyProvider JWTSecretKeyProvider) {
         this.shutdownManager = shutdownManager;
-        this.JWT_KEY = getJwtKey(keyProvider.getKey());
+        this.JWT_KEY = getJwtKey(JWTSecretKeyProvider.getKey());
     }
 
     //initialize JWT key or fail fast

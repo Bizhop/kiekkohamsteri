@@ -3,7 +3,6 @@ package fi.bizhop.kiekkohamsteri.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import fi.bizhop.kiekkohamsteri.model.R_mold;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fi.bizhop.kiekkohamsteri.dto.MoldCreateDto;
 import fi.bizhop.kiekkohamsteri.model.Members;
-import fi.bizhop.kiekkohamsteri.projection.MoldProjection;
+import fi.bizhop.kiekkohamsteri.projection.v1.MoldProjection;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.MoldService;
 

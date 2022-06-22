@@ -1,38 +1,24 @@
 package fi.bizhop.kiekkohamsteri.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import fi.bizhop.kiekkohamsteri.db.*;
+import fi.bizhop.kiekkohamsteri.dto.DropdownsDto;
+import fi.bizhop.kiekkohamsteri.projection.v1.dropdown.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import fi.bizhop.kiekkohamsteri.db.DDRepository;
-import fi.bizhop.kiekkohamsteri.db.MoldRepository;
-import fi.bizhop.kiekkohamsteri.db.MuoviRepository;
-import fi.bizhop.kiekkohamsteri.db.ValmRepository;
-import fi.bizhop.kiekkohamsteri.db.VariRepository;
-import fi.bizhop.kiekkohamsteri.dto.DropdownsDto;
-import fi.bizhop.kiekkohamsteri.model.R_valm;
-import fi.bizhop.kiekkohamsteri.projection.DDProjection;
-import fi.bizhop.kiekkohamsteri.projection.MoldDropdownProjection;
-import fi.bizhop.kiekkohamsteri.projection.MuoviDropdownProjection;
-import fi.bizhop.kiekkohamsteri.projection.ValmDropdownProjection;
-import fi.bizhop.kiekkohamsteri.projection.VariDropdownProjection;
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class DropdownsService {
-	@Autowired
-	MoldRepository moldRepo;
-	@Autowired
-	ValmRepository valmRepo;
-	@Autowired
-	MuoviRepository muoviRepo;
-	@Autowired
-	VariRepository variRepo;
-	@Autowired
-	DDRepository ddRepo;
-	
+	final MoldRepository moldRepo;
+	final ManufacturerRepository valmRepo;
+	final PlasticRepository muoviRepo;
+	final ColorRepository variRepo;
+	final DropdownRepository ddRepo;
+
 	public DropdownsDto getDropdowns(Long valmId) {
-		DropdownsDto dto = new DropdownsDto();
+		var dto = new DropdownsDto();
 		dto.setValms(getValms())
 			.setMolds(getMolds(valmId))
 			.setMuovit(getMuovit(valmId))
@@ -42,11 +28,11 @@ public class DropdownsService {
 		return dto;
 	}
 
-	private List<DDProjection> getTussit() {
+	private List<DropdownProjection> getTussit() {
 		return ddRepo.findByValikkoOrderByArvoAsc("tussit");
 	}
 
-	private List<DDProjection> getKunto() {
+	private List<DropdownProjection> getKunto() {
 		return ddRepo.findByValikkoOrderByArvoAsc("kunto");
 	}
 
@@ -55,26 +41,26 @@ public class DropdownsService {
 			return moldRepo.findAllByOrderByKiekkoAsc();
 		}
 		else {
-			R_valm valm = valmRepo.findById(valmId).orElseThrow();
+			var valm = valmRepo.findById(valmId).orElseThrow();
 			return moldRepo.findByValmistajaOrderByKiekkoAsc(valm);
 		}
 	}
 
-	private List<ValmDropdownProjection> getValms() {
+	private List<ManufacturerDropdownProjection> getValms() {
 		return valmRepo.findAllProjectedBy();
 	}
 	
-	private List<MuoviDropdownProjection> getMuovit(Long valmId) {
+	private List<PlasticDropdownProjection> getMuovit(Long valmId) {
 		if(valmId == null) {
 			return muoviRepo.findAllByOrderByMuoviAsc();
 		}
 		else {
-			R_valm valm = valmRepo.findById(valmId).orElseThrow();
+			var valm = valmRepo.findById(valmId).orElseThrow();
 			return muoviRepo.findByValmistajaOrderByMuoviAsc(valm);
 		}
 	}
 	
-	private List<VariDropdownProjection> getVarit() {
+	private List<ColorDropdownProjection> getVarit() {
 		return variRepo.findAllProjectedBy();
 	}
 }

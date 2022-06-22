@@ -2,6 +2,7 @@ package fi.bizhop.kiekkohamsteri.security;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import fi.bizhop.kiekkohamsteri.security.provider.GoogleIdTokenVerifierProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -12,8 +13,8 @@ public class GoogleAuthentication {
 
 	private final GoogleIdTokenVerifier verifier;
 
-	public GoogleAuthentication(VerifierProvider verifierProvider) {
-		this.verifier = verifierProvider.getVerifier();
+	public GoogleAuthentication(GoogleIdTokenVerifierProvider googleIdTokenVerifierProvider) {
+		this.verifier = googleIdTokenVerifierProvider.getVerifier();
 	}
 
 	public String getUserEmail(String token) {

@@ -8,13 +8,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import fi.bizhop.kiekkohamsteri.db.KiekkoRepository;
-import fi.bizhop.kiekkohamsteri.db.MembersRepository;
+import fi.bizhop.kiekkohamsteri.db.DiscRepository;
+import fi.bizhop.kiekkohamsteri.db.UserRepository;
 import fi.bizhop.kiekkohamsteri.db.MoldRepository;
-import fi.bizhop.kiekkohamsteri.db.MuoviRepository;
-import fi.bizhop.kiekkohamsteri.db.OstoRepository;
+import fi.bizhop.kiekkohamsteri.db.PlasticRepository;
+import fi.bizhop.kiekkohamsteri.db.BuyRepository;
 import fi.bizhop.kiekkohamsteri.db.StatsRepository;
-import fi.bizhop.kiekkohamsteri.db.ValmRepository;
+import fi.bizhop.kiekkohamsteri.db.ManufacturerRepository;
 import fi.bizhop.kiekkohamsteri.model.Ostot.Status;
 import fi.bizhop.kiekkohamsteri.model.Stats;
 import fi.bizhop.kiekkohamsteri.util.Utils;
@@ -24,17 +24,17 @@ public class StatsService {
 	@Autowired
 	StatsRepository statsRepo;
 	@Autowired
-	KiekkoRepository kiekkoRepo;
+    DiscRepository kiekkoRepo;
 	@Autowired
-	MembersRepository membersRepo;
+	UserRepository membersRepo;
 	@Autowired
-	ValmRepository valmRepo;
+	ManufacturerRepository valmRepo;
 	@Autowired
-	MuoviRepository muoviRepo;
+	PlasticRepository muoviRepo;
 	@Autowired
 	MoldRepository moldRepo;
 	@Autowired
-	OstoRepository ostoRepo;
+	BuyRepository ostoRepo;
 
 	public Page<Stats> getStats(Pageable pageable) {
 		return statsRepo.findAll(pageable);

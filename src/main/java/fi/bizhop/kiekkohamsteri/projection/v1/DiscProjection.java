@@ -1,4 +1,4 @@
-package fi.bizhop.kiekkohamsteri.projection;
+package fi.bizhop.kiekkohamsteri.projection.v1;
 
 import java.util.Date;
 
@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-public interface KiekkoProjection {
+public interface DiscProjection {
 	Long getId();	
 	@Value("#{target.getMember().getUsername()}")
 	String getOmistaja();
+	@Value("#{target.getMember().getEmail()}")
+	String getOwnerEmail();
 	@Value("#{target.getMold().getValmistaja().getValmistaja()}")
 	String getValmistaja();
 	@Value("#{target.getMold().getValmistaja().getId()}")

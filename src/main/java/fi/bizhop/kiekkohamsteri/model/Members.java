@@ -112,4 +112,14 @@ public class Members extends TimestampBase {
 	public void removeDisc() {
 		this.discCount--;
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		if(other == null) return false;
+		if(!(other instanceof Members)) return false;
+
+		var otherUser = (Members)other;
+		if(this.email == null) return false; //users with null emails are not equal
+		return this.email.equals(otherUser.email);
+	}
 }

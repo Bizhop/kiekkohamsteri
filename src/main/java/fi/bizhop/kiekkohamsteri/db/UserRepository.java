@@ -9,9 +9,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import fi.bizhop.kiekkohamsteri.model.Members;
-import fi.bizhop.kiekkohamsteri.projection.LeaderProjection;
+import fi.bizhop.kiekkohamsteri.projection.v1.LeaderProjection;
 
-public interface MembersRepository extends CrudRepository<Members, Long> {
+public interface UserRepository extends CrudRepository<Members, Long> {
 	Members findByEmail(String email);
 	List<Members> findAllByOrderById();
 	List<Members> findByPublicDiscCountTrue();

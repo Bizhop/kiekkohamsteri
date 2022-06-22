@@ -1,6 +1,7 @@
 package fi.bizhop.kiekkohamsteri.model;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "ostot")
@@ -27,11 +28,11 @@ public class Ostot extends TimestampBase {
 		super();
 	}
 	
-	public Ostot(Kiekot kiekko, Members myyja, Members ostaja, Status status) {
+	public Ostot(Kiekot disc, Members seller, Members buyer, Status status) {
 		super();
-		this.kiekko = kiekko;
-		this.myyja = myyja;
-		this.ostaja = ostaja;
+		this.kiekko = disc;
+		this.myyja = seller;
+		this.ostaja = buyer;
 		this.status = status;
 	}
 
@@ -77,5 +78,13 @@ public class Ostot extends TimestampBase {
 
 	public enum Status {
 		REQUESTED, CONFIRMED, REJECTED;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if(o == null) return false;
+		if(!(o instanceof Ostot)) return false;
+		var other = (Ostot)o;
+		return Objects.equals(this.id, other.id);
 	}
 }

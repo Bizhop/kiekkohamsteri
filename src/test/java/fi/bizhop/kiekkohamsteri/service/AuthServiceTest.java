@@ -1,6 +1,6 @@
 package fi.bizhop.kiekkohamsteri.service;
 
-import fi.bizhop.kiekkohamsteri.db.MembersRepository;
+import fi.bizhop.kiekkohamsteri.db.UserRepository;
 import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.security.GoogleAuthentication;
 import fi.bizhop.kiekkohamsteri.security.JWTAuthentication;
@@ -20,13 +20,13 @@ import static org.mockito.Mockito.*;
 
 public class AuthServiceTest {
     @Mock
-    MembersRepository membersRepository;
+    UserRepository userRepo;
 
     @Mock
-    JWTAuthentication jwtAuthentication;
+    JWTAuthentication jwtAuth;
 
     @Mock
-    GoogleAuthentication googleAuthentication;
+    GoogleAuthentication googleAuth;
 
     @BeforeEach
     void init() {
@@ -36,8 +36,8 @@ public class AuthServiceTest {
     @Test
     void givenValidJwt_whenGetUser_thenReturnUser() {
         var testUser = new Members(TEST_EMAIL);
-        given(jwtAuthentication.getUserEmail(anyString())).willReturn(TEST_EMAIL);
-        given(membersRepository.findByEmail(anyString())).willReturn(testUser);
+        given(jwtAuth.getUserEmail(anyString())).willReturn(TEST_EMAIL);
+        given(userRepo.findByEmail(anyString())).willReturn(testUser);
 
         var token = String.format("%s%s", JWT_TOKEN_PREFIX, "anything-goes");
         var request = mock(HttpServletRequest.class);
@@ -52,8 +52,8 @@ public class AuthServiceTest {
     @Test
     void givenValidGoogleToken_whenGetUser_thenReturnUser() {
         var testUser = new Members(TEST_EMAIL);
-        given(googleAuthentication.getUserEmail(anyString())).willReturn(TEST_EMAIL);
-        given(membersRepository.findByEmail(anyString())).willReturn(testUser);
+        given(googleAuth.getUserEmail(anyString())).willReturn(TEST_EMAIL);
+        given(userRepo.findByEmail(anyString())).willReturn(testUser);
 
         var token = "anything-goes";
         var request = mock(HttpServletRequest.class);
@@ -78,8 +78,8 @@ public class AuthServiceTest {
 
     @Test
     void givenValidTokenAndUserDoesntExist_whenGetUser_thenReturnNull() {
-        given(jwtAuthentication.getUserEmail(anyString())).willReturn(TEST_EMAIL);
-        given(membersRepository.findByEmail(anyString())).willReturn(null);
+        given(jwtAuth.getUserEmail(anyString())).willReturn(TEST_EMAIL);
+        given(userRepo.findByEmail(anyString())).willReturn(null);
 
         var token = String.format("%s%s", JWT_TOKEN_PREFIX, "anything-goes");
         var request = mock(HttpServletRequest.class);
@@ -93,8 +93,8 @@ public class AuthServiceTest {
     @Test
     void givenValidToken_whenLogin_thenReturnUser() {
         var testUser = new Members(TEST_EMAIL);
-        given(jwtAuthentication.getUserEmail(anyString())).willReturn(TEST_EMAIL);
-        given(membersRepository.findByEmail(anyString())).willReturn(testUser);
+        given(jwtAuth.getUserEmail(anyString())).willReturn(TEST_EMAIL);
+        given(userRepo.findByEmail(anyString())).willReturn(testUser);
 
         var token = String.format("%s%s", JWT_TOKEN_PREFIX, "anything-goes");
         var request = mock(HttpServletRequest.class);
@@ -104,14 +104,14 @@ public class AuthServiceTest {
 
         assertNotNull(user);
         assertEquals(TEST_EMAIL, user.getEmail());
-        verify(membersRepository, never()).save(any());
+        verify(userRepo, never()).save(any());
     }
 
     @Test
     void givenValidTokenAndUserDoesntExist_whenLogin_thenSaveAndReturnUser() {
-        given(jwtAuthentication.getUserEmail(anyString())).willReturn(TEST_EMAIL);
-        given(membersRepository.findByEmail(anyString())).willReturn(null);
-        given(membersRepository.save(any(Members.class))).willAnswer(i -> {
+        given(jwtAuth.getUserEmail(anyString())).willReturn(TEST_EMAIL);
+        given(userRepo.findByEmail(anyString())).willReturn(null);
+        given(userRepo.save(any(Members.class))).willAnswer(i -> {
             var user = (Members)i.getArguments()[0];
             if(user.getId() == null) user.setId(1L);
             return user;
@@ -126,11 +126,11 @@ public class AuthServiceTest {
         assertNotNull(user);
         assertEquals(TEST_EMAIL, user.getEmail());
         assertEquals("Uusi1", user.getUsername());
-        verify(membersRepository, times(2)).save(any());
+        verify(userRepo, times(2)).save(any());
     }
 
     //HELPER METHODS
     AuthService getAuth() {
-        return new AuthService(membersRepository, jwtAuthentication, googleAuthentication);
+        return new AuthService(userRepo, jwtAuth, googleAuth);
     }
 }
