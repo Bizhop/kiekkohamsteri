@@ -2,19 +2,19 @@ package fi.bizhop.kiekkohamsteri.dto;
 
 import java.util.List;
 
-import fi.bizhop.kiekkohamsteri.projection.DDProjection;
-import fi.bizhop.kiekkohamsteri.projection.MoldDropdownProjection;
-import fi.bizhop.kiekkohamsteri.projection.MuoviDropdownProjection;
-import fi.bizhop.kiekkohamsteri.projection.ValmDropdownProjection;
-import fi.bizhop.kiekkohamsteri.projection.VariDropdownProjection;
+import fi.bizhop.kiekkohamsteri.projection.v1.dropdown.DropdownProjection;
+import fi.bizhop.kiekkohamsteri.projection.v1.dropdown.MoldDropdownProjection;
+import fi.bizhop.kiekkohamsteri.projection.v1.dropdown.PlasticDropdownProjection;
+import fi.bizhop.kiekkohamsteri.projection.v1.dropdown.ManufacturerDropdownProjection;
+import fi.bizhop.kiekkohamsteri.projection.v1.dropdown.ColorDropdownProjection;
 
 public class DropdownsDto {
 	private List<MoldDropdownProjection> molds;
-	private List<ValmDropdownProjection> valms;
-	private List<MuoviDropdownProjection> muovit;
-	private List<VariDropdownProjection> varit;
-	private List<DDProjection> kunto;
-	private List<DDProjection> tussit;
+	private List<ManufacturerDropdownProjection> valms;
+	private List<PlasticDropdownProjection> muovit;
+	private List<ColorDropdownProjection> varit;
+	private List<DropdownProjection> kunto;
+	private List<DropdownProjection> tussit;
 	
 	public List<MoldDropdownProjection> getMolds() {
 		return molds;
@@ -23,38 +23,38 @@ public class DropdownsDto {
 		this.molds = molds;
 		return this;
 	}
-	public List<ValmDropdownProjection> getValms() {
+	public List<ManufacturerDropdownProjection> getValms() {
 		return valms;
 	}
-	public DropdownsDto setValms(List<ValmDropdownProjection> valms) {
+	public DropdownsDto setValms(List<ManufacturerDropdownProjection> valms) {
 		this.valms = valms;
 		return this;
 	}
-	public List<MuoviDropdownProjection> getMuovit() {
+	public List<PlasticDropdownProjection> getMuovit() {
 		return muovit;
 	}
-	public DropdownsDto setMuovit(List<MuoviDropdownProjection> muovit) {
+	public DropdownsDto setMuovit(List<PlasticDropdownProjection> muovit) {
 		this.muovit = muovit;
 		return this;
 	}
-	public List<VariDropdownProjection> getVarit() {
+	public List<ColorDropdownProjection> getVarit() {
 		return varit;
 	}
-	public DropdownsDto setVarit(List<VariDropdownProjection> varit) {
+	public DropdownsDto setVarit(List<ColorDropdownProjection> varit) {
 		this.varit = varit;
 		return this;
 	}
-	public List<DDProjection> getKunto() {
+	public List<DropdownProjection> getKunto() {
 		return kunto;
 	}
-	public DropdownsDto setKunto(List<DDProjection> kunto) {
+	public DropdownsDto setKunto(List<DropdownProjection> kunto) {
 		this.kunto = kunto;
 		return this;
 	}
-	public List<DDProjection> getTussit() {
+	public List<DropdownProjection> getTussit() {
 		return tussit;
 	}
-	public DropdownsDto setTussit(List<DDProjection> tussit) {
+	public DropdownsDto setTussit(List<DropdownProjection> tussit) {
 		this.tussit = tussit;
 		return this;
 	}

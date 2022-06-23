@@ -2,8 +2,7 @@ package fi.bizhop.kiekkohamsteri.security;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import fi.bizhop.kiekkohamsteri.security.GoogleAuthentication;
-import fi.bizhop.kiekkohamsteri.security.VerifierProvider;
+import fi.bizhop.kiekkohamsteri.security.provider.GoogleIdTokenVerifierProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -20,7 +19,7 @@ import static org.mockito.BDDMockito.given;
 
 public class GoogleAuthenticationTest {
     @Mock
-    VerifierProvider verifierProvider;
+    GoogleIdTokenVerifierProvider googleIdTokenVerifierProvider;
 
     @Mock
     GoogleIdTokenVerifier googleIdTokenVerifier;
@@ -38,7 +37,7 @@ public class GoogleAuthenticationTest {
 
     @Test
     void givenValidGoogleToken_whenGetUserEmail_thenReturnUserEmail() throws GeneralSecurityException, IOException {
-        given(verifierProvider.getVerifier()).willReturn(googleIdTokenVerifier);
+        given(googleIdTokenVerifierProvider.getVerifier()).willReturn(googleIdTokenVerifier);
         given(googleIdTokenVerifier.verify(anyString())).willReturn(googleIdToken);
         given(googleIdToken.getPayload()).willReturn(payload);
         given(payload.getEmail()).willReturn(TEST_EMAIL);
@@ -50,7 +49,7 @@ public class GoogleAuthenticationTest {
 
     @Test
     void givenInvalidToken_whenGetUserEmail_thenReturnNull() throws GeneralSecurityException, IOException {
-        given(verifierProvider.getVerifier()).willReturn(googleIdTokenVerifier);
+        given(googleIdTokenVerifierProvider.getVerifier()).willReturn(googleIdTokenVerifier);
         given(googleIdTokenVerifier.verify(anyString())).willReturn(null);
 
         var email = getAuth().getUserEmail("invalid :("); //input token doesn't matter in this test
@@ -60,7 +59,7 @@ public class GoogleAuthenticationTest {
 
     @Test
     void givenInvalidResponseFromGoogle_whenGetUserEmail_thenReturnNull() throws GeneralSecurityException, IOException {
-        given(verifierProvider.getVerifier()).willReturn(googleIdTokenVerifier);
+        given(googleIdTokenVerifierProvider.getVerifier()).willReturn(googleIdTokenVerifier);
         given(googleIdTokenVerifier.verify(anyString())).willReturn(googleIdToken);
         //null payload will produce NPE, that should get caught in the method
         given(googleIdToken.getPayload()).willReturn(null);
@@ -73,6 +72,6 @@ public class GoogleAuthenticationTest {
 
     //HELPER METHODS
     private GoogleAuthentication getAuth() {
-        return new GoogleAuthentication(verifierProvider);
+        return new GoogleAuthentication(googleIdTokenVerifierProvider);
     }
 }

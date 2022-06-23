@@ -2,7 +2,6 @@ package fi.bizhop.kiekkohamsteri.db;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,8 +9,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import fi.bizhop.kiekkohamsteri.model.R_mold;
 import fi.bizhop.kiekkohamsteri.model.R_valm;
-import fi.bizhop.kiekkohamsteri.projection.MoldDropdownProjection;
-import fi.bizhop.kiekkohamsteri.projection.MoldProjection;
+import fi.bizhop.kiekkohamsteri.projection.v1.dropdown.MoldDropdownProjection;
+import fi.bizhop.kiekkohamsteri.projection.v1.MoldProjection;
 
 public interface MoldRepository extends PagingAndSortingRepository<R_mold, Long> {
 	List<MoldDropdownProjection> findAllByOrderByKiekkoAsc();

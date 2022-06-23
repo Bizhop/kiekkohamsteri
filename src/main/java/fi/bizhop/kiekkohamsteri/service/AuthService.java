@@ -1,10 +1,10 @@
 package fi.bizhop.kiekkohamsteri.service;
 
-import fi.bizhop.kiekkohamsteri.db.MembersRepository;
+import fi.bizhop.kiekkohamsteri.db.UserRepository;
 import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.security.GoogleAuthentication;
 import fi.bizhop.kiekkohamsteri.security.JWTAuthentication;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthService {
 	private static final Logger LOG = LogManager.getLogger(AuthService.class);
     private static final String HEADER_STRING = "Authorization";
 
-	private final MembersRepository membersRepo;
+	private final UserRepository membersRepo;
 	private final JWTAuthentication jwtAuthentication;
 	private final GoogleAuthentication googleAuthentication;
 	

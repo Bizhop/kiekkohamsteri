@@ -3,67 +3,83 @@ package fi.bizhop.kiekkohamsteri.service;
 import java.time.LocalDate;
 import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import fi.bizhop.kiekkohamsteri.db.KiekkoRepository;
-import fi.bizhop.kiekkohamsteri.db.MembersRepository;
+import fi.bizhop.kiekkohamsteri.db.DiscRepository;
+import fi.bizhop.kiekkohamsteri.db.UserRepository;
 import fi.bizhop.kiekkohamsteri.db.MoldRepository;
-import fi.bizhop.kiekkohamsteri.db.MuoviRepository;
-import fi.bizhop.kiekkohamsteri.db.OstoRepository;
+import fi.bizhop.kiekkohamsteri.db.PlasticRepository;
+import fi.bizhop.kiekkohamsteri.db.BuyRepository;
 import fi.bizhop.kiekkohamsteri.db.StatsRepository;
-import fi.bizhop.kiekkohamsteri.db.ValmRepository;
+import fi.bizhop.kiekkohamsteri.db.ManufacturerRepository;
 import fi.bizhop.kiekkohamsteri.model.Ostot.Status;
 import fi.bizhop.kiekkohamsteri.model.Stats;
 import fi.bizhop.kiekkohamsteri.util.Utils;
 
 @Service
+@RequiredArgsConstructor
 public class StatsService {
-	@Autowired
-	StatsRepository statsRepo;
-	@Autowired
-	KiekkoRepository kiekkoRepo;
-	@Autowired
-	MembersRepository membersRepo;
-	@Autowired
-	ValmRepository valmRepo;
-	@Autowired
-	MuoviRepository muoviRepo;
-	@Autowired
-	MoldRepository moldRepo;
-	@Autowired
-	OstoRepository ostoRepo;
+	private static final Logger LOG = LogManager.getLogger(StatsService.class);
+
+	final StatsRepository statsRepo;
+	final DiscRepository discRepo;
+	final UserRepository userRepo;
+	final ManufacturerRepository manufacturerRepo;
+	final PlasticRepository plasticRepo;
+	final MoldRepository moldRepo;
+	final BuyRepository buyRepo;
+
+	public UpdateStatus generateStatsByYearAndMonth(int year, int month) {
+		if(year < 2017 || month < 1 || month > 12) {
+			return UpdateStatus.FAILED;
+		}
+
+		try {
+			LocalDate begin = LocalDate.of(year, month, 1);
+			LocalDate end = begin.plusMonths(1).withDayOfMonth(1);
+
+			Stats stats = statsRepo.findByYearAndMonth(year, month);
+			if (stats == null) {
+				stats = new Stats(year, month);
+			}
+
+			Date beginDate = Utils.asDate(begin);
+			Date endDate = Utils.asDate(end);
+
+			stats.setNewDiscs(discRepo.countByCreatedAtBetween(beginDate, endDate));
+			stats.setNewUsers(userRepo.countByCreatedAtBetween(beginDate, endDate));
+			stats.setNewManufacturers(manufacturerRepo.countByCreatedAtBetween(beginDate, endDate));
+			stats.setNewPlastics(plasticRepo.countByCreatedAtBetween(beginDate, endDate));
+			stats.setNewMolds(moldRepo.countByCreatedAtBetween(beginDate, endDate));
+			stats.setSalesCompleted(buyRepo.countByUpdatedAtBetweenAndStatus(beginDate, endDate, Status.CONFIRMED));
+
+			statsRepo.save(stats);
+			return UpdateStatus.DONE;
+		}
+		catch (Exception e) {
+			LOG.error("Stats generation failed", e);
+			return UpdateStatus.FAILED;
+		}
+	}
 
 	public Page<Stats> getStats(Pageable pageable) {
 		return statsRepo.findAll(pageable);
 	}
 
-	public boolean generateStatsByYearAndMonth(int year, int month) {
-		if(year < 2017 || month < 1 || month > 12) {
-			return false;
+	public enum UpdateStatus {
+		DONE("Scheduled update done"), FAILED("Scheduled update failed");
+		private final String stringValue;
+
+		UpdateStatus(String stringValue) {
+			this.stringValue = stringValue;
 		}
-		LocalDate begin = LocalDate.of(year, month, 1);
-		LocalDate end = begin.plusMonths(1).withDayOfMonth(1);
-				
-		Stats stats = statsRepo.findByYearAndMonth(year, month);
-		if(stats == null) {
-			stats = new Stats(year, month);
-		}
-		
-		Date beginDate = Utils.asDate(begin);
-		Date endDate = Utils.asDate(end);
-				
-		stats.setNewDiscs(kiekkoRepo.countByCreatedAtBetween(beginDate, endDate));
-		stats.setNewUsers(membersRepo.countByCreatedAtBetween(beginDate, endDate));
-		stats.setNewManufacturers(valmRepo.countByCreatedAtBetween(beginDate, endDate));
-		stats.setNewPlastics(muoviRepo.countByCreatedAtBetween(beginDate, endDate));
-		stats.setNewMolds(moldRepo.countByCreatedAtBetween(beginDate, endDate));
-		stats.setSalesCompleted(ostoRepo.countByUpdatedAtBetweenAndStatus(beginDate, endDate, Status.CONFIRMED));
-		
-		statsRepo.save(stats);
-		
-		return true;
+
+		@Override
+		public String toString() { return this.stringValue; }
 	}
 }

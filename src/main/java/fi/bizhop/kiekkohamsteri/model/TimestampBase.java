@@ -7,12 +7,14 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @MappedSuperclass
+@Setter
 public class TimestampBase {
 	  @Column(name = "created_at")
 	  @Temporal(TemporalType.TIMESTAMP)
@@ -31,16 +33,8 @@ public class TimestampBase {
 	    return createdAt;
 	  }
 
-	  public void setCreatedAt(Date createdAt) {
-	    this.createdAt = createdAt;
-	  }
-
 	  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSZ", locale = "fi_FI")
 	  public Date getUpdatedAt() {
 	    return updatedAt;
-	  }
-
-	  public void setUpdatedAt(Date updatedAt) {
-	    this.updatedAt = updatedAt;
 	  }
 }
