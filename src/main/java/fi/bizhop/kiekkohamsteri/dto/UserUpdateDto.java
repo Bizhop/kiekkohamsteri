@@ -1,13 +1,15 @@
 package fi.bizhop.kiekkohamsteri.dto;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
 
-@Data
+@Value
+@Builder
 public class UserUpdateDto {
-	private String username;
-	private String etunimi;
-	private String sukunimi;
-	private Integer pdga_num;
-	private boolean publicDiscCount;
-	private boolean publicList;
+	String username;
+	String etunimi;
+	String sukunimi;
+	Integer pdga_num;
+	boolean publicDiscCount;
+	boolean publicList;
 }

@@ -9,9 +9,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
-import static fi.bizhop.kiekkohamsteri.TestObjects.COLORS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class ColorServiceTest {
@@ -21,18 +19,6 @@ public class ColorServiceTest {
     @BeforeEach
     void init() {
         MockitoAnnotations.openMocks(this);
-    }
-
-    @Test
-    void getColorTest() {
-        var color = COLORS.get(0);
-
-        when(colorRepo.findById(123L)).thenReturn(Optional.of(color));
-
-        var response = getColorService().getColor(123L);
-
-        assertTrue(response.isPresent());
-        assertEquals(color, response.get());
     }
 
     @Test

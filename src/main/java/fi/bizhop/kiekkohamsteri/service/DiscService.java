@@ -136,12 +136,15 @@ public class DiscService {
 		}
 	}
 
+	public void updateDiscCounts(List<Members> users) {
+		for(var user : users) {
+			var count = discRepo.countByMember(user);
+			user.setDiscCount(count);
+		}
+	}
+
 	// Passthrough methods to db
 	// Not covered (or to be covered by unit tests)
-
-	public Integer getDiscCountByUser(Members user) {
-		return discRepo.countByMember(user);
-	}
 
 	public Page<DiscProjection> getLost(Pageable pageable) {
 		return discRepo.findByLostTrue(pageable);

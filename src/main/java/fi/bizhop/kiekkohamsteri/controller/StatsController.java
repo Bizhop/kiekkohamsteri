@@ -3,6 +3,7 @@ package fi.bizhop.kiekkohamsteri.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,24 +18,20 @@ import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.StatsService;
 
 @RestController
+@RequiredArgsConstructor
 public class StatsController extends BaseController {
-	@Autowired
-	StatsService statsService;
-	@Autowired
-	AuthService authService;
+	final StatsService statsService;
+	final AuthService authService;
 	
 	@RequestMapping(value="/stats", method=RequestMethod.GET, produces = "application/json")
 	public @ResponseBody Page<Stats> getStats(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
-		LOG.info("StatsController.getStats()");
-		
-		Members user = authService.getUser(request);
+		var user = authService.getUser(request);
 		if(user == null) {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			return null;
 		}
-		else {
-			response.setStatus(HttpServletResponse.SC_OK);
-			return statsService.getStats(pageable);
-		}
+
+		response.setStatus(HttpServletResponse.SC_OK);
+		return statsService.getStats(pageable);
 	}
 }

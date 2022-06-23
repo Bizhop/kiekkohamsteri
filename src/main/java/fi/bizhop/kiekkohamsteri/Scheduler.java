@@ -27,12 +27,6 @@ public class Scheduler {
 		}
 		
 		LOG.info(String.format("Scheduler updating stats (%d-%d)...", month, year));
-		
-		if(statsService.generateStatsByYearAndMonth(year, month)) {
-			LOG.info("Scheduled update done");
-		}
-		else {
-			LOG.error("Scheduled update failed");
-		}
+		LOG.info(statsService.generateStatsByYearAndMonth(year,month));
 	}
 }

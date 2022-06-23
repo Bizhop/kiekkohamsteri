@@ -1,10 +1,19 @@
 package fi.bizhop.kiekkohamsteri.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
 @Table(name = "ostot")
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
 public class Ostot extends TimestampBase {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -24,55 +33,10 @@ public class Ostot extends TimestampBase {
 	
 	Status status;
 	
-	public Ostot() {
-		super();
-	}
-	
 	public Ostot(Kiekot disc, Members seller, Members buyer, Status status) {
-		super();
 		this.kiekko = disc;
 		this.myyja = seller;
 		this.ostaja = buyer;
-		this.status = status;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Kiekot getKiekko() {
-		return kiekko;
-	}
-
-	public void setKiekko(Kiekot kiekko) {
-		this.kiekko = kiekko;
-	}
-
-	public Members getMyyja() {
-		return myyja;
-	}
-
-	public void setMyyja(Members myyja) {
-		this.myyja = myyja;
-	}
-
-	public Members getOstaja() {
-		return ostaja;
-	}
-
-	public void setOstaja(Members ostaja) {
-		this.ostaja = ostaja;
-	}
-
-	public Status getStatus() {
-		return status;
-	}
-
-	public void setStatus(Status status) {
 		this.status = status;
 	}
 

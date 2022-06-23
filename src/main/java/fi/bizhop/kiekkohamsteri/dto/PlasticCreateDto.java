@@ -5,11 +5,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class MoldCreateDto {
+public class PlasticCreateDto {
 	Long valmId;
-	String kiekko;
-	Double nopeus;
-	Double liito;
-	Double vakaus;
-	Double feidi;
+	String muovi;
 }
