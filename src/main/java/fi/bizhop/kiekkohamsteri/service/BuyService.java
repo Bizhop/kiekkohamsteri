@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import fi.bizhop.kiekkohamsteri.db.BuyRepository;
-import fi.bizhop.kiekkohamsteri.dto.OstotDto;
+import fi.bizhop.kiekkohamsteri.dto.BuysDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.model.Kiekot;
 import fi.bizhop.kiekkohamsteri.model.Members;
@@ -33,8 +33,8 @@ public class BuyService {
 		return buyRepo.save(buy);
 	}
 
-	public OstotDto getSummary(Members user) {
-		return new OstotDto(
+	public BuysDto getSummary(Members user) {
+		return new BuysDto(
 				buyRepo.findByStatusAndMyyja(Status.REQUESTED, user),
 				buyRepo.findByStatusAndOstaja(Status.REQUESTED, user)
 				);

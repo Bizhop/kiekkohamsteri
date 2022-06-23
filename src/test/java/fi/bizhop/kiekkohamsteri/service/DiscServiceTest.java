@@ -2,7 +2,7 @@ package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.TestObjects;
 import fi.bizhop.kiekkohamsteri.db.DiscRepository;
-import fi.bizhop.kiekkohamsteri.dto.KiekkoDto;
+import fi.bizhop.kiekkohamsteri.dto.DiscDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.Kiekot;
@@ -115,7 +115,7 @@ public class DiscServiceTest {
 
         when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
 
-        var dto = KiekkoDto.builder().build();
+        var dto = DiscDto.builder().build();
 
         try {
             getDiscService().updateDisc(dto, 123L, TEST_USER, null, null, null);
@@ -143,7 +143,7 @@ public class DiscServiceTest {
 
         when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
 
-        var dto = KiekkoDto.builder()
+        var dto = DiscDto.builder()
                 .muuta("text")
                 .kunto(8)
                 .kuva("image")
@@ -167,7 +167,7 @@ public class DiscServiceTest {
 
         when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
 
-        var dto = KiekkoDto.builder().lost(true).build();
+        var dto = DiscDto.builder().lost(true).build();
 
         getDiscService().updateDisc(dto, 123L, TEST_USER, null, null, null);
 

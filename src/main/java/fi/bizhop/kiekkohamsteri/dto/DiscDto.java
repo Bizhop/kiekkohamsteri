@@ -5,7 +5,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class KiekkoDto {
+public class DiscDto {
 	Long moldId;
 	Long muoviId;
 	Long variId;

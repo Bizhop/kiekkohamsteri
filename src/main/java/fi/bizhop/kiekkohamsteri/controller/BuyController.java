@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import fi.bizhop.kiekkohamsteri.dto.OstotDto;
+import fi.bizhop.kiekkohamsteri.dto.BuysDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.model.Ostot;
 import fi.bizhop.kiekkohamsteri.model.Ostot.Status;
@@ -41,7 +41,8 @@ public class BuyController extends BaseController {
 	}
 
 	@RequestMapping(value = "/ostot/omat", method = RequestMethod.GET)
-	public @ResponseBody OstotDto omat(HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody
+	BuysDto omat(HttpServletRequest request, HttpServletResponse response) {
 		var user = authService.getUser(request);
 		if(user == null) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

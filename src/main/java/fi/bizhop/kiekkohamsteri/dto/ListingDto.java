@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class ListausDto {
+public class ListingDto {
 	String username;
 	List<DiscProjection> kiekot;
 }

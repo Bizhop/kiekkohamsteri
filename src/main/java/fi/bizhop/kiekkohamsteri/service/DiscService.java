@@ -1,8 +1,8 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.DiscRepository;
-import fi.bizhop.kiekkohamsteri.dto.KiekkoDto;
-import fi.bizhop.kiekkohamsteri.dto.ListausDto;
+import fi.bizhop.kiekkohamsteri.dto.DiscDto;
+import fi.bizhop.kiekkohamsteri.dto.ListingDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.*;
@@ -55,7 +55,7 @@ public class DiscService {
 		discRepo.deleteById(id);
 	}
 	
-	public DiscProjection updateDisc(KiekkoDto dto, Long id, Members owner, R_mold newMold, R_muovi newPlastic, R_vari newColor) throws AuthorizationException, HttpResponseException {
+	public DiscProjection updateDisc(DiscDto dto, Long id, Members owner, R_mold newMold, R_muovi newPlastic, R_vari newColor) throws AuthorizationException, HttpResponseException {
 		if(dto == null) throw new HttpResponseException(HttpServletResponse.SC_BAD_REQUEST, "Dto must not be null");
 		var disc = discRepo.findById(id).orElse(null);
 		
@@ -103,14 +103,14 @@ public class DiscService {
 		}
 	}
 
-	public List<ListausDto> getPublicLists(List<Members> usersWithPublicDiscs) {
+	public List<ListingDto> getPublicLists(List<Members> usersWithPublicDiscs) {
 		if(usersWithPublicDiscs == null || usersWithPublicDiscs.isEmpty()) return Collections.emptyList();
 
 		return discRepo.findByMemberInAndPublicDiscTrue(usersWithPublicDiscs)
 				.stream()
 				.collect(Collectors.groupingBy(DiscProjection::getOwnerEmail))
 				.entrySet().stream()
-				.map(entry -> new ListausDto(entry.getKey(), entry.getValue()))
+				.map(entry -> new ListingDto(entry.getKey(), entry.getValue()))
 				.peek(listing -> {
 					var username = listing.getKiekot().stream()
 							.findFirst()

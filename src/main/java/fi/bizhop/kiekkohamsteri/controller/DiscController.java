@@ -1,7 +1,7 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
-import fi.bizhop.kiekkohamsteri.dto.KiekkoDto;
-import fi.bizhop.kiekkohamsteri.dto.ListausDto;
+import fi.bizhop.kiekkohamsteri.dto.DiscDto;
+import fi.bizhop.kiekkohamsteri.dto.ListingDto;
 import fi.bizhop.kiekkohamsteri.dto.UploadDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
@@ -143,7 +143,7 @@ public class DiscController extends BaseController {
 	
 	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
 	public @ResponseBody
-	DiscProjection paivitaKiekko(@PathVariable Long id, @RequestBody KiekkoDto dto, HttpServletRequest request, HttpServletResponse response) {
+	DiscProjection paivitaKiekko(@PathVariable Long id, @RequestBody DiscDto dto, HttpServletRequest request, HttpServletResponse response) {
 		var owner = authService.getUser(request);
 		if(owner == null) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -219,7 +219,7 @@ public class DiscController extends BaseController {
 	}
 	
 	@RequestMapping(value = "/kiekot/public-lists", method = RequestMethod.GET)
-	public List<ListausDto> haeJulkisetListat(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
+	public List<ListingDto> haeJulkisetListat(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
 		var user = authService.getUser(request);
 		if(user == null) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
