@@ -42,7 +42,7 @@ public class BuyControllerTest extends SpringContextTestBase {
     ArgumentCaptor<Kiekot> discCaptor;
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "/omat"})
+    @ValueSource(strings = {"", "omat"})
     void givenUnableToAuthenticateUser_whenCallingGetEndpoint_thenRespondWithUnauthorized(String endpoint) {
         when(authService.getUser(any())).thenReturn(null);
 

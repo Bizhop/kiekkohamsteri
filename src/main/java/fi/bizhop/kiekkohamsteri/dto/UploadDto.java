@@ -1,9 +1,11 @@
 package fi.bizhop.kiekkohamsteri.dto;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
 
-@Data
+@Value
+@Builder
 public class UploadDto {
-	private String data;
-	private String name;
+	String data;
+	String name;
 }

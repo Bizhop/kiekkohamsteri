@@ -110,13 +110,7 @@ public class DiscService {
 				.stream()
 				.collect(Collectors.groupingBy(DiscProjection::getOwnerEmail))
 				.entrySet().stream()
-				.map(entry -> new ListingDto(entry.getKey(), entry.getValue()))
-				.peek(listing -> {
-					var username = listing.getKiekot().stream()
-							.findFirst()
-							.map(DiscProjection::getOmistaja);
-					listing.setUsername(username.orElse(null));
-				})
+				.map(ListingDto::fromMapEntry)
 				.collect(Collectors.toList());
 	}
 	
