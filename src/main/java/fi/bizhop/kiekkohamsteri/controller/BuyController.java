@@ -29,28 +29,25 @@ public class BuyController extends BaseController {
 	final DiscService discService;
 
 	@RequestMapping(value = "/ostot", method = RequestMethod.GET)
-	public @ResponseBody List<Ostot> list(@RequestParam(value = "status", required = false) Status status, HttpServletRequest request, HttpServletResponse response ) {
+	public @ResponseBody List<Ostot> listing(@RequestParam(value = "status", required = false) Status status, HttpServletRequest request, HttpServletResponse response ) {
 		var user = authService.getUser(request);
 		if(user == null) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return null;
 		}
-		else {
-			return buyService.getListing(status);
-		}
+
+		return buyService.getListing(status);
 	}
 
 	@RequestMapping(value = "/ostot/omat", method = RequestMethod.GET)
-	public @ResponseBody
-	BuysDto omat(HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody BuysDto summary(HttpServletRequest request, HttpServletResponse response) {
 		var user = authService.getUser(request);
 		if(user == null) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return null;
 		}
-		else {
-			return buyService.getSummary(user);
-		}
+
+		return buyService.getSummary(user);
 	}
 
 	@RequestMapping(value = "/ostot/{id}/confirm", method = RequestMethod.POST)
@@ -58,15 +55,15 @@ public class BuyController extends BaseController {
 		var user = authService.getUser(request);
 		if(user == null) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
 		}
-		else {
-			try {
-				var disc = buyService.confirm(id, user);
-				discService.saveDisc(disc);
-			}
-			catch (AuthorizationException e) {
-				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			}
+
+		try {
+			var disc = buyService.confirm(id, user);
+			discService.saveDisc(disc);
+		}
+		catch (AuthorizationException e) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 		}
 	}
 
@@ -75,14 +72,14 @@ public class BuyController extends BaseController {
 		var user = authService.getUser(request);
 		if(user == null) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
 		}
-		else {
-			try {
-				buyService.reject(id, user);
-			}
-			catch (AuthorizationException e) {
-				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			}
+
+		try {
+			buyService.reject(id, user);
+		}
+		catch (AuthorizationException e) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 		}
 	}
 }

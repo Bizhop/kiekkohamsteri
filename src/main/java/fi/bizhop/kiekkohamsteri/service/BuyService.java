@@ -34,10 +34,12 @@ public class BuyService {
 	}
 
 	public BuysDto getSummary(Members user) {
-		return new BuysDto(
-				buyRepo.findByStatusAndMyyja(Status.REQUESTED, user),
-				buyRepo.findByStatusAndOstaja(Status.REQUESTED, user)
-				);
+		var myyjana = buyRepo.findByStatusAndMyyja(Status.REQUESTED, user);
+		var ostajana = buyRepo.findByStatusAndOstaja(Status.REQUESTED, user);
+		return BuysDto.builder()
+				.myyjana(myyjana)
+				.ostajana(ostajana)
+				.build();
 	}
 
 	public List<Ostot> getListing(Status status) {
