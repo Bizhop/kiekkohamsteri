@@ -137,6 +137,19 @@ public class TestObjects {
                 .collect(Collectors.toList());
     }
 
+    public static List<PlasticProjection> getPlastics() {
+        return PLASTICS.stream()
+                .map(TestObjects::projectionFromPlastic)
+                .collect(Collectors.toList());
+    }
+
+    public static List<PlasticProjection> getPlastics(R_valm manufacturer) {
+        return PLASTICS.stream()
+                .filter(mold -> mold.getValmistaja().getId().equals(manufacturer.getId()))
+                .map(TestObjects::projectionFromPlastic)
+                .collect(Collectors.toList());
+    }
+
     public static List<PlasticDropdownProjection> getPlasticsDD() {
         return PLASTICS.stream()
                 .map(TestObjects::dropdownProjectionFromPlastic)
@@ -255,6 +268,14 @@ public class TestObjects {
             @Override public Double getLiito() { return mold.getLiito(); }
             @Override public Double getVakaus() { return mold.getVakaus(); }
             @Override public Double getFeidi() { return mold.getFeidi(); }
+        };
+    }
+
+    public static PlasticProjection projectionFromPlastic(R_muovi plastic) {
+        return new PlasticProjection() {
+            @Override public Long getId() { return plastic.getId(); }
+            @Override public String getValmistaja() { return plastic.getValmistaja().getValmistaja(); }
+            @Override public String getMuovi() { return plastic.getMuovi(); }
         };
     }
 

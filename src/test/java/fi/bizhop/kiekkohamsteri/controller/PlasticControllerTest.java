@@ -2,12 +2,13 @@ package fi.bizhop.kiekkohamsteri.controller;
 
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.dto.MoldCreateDto;
+import fi.bizhop.kiekkohamsteri.dto.PlasticCreateDto;
 import fi.bizhop.kiekkohamsteri.model.Members;
-import fi.bizhop.kiekkohamsteri.model.R_mold;
+import fi.bizhop.kiekkohamsteri.model.R_muovi;
 import fi.bizhop.kiekkohamsteri.model.R_valm;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.ManufacturerService;
-import fi.bizhop.kiekkohamsteri.service.MoldService;
+import fi.bizhop.kiekkohamsteri.service.PlasticService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,21 +28,22 @@ import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-public class MoldControllerTest extends SpringContextTestBase {
+public class PlasticControllerTest extends SpringContextTestBase {
     @LocalServerPort int port;
     @Autowired TestRestTemplate restTemplate;
 
     @MockBean AuthService authService;
-    @MockBean MoldService moldService;
+    @MockBean PlasticService plasticService;
     @MockBean ManufacturerService manufacturerService;
 
     @Test
-    void givenUnableToAuthenticateUser_whenCallingGetMolds_thenRespondWithUnauthorized() {
+    void givenUnableToAuthenticateUser_whenCallingGetPlastics_thenRespondWithUnauthorized() {
         when(authService.getUser(any())).thenReturn(null);
 
         var response = restTemplate.getForEntity(createUrl(), Object.class);
@@ -51,7 +53,7 @@ public class MoldControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenNonAdminUser_whenCallingGetMolds_thenRespondForbidden() {
+    void givenNonAdminUser_whenCallingGetPlastics_thenRespondForbidden() {
         var user = new Members(TEST_EMAIL);
         user.setLevel(1);
         when(authService.getUser(any())).thenReturn(user);
@@ -63,130 +65,125 @@ public class MoldControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenUnableToAuthenticateUser_whenCreatingMold_thenRespondWithUnauthorized() {
+    void givenUnableToAuthenticateUser_whenCreatingPlastic_thenRespondWithUnauthorized() {
         when(authService.getUser(any())).thenReturn(null);
 
-        var response = restTemplate.postForEntity(createUrl(), MoldCreateDto.builder().build(), Object.class);
+        var response = restTemplate.postForEntity(createUrl(), PlasticCreateDto.builder().build(), Object.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
         assertNull(response.getBody());
     }
 
     @Test
-    void givenNonAdminUser_whenCreatingMold_thenRespondWithUnauthorized() {
+    void givenNonAdminUser_whenCreatingPlastic_thenRespondWithUnauthorized() {
         var user = new Members(TEST_EMAIL);
         user.setLevel(1);
         when(authService.getUser(any())).thenReturn(user);
 
-        var response = restTemplate.postForEntity(createUrl(), MoldCreateDto.builder().build(), Object.class);
+        var response = restTemplate.postForEntity(createUrl(), PlasticCreateDto.builder().build(), Object.class);
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
         assertNull(response.getBody());
     }
 
     @Test
-    void givenValidRequestWithoutManufacturerId_whenGetMolds_thenReturnAllMolds() throws IOException {
+    void givenValidRequestWithoutManufacturerId_whenGetPlastics_thenReturnAllPlastics() throws IOException {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
-        var page = new PageImpl<>(getMolds());
-        when(moldService.getMolds(any())).thenReturn(page);
+        var page = new PageImpl<>(getPlastics());
+        when(plasticService.getPlastics(any())).thenReturn(page);
 
         var response = restTemplate.getForEntity(createUrl(), String.class);
 
-        verify(moldService, times(1)).getMolds(any());
+        verify(plasticService, times(1)).getPlastics(any());
         verify(manufacturerService, never()).getManufacturer(anyLong());
-        verify(moldService, never()).getMoldsByManufacturer(any(), any());
+        verify(plasticService, never()).getPlasticsByManufacturer(any(), any());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEquals(getJsonFromFile("expectedAllMolds.json"), getJsonFromString(response.getBody()));
+        assertEquals(getJsonFromFile("expectedAllPlastics.json"), getJsonFromString(response.getBody()));
     }
 
     @Test
-    void givenValidRequestWithManufacturerId_whenGetMolds_thenReturnMoldsByManufacturer() throws IOException {
+    void givenValidRequestWithManufacturerId_whenGetPlastics_thenReturnPlasticsByManufacturer() throws IOException {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
         var manufacturer = MANUFACTURERS.get(0);
-        var page = new PageImpl<>(getMolds(manufacturer));
+        var page = new PageImpl<>(getPlastics(manufacturer));
         when(manufacturerService.getManufacturer(0L)).thenReturn(Optional.of(manufacturer));
-        when(moldService.getMoldsByManufacturer(eq(manufacturer), any())).thenReturn(page);
+        when(plasticService.getPlasticsByManufacturer(eq(manufacturer), any())).thenReturn(page);
 
         var response = restTemplate.getForEntity(createUrl() + "?valmId=0", String.class);
 
-        verify(moldService, never()).getMolds(any());
+        verify(plasticService, never()).getPlastics(any());
         verify(manufacturerService, times(1)).getManufacturer(0L);
-        verify(moldService, times(1)).getMoldsByManufacturer(eq(manufacturer), any());
+        verify(plasticService, times(1)).getPlasticsByManufacturer(eq(manufacturer), any());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEquals(getJsonFromFile("expectedDiscmaniaMolds.json"), getJsonFromString(response.getBody()));
+        assertEquals(getJsonFromFile("expectedDiscmaniaPlastics.json"), getJsonFromString(response.getBody()));
     }
 
     @Test
-    void givenManufacturerNotFound_whenGetMolds_thenRespondBadRequest() {
+    void givenManufacturerNotFound_whenGetPlastics_thenRespondBadRequest() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
         when(manufacturerService.getManufacturer(66L)).thenReturn(Optional.empty());
 
         var response = restTemplate.getForEntity(createUrl() + "?valmId=66", String.class);
 
-        verify(moldService, never()).getMolds(any());
+        verify(plasticService, never()).getPlastics(any());
         verify(manufacturerService, times(1)).getManufacturer(66L);
-        verify(moldService, never()).getMoldsByManufacturer(any(), any());
+        verify(plasticService, never()).getPlasticsByManufacturer(any(), any());
 
         assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
         assertNull(response.getBody());
     }
 
     @Test
-    void givenValidRequest_whenCreateMold_thenCreateMold() throws IOException {
+    void givenValidRequest_whenCreatePlastic_thenCreatePlastic() throws IOException {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
         var manufacturer = MANUFACTURERS.get(0);
-        var dto = MoldCreateDto.builder().valmId(0L).build();
-        var mold = getTestMold(manufacturer);
+        var dto = PlasticCreateDto.builder().valmId(0L).build();
+        var mold = getTestPlastic(manufacturer);
         when(manufacturerService.getManufacturer(0L)).thenReturn(Optional.of(manufacturer));
-        when(moldService.createMold(dto, manufacturer)).thenReturn(projectionFromMold(mold));
+        when(plasticService.createPlastic(dto, manufacturer)).thenReturn(projectionFromPlastic(mold));
 
         var response = restTemplate.postForEntity(createUrl(), dto, String.class);
 
         verify(manufacturerService, times(1)).getManufacturer(0L);
-        verify(moldService, times(1)).createMold(dto, manufacturer);
+        verify(plasticService, times(1)).createPlastic(dto, manufacturer);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEquals(getJsonFromFile("expectedNewMold.json"), getJsonFromString(response.getBody()));
+        assertEquals(getJsonFromFile("expectedNewPlastic.json"), getJsonFromString(response.getBody()));
     }
 
     @Test
-    void givenManufacturerNotFound_whenCreateMold_thenRespondBadRequest() {
+    void givenManufacturerNotFound_whenCreatePlastic_thenRespondBadRequest() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
-        var dto = MoldCreateDto.builder().valmId(0L).build();
+        var dto = PlasticCreateDto.builder().valmId(0L).build();
         when(manufacturerService.getManufacturer(0L)).thenReturn(Optional.empty());
 
         var response = restTemplate.postForEntity(createUrl(), dto, String.class);
 
         verify(manufacturerService, times(1)).getManufacturer(0L);
-        verify(moldService, never()).createMold(any(), any());
+        verify(plasticService, never()).createPlastic(any(), any());
 
         assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
         assertNull(response.getBody());
     }
 
-
     //HELPER METHODS
 
     private String createUrl() {
-        return String.format("http://localhost:%d/api/molds/", port);
+        return String.format("http://localhost:%d/api/muovit/", port);
     }
 
-    private R_mold getTestMold(R_valm manufacturer) {
-        var mold = new R_mold();
-        mold.setId(66L);
-        mold.setKiekko("New Mold");
-        mold.setValmistaja(manufacturer);
-        mold.setNopeus(1.0);
-        mold.setLiito(2.0);
-        mold.setVakaus(3.0);
-        mold.setFeidi(4.0);
-        return mold;
+    private R_muovi getTestPlastic(R_valm manufacturer) {
+        var plastic = new R_muovi();
+        plastic.setId(66L);
+        plastic.setValmistaja(manufacturer);
+        plastic.setMuovi("New Plastic");
+        return plastic;
     }
 }
