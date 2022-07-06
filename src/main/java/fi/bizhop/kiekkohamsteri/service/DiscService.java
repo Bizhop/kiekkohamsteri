@@ -8,6 +8,7 @@ import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.*;
 import fi.bizhop.kiekkohamsteri.projection.v1.DiscProjection;
 import fi.bizhop.kiekkohamsteri.util.Utils;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -55,8 +56,7 @@ public class DiscService {
 		discRepo.deleteById(id);
 	}
 	
-	public DiscProjection updateDisc(DiscDto dto, Long id, Members owner, R_mold newMold, R_muovi newPlastic, R_vari newColor) throws AuthorizationException, HttpResponseException {
-		if(dto == null) throw new HttpResponseException(HttpServletResponse.SC_BAD_REQUEST, "Dto must not be null");
+	public DiscProjection updateDisc(DiscDto dto, Long id, Members owner, R_mold newMold, R_muovi newPlastic, R_vari newColor) throws AuthorizationException {
 		var disc = discRepo.findById(id).orElse(null);
 		
 		if(disc == null || !disc.getMember().equals(owner)) {
@@ -115,8 +115,8 @@ public class DiscService {
 	}
 	
 	public void handleFoundDisc(Members user, Long id) throws HttpResponseException {
-		var disc = discRepo.findById(id).orElseThrow();
-		if(!disc.getMember().equals(user)) {
+		var disc = discRepo.findById(id).orElse(null);
+		if(disc == null || !disc.getMember().equals(user)) {
 			throw new HttpResponseException(HttpServletResponse.SC_FORBIDDEN, "User is not disc owner");
 		}
 		else if(!Boolean.TRUE.equals(disc.getLost())) {
@@ -137,7 +137,7 @@ public class DiscService {
 		}
 	}
 
-	// Passthrough methods to db
+	// Pass-through methods to db
 	// Not covered (or to be covered by unit tests)
 
 	public Page<DiscProjection> getLost(Pageable pageable) {

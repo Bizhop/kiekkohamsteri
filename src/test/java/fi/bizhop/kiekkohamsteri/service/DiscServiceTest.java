@@ -127,17 +127,6 @@ public class DiscServiceTest {
     }
 
     @Test
-    void givenDtoIsNull_whenUpdatingDisc_thenThrowException() throws AuthorizationException {
-        try {
-            getDiscService().updateDisc(null, 0L, TEST_USER, null, null, null);
-
-            fail(SHOULD_THROW_EXCEPTION);
-        } catch (HttpResponseException ignored) {}
-
-        verify(discRepo, never()).save(any());
-    }
-
-    @Test
     void givenValidDto_whenUpdatingDisc_thenUpdateDisc() throws AuthorizationException, HttpResponseException {
         var disc = getTestDiscFor(TEST_USER);
 

@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class TestObjects {
+    public static final String TEST_UUID = "d2b62756-378f-487d-ba25-0b0ff287d1d8";
     public static final String SHOULD_THROW_EXCEPTION = "Previous call should throw Exception";
     public static final String TEST_EMAIL = "test@example.com";
     public static final String OTHER_EMAIL = "other@example.com";

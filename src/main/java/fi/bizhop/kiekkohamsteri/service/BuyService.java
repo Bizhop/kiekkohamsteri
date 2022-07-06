@@ -17,28 +17,32 @@ import fi.bizhop.kiekkohamsteri.model.Ostot.Status;
 
 import javax.servlet.http.HttpServletResponse;
 
+import static fi.bizhop.kiekkohamsteri.model.Ostot.Status.*;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+
 @Service
 @RequiredArgsConstructor
 public class BuyService {
 	final BuyRepository buyRepo;
 
 	public Ostot buyDisc(Members buyer, Kiekot disc) throws HttpResponseException {
-		if(buyer.equals(disc.getMember())) throw new HttpResponseException(HttpServletResponse.SC_BAD_REQUEST, "Et voi ostaa omaa kiekkoasi");
-		if(!disc.getMyynnissa()) throw new HttpResponseException(HttpServletResponse.SC_FORBIDDEN, "Ei myynnissä");
+		if(disc == null || !disc.getMyynnissa()) throw new HttpResponseException(SC_FORBIDDEN, "Not for sale");
+		if(buyer.equals(disc.getMember())) throw new HttpResponseException(SC_BAD_REQUEST, "You can't buy your own disc");
 
-		var existing = buyRepo.findByKiekkoAndOstajaAndStatus(disc, buyer, Status.REQUESTED);
-		if(existing != null) throw new HttpResponseException(HttpServletResponse.SC_BAD_REQUEST, "Olet jo ostamassa tätä kiekkoa");
+		var existing = buyRepo.findByKiekkoAndOstajaAndStatus(disc, buyer, REQUESTED);
+		if(existing != null) throw new HttpResponseException(SC_BAD_REQUEST, "You are already buying this disc");
 
-		var buy = new Ostot(disc, disc.getMember(), buyer, Status.REQUESTED);
+		var buy = new Ostot(disc, disc.getMember(), buyer, REQUESTED);
 		return buyRepo.save(buy);
 	}
 
 	public BuysDto getSummary(Members user) {
-		var myyjana = buyRepo.findByStatusAndMyyja(Status.REQUESTED, user);
-		var ostajana = buyRepo.findByStatusAndOstaja(Status.REQUESTED, user);
+		var asSeller = buyRepo.findByStatusAndMyyja(REQUESTED, user);
+		var asBuyer = buyRepo.findByStatusAndOstaja(REQUESTED, user);
 		return BuysDto.builder()
-				.myyjana(myyjana)
-				.ostajana(ostajana)
+				.myyjana(asSeller)
+				.ostajana(asBuyer)
 				.build();
 	}
 
@@ -58,7 +62,7 @@ public class BuyService {
 				.collect(Collectors.toList());
 		if(otherBuys.size() > 0) {
 			for(Ostot o : otherBuys) {
-				o.setStatus(Status.REJECTED);
+				o.setStatus(REJECTED);
 			}
 			buyRepo.saveAll(otherBuys);
 		}
@@ -70,7 +74,7 @@ public class BuyService {
 		disc.setItb(false);
 
 		//set status to confirmed
-		buy.setStatus(Status.CONFIRMED);
+		buy.setStatus(CONFIRMED);
 		buyRepo.save(buy);
 
 		return disc;
@@ -80,7 +84,7 @@ public class BuyService {
 		var buy = buyRepo.findById(id).orElseThrow();
 		if(!user.equals(buy.getMyyja()) && !user.equals(buy.getOstaja())) throw new AuthorizationException();
 
-		buy.setStatus(Status.REJECTED);
+		buy.setStatus(REJECTED);
 		buyRepo.save(buy);
 	}
 }

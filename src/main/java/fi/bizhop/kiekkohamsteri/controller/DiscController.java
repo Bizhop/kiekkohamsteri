@@ -1,5 +1,6 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
+import fi.bizhop.kiekkohamsteri.controller.provider.UUIDProvider;
 import fi.bizhop.kiekkohamsteri.dto.DiscDto;
 import fi.bizhop.kiekkohamsteri.dto.ListingDto;
 import fi.bizhop.kiekkohamsteri.dto.UploadDto;
@@ -17,8 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
+
+import static javax.servlet.http.HttpServletResponse.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,16 +33,17 @@ public class DiscController extends BaseController {
 	final MoldService moldService;
 	final PlasticService plasticService;
 	final ColorService colorService;
+	final UUIDProvider uuidProvider;
 
 	@RequestMapping(value = "/kiekot", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody Page<DiscProjection> getDiscs(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
 		var owner = authService.getUser(request);
 		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setStatus(SC_UNAUTHORIZED);
 			return null;
 		}
 
-		response.setStatus(HttpServletResponse.SC_OK);
+		response.setStatus(SC_OK);
 		return discService.getDiscs(owner, pageable);
 	}
 
@@ -48,11 +51,11 @@ public class DiscController extends BaseController {
 	public @ResponseBody Page<DiscProjection> getDiscsForSale(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
 		var owner = authService.getUser(request);
 		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setStatus(SC_UNAUTHORIZED);
 			return null;
 		}
 
-		response.setStatus(HttpServletResponse.SC_OK);
+		response.setStatus(SC_OK);
 		return discService.getDiscsForSale(pageable);
 	}
 
@@ -60,7 +63,11 @@ public class DiscController extends BaseController {
 	public @ResponseBody DiscProjection createDisc(@RequestBody UploadDto dto, HttpServletRequest request, HttpServletResponse response) {
 		var owner = authService.getUser(request);
 		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setStatus(SC_UNAUTHORIZED);
+			return null;
+		}
+		if(invalidUploadDto(dto)) {
+			response.setStatus(SC_BAD_REQUEST);
 			return null;
 		}
 
@@ -76,7 +83,7 @@ public class DiscController extends BaseController {
 		try {
 			uploadService.upload(dto, image);
 			disc = discService.updateImage(disc.getId(), image);
-			response.setStatus(HttpServletResponse.SC_OK);
+			response.setStatus(SC_OK);
 			return disc;
 		}
 		catch (IOException e) {
@@ -84,7 +91,7 @@ public class DiscController extends BaseController {
 
 			//if image upload fails, delete the created disc
 			discService.deleteDiscById(disc.getId());
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.setStatus(SC_INTERNAL_SERVER_ERROR);
 			return null;
 		}
 	}
@@ -93,27 +100,35 @@ public class DiscController extends BaseController {
 	public void updateImage(@PathVariable Long id, @RequestBody UploadDto dto, HttpServletRequest request, HttpServletResponse response) {
 		var owner = authService.getUser(request);
 		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setStatus(SC_UNAUTHORIZED);
+			return;
+		}
+		if(invalidUploadDto(dto)) {
+			response.setStatus(SC_BAD_REQUEST);
 			return;
 		}
 
 		try {
 			var disc = discService.getDisc(owner, id);
 			var image = disc.getKuva();
-			var newImage = image + "-" + new Date().getTime();
-			if(StringUtils.countOccurrencesOf(image, "-") > 1) {
-				newImage = image.substring(0, image.lastIndexOf("-")) + "-" + new Date().getTime();
-			}
+			//if image name already has more than one "-", it has been updated previously
+			// then replace the uuid with new one
+			var uuid = uuidProvider.getUuid();
+			var newImage = StringUtils.countOccurrencesOf(image, "-") > 1
+					? image.substring(0, image.lastIndexOf("-")) + "-" + uuid
+					: image + "-" + uuid;
+
 			uploadService.upload(dto, newImage);
 			discService.updateImage(disc.getId(), newImage);
-			response.setStatus(HttpServletResponse.SC_OK);
+			response.setStatus(SC_NO_CONTENT);
 		}
 		catch (AuthorizationException e) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			LOG.error("{} trying to update someone else's disc", owner.getEmail());
+			response.setStatus(SC_FORBIDDEN);
 		}
 		catch (IOException e) {
 			LOG.error("Cloudinary error uploading image", e);
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.setStatus(SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -121,16 +136,16 @@ public class DiscController extends BaseController {
 	public @ResponseBody DiscProjection getDisc(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
 		var owner = authService.getUser(request);
 		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setStatus(SC_UNAUTHORIZED);
 			return null;
 		}
 
 		try {
-			response.setStatus(HttpServletResponse.SC_OK);
+			response.setStatus(SC_OK);
 			return discService.getDiscIfPublicOrOwn(owner, id);
 		}
 		catch (AuthorizationException ae) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.setStatus(SC_FORBIDDEN);
 			return null;
 		}
 	}
@@ -139,7 +154,7 @@ public class DiscController extends BaseController {
 	public @ResponseBody DiscProjection updateDisc(@PathVariable Long id, @RequestBody DiscDto dto, HttpServletRequest request, HttpServletResponse response) {
 		var owner = authService.getUser(request);
 		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setStatus(SC_UNAUTHORIZED);
 			return null;
 		}
 
@@ -147,21 +162,16 @@ public class DiscController extends BaseController {
 			var newMold = moldService.getMold(dto.getMoldId()).orElse(null);
 			var newPlastic = plasticService.getPlastic(dto.getMuoviId()).orElse(null);
 			var newColor = colorService.getColor(dto.getVariId()).orElse(null);
-			response.setStatus(HttpServletResponse.SC_OK);
+			response.setStatus(SC_OK);
 			return discService.updateDisc(dto, id, owner, newMold, newPlastic, newColor);
 		}
 		catch(AuthorizationException ae) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			return null;
-		}
-		catch(HttpResponseException hre) {
-			LOG.error(hre.getMessage());
-			response.setStatus(hre.getStatusCode());
+			response.setStatus(SC_FORBIDDEN);
 			return null;
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.setStatus(SC_INTERNAL_SERVER_ERROR);
 			return null;
 		}
 	}
@@ -170,7 +180,7 @@ public class DiscController extends BaseController {
 	public void deleteDisc(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
 		var owner = authService.getUser(request);
 		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setStatus(SC_UNAUTHORIZED);
 			return;
 		}
 
@@ -178,9 +188,10 @@ public class DiscController extends BaseController {
 			discService.deleteDisc(id, owner);
 			owner.removeDisc();
 			userService.saveUser(owner);
+			response.setStatus(SC_NO_CONTENT);
 		}
 		catch(AuthorizationException ae) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.setStatus(SC_FORBIDDEN);
 		}
 	}
 
@@ -188,19 +199,14 @@ public class DiscController extends BaseController {
 	public @ResponseBody Ostot buyDisc(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
 		var user = authService.getUser(request);
 		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setStatus(SC_UNAUTHORIZED);
 			return null;
 		}
 
 		try {
-			var discOpt = discService.getDiscDb(id);
-			if(discOpt.isEmpty()) {
-				response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-				return null;
-			}
+			var disc = discService.getDiscDb(id).orElse(null);
 
-			var disc = discOpt.get();
-
+			response.setStatus(SC_OK);
 			return buyService.buyDisc(user, disc);
 		}
 		catch (HttpResponseException e) {
@@ -214,7 +220,7 @@ public class DiscController extends BaseController {
 	public List<ListingDto> getPublicLists(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
 		var user = authService.getUser(request);
 		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setStatus(SC_UNAUTHORIZED);
 			return null;
 		}
 
@@ -226,7 +232,7 @@ public class DiscController extends BaseController {
 	public Page<DiscProjection> getLost(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
 		var user = authService.getUser(request);
 		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setStatus(SC_UNAUTHORIZED);
 			return null;
 		}
 
@@ -237,16 +243,20 @@ public class DiscController extends BaseController {
 	public void markFound(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
 		var user = authService.getUser(request);
 		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setStatus(SC_UNAUTHORIZED);
 			return;
 		}
 
-		response.setStatus(HttpServletResponse.SC_OK);
 		try {
 			discService.handleFoundDisc(user, id);
+			response.setStatus(SC_NO_CONTENT);
 		} catch (HttpResponseException e) {
 			LOG.error(e.getMessage());
 			response.setStatus(e.getStatusCode());
 		}
+	}
+
+	private boolean invalidUploadDto(UploadDto dto) {
+		return dto.getData() == null;
 	}
 }
