@@ -1,7 +1,5 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.controller.provider.UUIDProvider;
 import fi.bizhop.kiekkohamsteri.dto.DiscDto;
@@ -25,14 +23,13 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static fi.bizhop.kiekkohamsteri.TestUtils.getJsonFromFile;
+import static fi.bizhop.kiekkohamsteri.TestUtils.getJsonFromString;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,8 +53,6 @@ public class DiscControllerTest extends SpringContextTestBase {
     @MockBean UUIDProvider uuidProvider;
 
     @Captor ArgumentCaptor<Members> userCaptor;
-
-    ObjectMapper mapper = new ObjectMapper();
 
     @ParameterizedTest
     @ValueSource(strings = {"", "myytavat", "1", "public-lists", "lost"})
@@ -182,7 +177,7 @@ public class DiscControllerTest extends SpringContextTestBase {
 
         assertEquals(SC_OK, response.getStatusCodeValue());
 
-        assertEquals(getDiscJson("expectedNewDisc.json"), mapper.readTree(response.getBody()));
+        assertEquals(getJsonFromFile("expectedNewDisc.json"), getJsonFromString(response.getBody()));
     }
 
     @Test
@@ -315,7 +310,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl("123"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEquals(getDiscJson("expectedMyDisc.json"), mapper.readTree(response.getBody()));
+        assertEquals(getJsonFromFile("expectedMyDisc.json"), getJsonFromString(response.getBody()));
     }
 
     @Test
@@ -344,7 +339,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl("123"), PUT, new HttpEntity<>(dto), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEquals(getDiscJson("expectedMyDisc.json"), mapper.readTree(response.getBody()));
+        assertEquals(getJsonFromFile("expectedMyDisc.json"), getJsonFromString(response.getBody()));
     }
 
     @Test
@@ -523,11 +518,6 @@ public class DiscControllerTest extends SpringContextTestBase {
         when(moldService.getMold(anyLong())).thenReturn(Optional.of(MOLDS.get(moldIndex)));
         when(plasticService.getPlastic(anyLong())).thenReturn(Optional.of(PLASTICS.get(plasticIndex)));
         when(colorService.getColor(anyLong())).thenReturn(Optional.of(COLORS.get(colorIndex)));
-    }
-
-    private JsonNode getDiscJson(String filename) throws IOException {
-        var string = FileUtils.readFileToString(new File(String.format("src/test/resources/%s", filename)), UTF_8);
-        return mapper.readTree(string);
     }
 
     private static UploadDto.UploadDtoBuilder uploadDto() {

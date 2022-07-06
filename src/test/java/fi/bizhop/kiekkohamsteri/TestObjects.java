@@ -14,8 +14,10 @@ public class TestObjects {
     public static final String SHOULD_THROW_EXCEPTION = "Previous call should throw Exception";
     public static final String TEST_EMAIL = "test@example.com";
     public static final String OTHER_EMAIL = "other@example.com";
+    public static final String ADMIN_EMAIL = "admin@example.com";
     public static final Members TEST_USER = new Members(TEST_EMAIL);
     public static final Members OTHER_USER = new Members(OTHER_EMAIL);
+    public static final Members ADMIN_USER = new Members(ADMIN_EMAIL);
     public static final List<R_valm> MANUFACTURERS;
     public static final List<R_mold> MOLDS;
     public static final List<R_muovi> PLASTICS;
@@ -40,6 +42,8 @@ public class TestObjects {
     static {
         TEST_USER.setUsername("User");
         OTHER_USER.setUsername("Other");
+        ADMIN_USER.setUsername("Admin");
+        ADMIN_USER.setLevel(2);
 
         var discmania = createManufacturer(0L, "Discmania");
         var innova = createManufacturer(1L, "Innova");
@@ -101,51 +105,64 @@ public class TestObjects {
                 .collect(Collectors.toList());
     }
 
-    public static List<ManufacturerDropdownProjection> getManufacturers() {
+    public static List<ManufacturerDropdownProjection> getManufacturersDD() {
         return MANUFACTURERS.stream()
                 .map(TestObjects::dropdownProjectionFromManufacturer)
                 .collect(Collectors.toList());
     }
 
-    public static List<MoldDropdownProjection> getMolds() {
+    public static List<MoldDropdownProjection> getMoldsDD() {
         return MOLDS.stream()
                 .map(TestObjects::dropdownProjectionFromMold)
                 .collect(Collectors.toList());
     }
 
-    public static List<MoldDropdownProjection> getMolds(R_valm manufacturer) {
+    public static List<MoldDropdownProjection> getMoldsDD(R_valm manufacturer) {
         return MOLDS.stream()
                 .filter(mold -> mold.getValmistaja().getId().equals(manufacturer.getId()))
                 .map(TestObjects::dropdownProjectionFromMold)
                 .collect(Collectors.toList());
     }
 
-    public static List<PlasticDropdownProjection> getPlastics() {
+    public static List<MoldProjection> getMolds() {
+        return MOLDS.stream()
+                .map(TestObjects::projectionFromMold)
+                .collect(Collectors.toList());
+    }
+
+    public static List<MoldProjection> getMolds(R_valm manufacturer) {
+        return MOLDS.stream()
+                .filter(mold -> mold.getValmistaja().getId().equals(manufacturer.getId()))
+                .map(TestObjects::projectionFromMold)
+                .collect(Collectors.toList());
+    }
+
+    public static List<PlasticDropdownProjection> getPlasticsDD() {
         return PLASTICS.stream()
                 .map(TestObjects::dropdownProjectionFromPlastic)
                 .collect(Collectors.toList());
     }
 
-    public static List<PlasticDropdownProjection> getPlastics(R_valm manufacturer) {
+    public static List<PlasticDropdownProjection> getPlasticsDD(R_valm manufacturer) {
         return PLASTICS.stream()
                 .filter(plastic -> plastic.getValmistaja().getId().equals(manufacturer.getId()))
                 .map(TestObjects::dropdownProjectionFromPlastic)
                 .collect(Collectors.toList());
     }
 
-    public static List<ColorDropdownProjection> getColors() {
+    public static List<ColorDropdownProjection> getColorsDD() {
         return COLORS.stream()
                 .map(TestObjects::dropdownProjectionFromColor)
                 .collect(Collectors.toList());
     }
 
-    public static List<DropdownProjection> getConditions() {
+    public static List<DropdownProjection> getConditionsDD() {
         return CONDITIONS.stream()
                 .map(TestObjects::dropdownProjection)
                 .collect(Collectors.toList());
     }
 
-    public static List<DropdownProjection> getMarkings() {
+    public static List<DropdownProjection> getMarkingsDD() {
         return MARKINGS.stream()
                 .map(TestObjects::dropdownProjection)
                 .collect(Collectors.toList());
@@ -226,6 +243,18 @@ public class TestObjects {
         return new ManufacturerDropdownProjection() {
             @Override public Long getId() { return manufacturer.getId(); }
             @Override public String getValmistaja() { return manufacturer.getValmistaja(); }
+        };
+    }
+
+    public static MoldProjection projectionFromMold(R_mold mold) {
+        return new MoldProjection() {
+            @Override public Long getId() { return mold.getId(); }
+            @Override public String getValmistaja() { return mold.getValmistaja().getValmistaja(); }
+            @Override public String getKiekko() { return mold.getKiekko(); }
+            @Override public Double getNopeus() { return mold.getNopeus(); }
+            @Override public Double getLiito() { return mold.getLiito(); }
+            @Override public Double getVakaus() { return mold.getVakaus(); }
+            @Override public Double getFeidi() { return mold.getFeidi(); }
         };
     }
 

@@ -35,12 +35,12 @@ class DropdownsServiceTest {
 
     @Test
     void getDropdownsTest() {
-        when(moldRepo.findAllByOrderByKiekkoAsc()).thenReturn(getMolds());
-        when(manufacturerRepo.findAllProjectedBy()).thenReturn(getManufacturers());
-        when(plasticRepo.findAllByOrderByMuoviAsc()).thenReturn(getPlastics());
-        when(colorRepo.findAllProjectedBy()).thenReturn(getColors());
-        when(ddRepo.findByValikkoOrderByArvoAsc("kunto")).thenReturn(getConditions());
-        when(ddRepo.findByValikkoOrderByArvoAsc("tussit")).thenReturn(getMarkings());
+        when(moldRepo.findAllByOrderByKiekkoAsc()).thenReturn(getMoldsDD());
+        when(manufacturerRepo.findAllProjectedBy()).thenReturn(getManufacturersDD());
+        when(plasticRepo.findAllByOrderByMuoviAsc()).thenReturn(getPlasticsDD());
+        when(colorRepo.findAllProjectedBy()).thenReturn(getColorsDD());
+        when(ddRepo.findByValikkoOrderByArvoAsc("kunto")).thenReturn(getConditionsDD());
+        when(ddRepo.findByValikkoOrderByArvoAsc("tussit")).thenReturn(getMarkingsDD());
 
         var dto = getDropdownsService().getDropdowns(null);
 
@@ -56,14 +56,14 @@ class DropdownsServiceTest {
     void getDropdownsByManufacturerTest() {
         var manufacturer = MANUFACTURERS.get(0);
 
-        when(manufacturerRepo.findAllProjectedBy()).thenReturn(getManufacturers());
+        when(manufacturerRepo.findAllProjectedBy()).thenReturn(getManufacturersDD());
         when(manufacturerRepo.findById(manufacturer.getId())).thenReturn(Optional.of(MANUFACTURERS.get(0)));
-        when(colorRepo.findAllProjectedBy()).thenReturn(getColors());
-        when(ddRepo.findByValikkoOrderByArvoAsc("kunto")).thenReturn(getConditions());
-        when(ddRepo.findByValikkoOrderByArvoAsc("tussit")).thenReturn(getMarkings());
+        when(colorRepo.findAllProjectedBy()).thenReturn(getColorsDD());
+        when(ddRepo.findByValikkoOrderByArvoAsc("kunto")).thenReturn(getConditionsDD());
+        when(ddRepo.findByValikkoOrderByArvoAsc("tussit")).thenReturn(getMarkingsDD());
 
-        when(moldRepo.findByValmistajaOrderByKiekkoAsc(manufacturer)).thenReturn(getMolds(manufacturer));
-        when(plasticRepo.findByValmistajaOrderByMuoviAsc(manufacturer)).thenReturn(getPlastics(manufacturer));
+        when(moldRepo.findByValmistajaOrderByKiekkoAsc(manufacturer)).thenReturn(getMoldsDD(manufacturer));
+        when(plasticRepo.findByValmistajaOrderByMuoviAsc(manufacturer)).thenReturn(getPlasticsDD(manufacturer));
 
         var dto = getDropdownsService().getDropdowns(manufacturer.getId());
 
