@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
-import static fi.bizhop.kiekkohamsteri.TestUtils.getJsonFromFile;
-import static fi.bizhop.kiekkohamsteri.TestUtils.getJsonFromString;
+import static fi.bizhop.kiekkohamsteri.TestUtils.*;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -100,7 +99,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
         verify(plasticService, never()).getPlasticsByManufacturer(any(), any());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEquals(getJsonFromFile("expectedAllPlastics.json"), getJsonFromString(response.getBody()));
+        assertEqualsJson("expectedAllPlastics.json", response.getBody());
     }
 
     @Test
@@ -119,7 +118,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
         verify(plasticService, times(1)).getPlasticsByManufacturer(eq(manufacturer), any());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEquals(getJsonFromFile("expectedDiscmaniaPlastics.json"), getJsonFromString(response.getBody()));
+        assertEqualsJson("expectedDiscmaniaPlastics.json", response.getBody());
     }
 
     @Test
@@ -154,7 +153,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
         verify(plasticService, times(1)).createPlastic(dto, manufacturer);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEquals(getJsonFromFile("expectedNewPlastic.json"), getJsonFromString(response.getBody()));
+        assertEqualsJson("expectedNewPlastic.json", response.getBody());
     }
 
     @Test
@@ -172,6 +171,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
         assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
         assertNull(response.getBody());
     }
+
 
     //HELPER METHODS
 

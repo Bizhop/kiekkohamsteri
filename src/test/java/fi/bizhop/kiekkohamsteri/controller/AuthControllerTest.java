@@ -12,6 +12,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 
 import static fi.bizhop.kiekkohamsteri.TestObjects.TEST_USER;
+import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,20 +31,20 @@ public class AuthControllerTest extends SpringContextTestBase {
     void givenUnableToAuthenticateUser_whenLogin_thenResponseCodeUnauthorized() {
         when(authService.login(any())).thenReturn(null);
 
-        var response = restTemplate.getForEntity(String.format("%s%s", baseUrl(), "login"), Members.class);
+        var response = restTemplate.getForEntity(String.format("%s%s", baseUrl(), "login"), String.class);
 
-        assertNull(response.getBody());
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
+        assertNull(response.getBody());
     }
 
     @Test
     void givenAuthenticatedUser_whenLogin_thenRespondWithUserAndCodeOk() {
         when(authService.login(any())).thenReturn(TEST_USER);
 
-        var response = restTemplate.getForEntity(String.format("%s%s", baseUrl(), "login"), Members.class);
+        var response = restTemplate.getForEntity(String.format("%s%s", baseUrl(), "login"), String.class);
 
-        assertEquals(TEST_USER, response.getBody());
         assertEquals(SC_OK, response.getStatusCodeValue());
+        assertEqualsJson("expectedTestUser.json", response.getBody());
     }
 
     private String baseUrl() {

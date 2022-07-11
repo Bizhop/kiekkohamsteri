@@ -17,9 +17,9 @@ import java.util.List;
 public class UserService {
 	final UserRepository userRepo;
 
-	public Members updateDetails(Long id, UserUpdateDto dto) {
-		Members user = userRepo.findById(id).orElseThrow();
-		
+	public Members updateDetails(Members user, UserUpdateDto dto) {
+		if(user == null) return null;
+
 		String[] ignoreNulls = Utils.getNullPropertyNames(dto);
 		BeanUtils.copyProperties(dto, user, ignoreNulls);
 		
@@ -27,8 +27,7 @@ public class UserService {
 			userRepo.makeDiscsPublic(user);
 		}
 		
-		userRepo.save(user);
-		return userRepo.findById(id).orElse(null);
+		return userRepo.save(user);
 	}
 
 	// Passthrough methods to db

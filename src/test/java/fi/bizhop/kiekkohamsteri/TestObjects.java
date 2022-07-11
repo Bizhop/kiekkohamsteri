@@ -25,6 +25,7 @@ public class TestObjects {
     public static final List<Dropdown> CONDITIONS;
     public static final List<Dropdown> MARKINGS;
     public static final List<Kiekot> DISCS;
+    public static final List<Members> USERS;
 
     private static final Predicate<Kiekot> isNotLost = disc -> Boolean.FALSE.equals(disc.getLost());
     private static final Predicate<Kiekot> isLost = disc -> Boolean.TRUE.equals(disc.getLost());
@@ -44,6 +45,7 @@ public class TestObjects {
         OTHER_USER.setUsername("Other");
         ADMIN_USER.setUsername("Admin");
         ADMIN_USER.setLevel(2);
+        USERS = List.of(TEST_USER, OTHER_USER, ADMIN_USER);
 
         var discmania = createManufacturer(0L, "Discmania");
         var innova = createManufacturer(1L, "Innova");

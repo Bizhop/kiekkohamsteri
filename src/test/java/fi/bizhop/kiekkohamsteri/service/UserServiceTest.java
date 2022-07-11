@@ -30,18 +30,15 @@ public class UserServiceTest {
 
     @Test
     void givenPublicListFalse_whenUpdateDetails_thenUpdateDetails() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(TEST_USER));
-
         var dto = UserUpdateDto.builder()
                 .etunimi("TEST")
                 .sukunimi("USER")
                 .publicList(false)
                 .build();
 
-        getUserService().updateDetails(1L, dto);
+        getUserService().updateDetails(TEST_USER, dto);
 
         verify(userRepository, times(1)).save(userCaptor.capture());
-        verify(userRepository, times(2)).findById(1L);
         verify(userRepository, never()).makeDiscsPublic(any());
 
         var saved = userCaptor.getValue();
@@ -52,18 +49,15 @@ public class UserServiceTest {
 
     @Test
     void givenPublicListTrue_whenUpdateDetails_thenUpdateDetailsAndMakeDiscsPublic() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(TEST_USER));
-
         var dto = UserUpdateDto.builder()
                 .etunimi("TEST")
                 .sukunimi("USER")
                 .publicList(true)
                 .build();
 
-        getUserService().updateDetails(1L, dto);
+        getUserService().updateDetails(TEST_USER, dto);
 
         verify(userRepository, times(1)).save(userCaptor.capture());
-        verify(userRepository, times(2)).findById(1L);
         verify(userRepository, times(1)).makeDiscsPublic(TEST_USER);
 
         var saved = userCaptor.getValue();

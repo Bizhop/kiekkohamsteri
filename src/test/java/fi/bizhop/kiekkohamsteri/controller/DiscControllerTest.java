@@ -8,7 +8,6 @@ import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.model.Ostot;
-import fi.bizhop.kiekkohamsteri.projection.v1.DiscProjection;
 import fi.bizhop.kiekkohamsteri.service.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,7 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpEntity;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -28,8 +27,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
-import static fi.bizhop.kiekkohamsteri.TestUtils.getJsonFromFile;
-import static fi.bizhop.kiekkohamsteri.TestUtils.getJsonFromString;
+import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -124,7 +122,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         when(authService.getUser(any())).thenReturn(null);
 
         var requestEntity = new HttpEntity<>(DiscDto.builder().build());
-        var response = restTemplate.exchange(createUrl("1"), PUT, requestEntity, DiscProjection.class);
+        var response = restTemplate.exchange(createUrl("1"), PUT, requestEntity, String.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
         assertNull(response.getBody());
@@ -134,20 +132,28 @@ public class DiscControllerTest extends SpringContextTestBase {
     void getDiscsTest() {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
-        var response = restTemplate.getForEntity(createUrl(""), Page.class);
+        var discProjections = getDiscsByUser(TEST_USER);
+        var page = new PageImpl<>(discProjections);
+        when(discService.getDiscs(eq(TEST_USER), any())).thenReturn(page);
+
+        var response = restTemplate.getForEntity(createUrl(""), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        verify(discService, times(1)).getDiscs(eq(TEST_USER), any());
+        assertEqualsJson("expectedGetDiscs.json", response.getBody());
     }
 
     @Test
     void getDiscsForSaleTest() {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
-        var response = restTemplate.getForEntity(createUrl("myytavat"), Page.class);
+        var discProjections = getDiscsByUser(OTHER_USER);
+        var page = new PageImpl<>(discProjections);
+        when(discService.getDiscsForSale(any())).thenReturn(page);
+
+        var response = restTemplate.getForEntity(createUrl("myytavat"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        verify(discService, times(1)).getDiscsForSale(any());
+        assertEqualsJson("expectedGetDiscsForSale.json", response.getBody());
     }
 
     @Test
@@ -177,7 +183,7 @@ public class DiscControllerTest extends SpringContextTestBase {
 
         assertEquals(SC_OK, response.getStatusCodeValue());
 
-        assertEquals(getJsonFromFile("expectedNewDisc.json"), getJsonFromString(response.getBody()));
+        assertEqualsJson("expectedNewDisc.json", response.getBody());
     }
 
     @Test
@@ -218,6 +224,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.postForEntity(createUrl(""), dto, String.class);
 
         assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
+        assertNull(response.getBody());
     }
 
     @Test
@@ -244,6 +251,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         verify(discService, times(1)).updateImage(123L, newImage);
 
         assertEquals(SC_NO_CONTENT, response.getStatusCodeValue());
+        assertNull(response.getBody());
     }
 
     @Test
@@ -271,6 +279,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         verify(discService, never()).updateImage(anyLong(), anyString());
 
         assertEquals(SC_INTERNAL_SERVER_ERROR, response.getStatusCodeValue());
+        assertNull(response.getBody());
     }
 
     @Test
@@ -289,6 +298,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         verify(discService, never()).updateImage(anyLong(), anyString());
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
+        assertNull(response.getBody());
     }
 
     @Test
@@ -300,17 +310,18 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl("123/update-image"), PATCH, new HttpEntity<>(dto), Object.class);
 
         assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
+        assertNull(response.getBody());
     }
 
     @Test
-    void givenYourDisc_whenGetDisc_thenGetDisc() throws AuthorizationException, IOException {
+    void givenYourDisc_whenGetDisc_thenGetDisc() throws AuthorizationException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
         when(discService.getDiscIfPublicOrOwn(TEST_USER, 123L)).thenReturn(projectionFromDisc(DISCS.get(0)));
 
         var response = restTemplate.getForEntity(createUrl("123"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEquals(getJsonFromFile("expectedMyDisc.json"), getJsonFromString(response.getBody()));
+        assertEqualsJson("expectedMyDisc.json", response.getBody());
     }
 
     @Test
@@ -339,7 +350,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl("123"), PUT, new HttpEntity<>(dto), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEquals(getJsonFromFile("expectedMyDisc.json"), getJsonFromString(response.getBody()));
+        assertEqualsJson("expectedMyDisc.json", response.getBody());
     }
 
     @Test
@@ -393,6 +404,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         assertEquals(0, savedUser.getDiscCount());
 
         assertEquals(SC_NO_CONTENT, response.getStatusCodeValue());
+        assertNull(response.getBody());
     }
 
     @Test
@@ -406,6 +418,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         verify(userService, never()).saveUser(any());
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
+        assertNull(response.getBody());
     }
 
     @Test
@@ -423,7 +436,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         verify(buyService, times(1)).buyDisc(TEST_USER, disc);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertNotNull(response.getBody());
+        assertEqualsJson("expectedBuyDiscRequest.json", response.getBody());
     }
 
     @Test
@@ -474,12 +487,15 @@ public class DiscControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenValidRequest_whenMarkFound_thenHandleFoundDisc() {
+    void givenValidRequest_whenMarkFound_thenHandleFoundDisc() throws HttpResponseException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
         var response = restTemplate.exchange(createUrl("123/found"), PATCH, null, Object.class);
 
+        verify(discService, times(1)).handleFoundDisc(TEST_USER, 123L);
+
         assertEquals(SC_NO_CONTENT, response.getStatusCodeValue());
+        assertNull(response.getBody());
     }
 
     @Test
@@ -490,6 +506,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl("123/found"), PATCH, null, Object.class);
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
+        assertNull(response.getBody());
     }
 
     @Test
@@ -500,6 +517,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl("123/found"), PATCH, null, Object.class);
 
         assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
+        assertNull(response.getBody());
     }
 
     //HELPER METHODS

@@ -21,8 +21,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
-import static fi.bizhop.kiekkohamsteri.TestUtils.getJsonFromFile;
-import static fi.bizhop.kiekkohamsteri.TestUtils.getJsonFromString;
+import static fi.bizhop.kiekkohamsteri.TestUtils.*;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -98,7 +97,7 @@ public class MoldControllerTest extends SpringContextTestBase {
         verify(moldService, never()).getMoldsByManufacturer(any(), any());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEquals(getJsonFromFile("expectedAllMolds.json"), getJsonFromString(response.getBody()));
+        assertEqualsJson("expectedAllMolds.json", response.getBody());
     }
 
     @Test
@@ -117,7 +116,7 @@ public class MoldControllerTest extends SpringContextTestBase {
         verify(moldService, times(1)).getMoldsByManufacturer(eq(manufacturer), any());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEquals(getJsonFromFile("expectedDiscmaniaMolds.json"), getJsonFromString(response.getBody()));
+        assertEqualsJson("expectedDiscmaniaMolds.json", response.getBody());
     }
 
     @Test
@@ -152,7 +151,7 @@ public class MoldControllerTest extends SpringContextTestBase {
         verify(moldService, times(1)).createMold(dto, manufacturer);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEquals(getJsonFromFile("expectedNewMold.json"), getJsonFromString(response.getBody()));
+        assertEqualsJson("expectedNewMold.json", response.getBody());
     }
 
     @Test

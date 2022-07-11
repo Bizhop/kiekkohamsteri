@@ -22,8 +22,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static fi.bizhop.kiekkohamsteri.TestObjects.DISCS;
-import static fi.bizhop.kiekkohamsteri.TestObjects.TEST_USER;
+import static fi.bizhop.kiekkohamsteri.TestObjects.*;
+import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
+import static fi.bizhop.kiekkohamsteri.model.Ostot.Status.REQUESTED;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -64,35 +65,36 @@ public class BuyControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    @SuppressWarnings({"unchecked"})
     void givenValidUser_whenGetListing_thenReturnListing() {
         when(authService.getUser(any())).thenReturn(TEST_USER);
-        when(buyService.getListing(null)).thenReturn(List.of(new Ostot(), new Ostot()));
 
-        var response = restTemplate.getForEntity(createUrl(""), List.class);
+        var buy1 = new Ostot(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED);
+        var buy2 = new Ostot(getTestDiscFor(OTHER_USER), OTHER_USER, TEST_USER, REQUESTED);
+        when(buyService.getListing(null)).thenReturn(List.of(buy1, buy2));
+
+        var response = restTemplate.getForEntity(createUrl(""), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        var buys = (List<Ostot>) response.getBody();
-        assertNotNull(buys);
-        assertEquals(2, buys.size());
+        assertEqualsJson("expectedBuyListing.json", response.getBody());
     }
 
     @Test
     void givenValidUser_whenGetSummary_thenReturnSummary() {
         when(authService.getUser(any())).thenReturn(TEST_USER);
+
+        var sell = new Ostot(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED);
+        var buy1 = new Ostot(getTestDiscFor(OTHER_USER), OTHER_USER, TEST_USER, REQUESTED);
+        var buy2 = new Ostot(getTestDiscFor(OTHER_USER), OTHER_USER, TEST_USER, REQUESTED);
         var buys = BuysDto.builder()
-                .myyjana(List.of(new Ostot()))
-                .ostajana(List.of(new Ostot(), new Ostot()))
+                .myyjana(List.of(sell))
+                .ostajana(List.of(buy1, buy2))
                 .build();
         when(buyService.getSummary(TEST_USER)).thenReturn(buys);
 
-        var response = restTemplate.getForEntity(createUrl("omat"), BuysDto.class);
+        var response = restTemplate.getForEntity(createUrl("omat"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        var summary = response.getBody();
-        assertNotNull(summary);
-        assertEquals(1, summary.getMyyjana().size());
-        assertEquals(2, summary.getOstajana().size());
+        assertEqualsJson("expectedBuySummary.json", response.getBody());
     }
 
     @Test
