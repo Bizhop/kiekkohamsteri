@@ -34,14 +34,15 @@ public class RatingService {
                 if (tds.size() == 8) {
                     String link = getLink(tds.get(0));
                     RoundDto round = new RoundDto(
-                        getText(tds.get(0)),
-                        link,
-                        getDate(tds.get(2)),
-                        getInt(tds.get(3)),
-                        getInt(tds.get(4)),
-                        getInt(tds.get(5)),
-                        getHoles(link),
-                        getBoolean(tds.get(7)));
+                            getText(tds.get(0)),
+                            link,
+                            getDate(tds.get(2)),
+                            getInt(tds.get(3)),
+                            getInt(tds.get(4)),
+                            getInt(tds.get(5)),
+                            getHoles(link),
+                            getBoolean(tds.get(7)),
+                            false);
                     events.add(getEventNumber(link));
                     rounds.add(round);
                 }
@@ -106,14 +107,15 @@ public class RatingService {
                 Elements ratingElements = row.getElementsByClass("round-rating");
                 for (int i = 0; i < roundElements.size(); i++) {
                     RoundDto round = new RoundDto(
-                        title,
-                        url,
-                        date,
-                        i + 1,
-                        getInt(roundElements.get(i)),
-                        getInt(ratingElements.get(i)),
-                        getHoles(uo),
-                        true);
+                            title,
+                            url,
+                            date,
+                            i + 1,
+                            getInt(roundElements.get(i)),
+                            getInt(ratingElements.get(i)),
+                            getHoles(uo),
+                            true,
+                            false);
                     rounds.add(round);
                 }
             }

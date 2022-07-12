@@ -1,10 +1,12 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
-import fi.bizhop.kiekkohamsteri.dto.KiekkoDto;
-import fi.bizhop.kiekkohamsteri.dto.ListausDto;
+import fi.bizhop.kiekkohamsteri.controller.provider.UUIDProvider;
+import fi.bizhop.kiekkohamsteri.dto.DiscDto;
+import fi.bizhop.kiekkohamsteri.dto.ListingDto;
 import fi.bizhop.kiekkohamsteri.dto.UploadDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
+import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.model.Ostot;
 import fi.bizhop.kiekkohamsteri.projection.v1.DiscProjection;
 import fi.bizhop.kiekkohamsteri.service.*;
@@ -17,8 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
+
+import static javax.servlet.http.HttpServletResponse.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,232 +34,166 @@ public class DiscController extends BaseController {
 	final MoldService moldService;
 	final PlasticService plasticService;
 	final ColorService colorService;
+	final UUIDProvider uuidProvider;
 
 	@RequestMapping(value = "/kiekot", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody Page<DiscProjection> haeKiekot(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
-		var owner = authService.getUser(request);
-		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return null;
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_OK);
-			return discService.getDiscs(owner, pageable);
-		}
+	public @ResponseBody Page<DiscProjection> getDiscs(@RequestAttribute("user") Members owner, HttpServletResponse response, Pageable pageable) {
+		response.setStatus(SC_OK);
+		return discService.getDiscs(owner, pageable);
 	}
-	
+
 	@RequestMapping(value = "/kiekot/myytavat", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody Page<DiscProjection> haeMyytavat(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
-		var owner = authService.getUser(request);
-		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return null;
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_OK);
-			return discService.getDiscsForSale(pageable);
-		}
+	public @ResponseBody Page<DiscProjection> getDiscsForSale(@RequestAttribute("user") Members owner, HttpServletResponse response, Pageable pageable) {
+		response.setStatus(SC_OK);
+		return discService.getDiscsForSale(pageable);
 	}
-	
+
 	@RequestMapping(value = "/kiekot", method = RequestMethod.POST, produces = "application/json")
-	public @ResponseBody
-	DiscProjection uusiKiekko(@RequestBody UploadDto dto, HttpServletRequest request, HttpServletResponse response) {
-		var owner = authService.getUser(request);
-		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	public @ResponseBody DiscProjection createDisc(@RequestBody UploadDto dto, @RequestAttribute("user") Members owner, HttpServletResponse response) {
+		if(invalidUploadDto(dto)) {
+			response.setStatus(SC_BAD_REQUEST);
 			return null;
 		}
-		else {
-			var disc = discService.newDisc(
-					owner,
-					moldService.getDefaultMold(),
-					plasticService.getDefaultPlastic(),
-					colorService.getDefaultColor());
-			owner.addDisc();
-			userService.saveUser(owner);
 
-			var image = String.format("%s-%d", owner.getUsername(), disc.getId());
-			try {
-				uploadService.upload(dto, image);
-				disc = discService.updateImage(disc.getId(), image);
-				response.setStatus(HttpServletResponse.SC_OK);
-				return disc;
-			} 
-			catch (IOException e) {
-				LOG.error("Cloudinary error uploading image", e);
+		var disc = discService.newDisc(
+				owner,
+				moldService.getDefaultMold(),
+				plasticService.getDefaultPlastic(),
+				colorService.getDefaultColor());
+		owner.addDisc();
+		userService.saveUser(owner);
 
-				//if image upload fails, delete the created disc
-				discService.deleteDiscById(disc.getId());
-				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				return null;
-			}
+		var image = String.format("%s-%d", owner.getUsername(), disc.getId());
+		try {
+			uploadService.upload(dto, image);
+			disc = discService.updateImage(disc.getId(), image);
+			response.setStatus(SC_OK);
+			return disc;
+		}
+		catch (IOException e) {
+			LOG.error("Cloudinary error uploading image", e);
+
+			//if image upload fails, delete the created disc
+			discService.deleteDiscById(disc.getId());
+			response.setStatus(SC_INTERNAL_SERVER_ERROR);
+			return null;
 		}
 	}
-	
+
 	@RequestMapping(value = "/kiekot/{id}/update-image", method = RequestMethod.PATCH, produces = "application/json", consumes = "application/json")
-	public void paivitaKuva(@PathVariable Long id, @RequestBody UploadDto dto, HttpServletRequest request, HttpServletResponse response) {
-		var owner = authService.getUser(request);
-		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	public void updateImage(@PathVariable Long id, @RequestBody UploadDto dto, @RequestAttribute("user") Members owner, HttpServletResponse response) {
+		if(invalidUploadDto(dto)) {
+			response.setStatus(SC_BAD_REQUEST);
+			return;
 		}
-		else {
-			try {
-				var kiekko = discService.getDisc(owner, id);
-				var kuva = kiekko.getKuva();
-				var uusiKuva = kuva + "-" + new Date().getTime();
-				if(StringUtils.countOccurrencesOf(kuva, "-") > 1) {
-					uusiKuva = kuva.substring(0, kuva.lastIndexOf("-")) + "-" + new Date().getTime();
-				}
-				uploadService.upload(dto, uusiKuva);
-				discService.updateImage(kiekko.getId(), uusiKuva);
-				response.setStatus(HttpServletResponse.SC_OK);
-			}
-			catch (AuthorizationException e) {
-				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			}
-			catch (IOException e) {
-				LOG.error("Cloudinary error uploading image", e);
-				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			}
+
+		try {
+			var disc = discService.getDisc(owner, id);
+			var image = disc.getKuva();
+			//if image name already has more than one "-", it has been updated previously
+			// then replace the uuid with new one
+			var uuid = uuidProvider.getUuid();
+			var newImage = StringUtils.countOccurrencesOf(image, "-") > 1
+					? image.substring(0, image.lastIndexOf("-")) + "-" + uuid
+					: image + "-" + uuid;
+
+			uploadService.upload(dto, newImage);
+			discService.updateImage(disc.getId(), newImage);
+			response.setStatus(SC_NO_CONTENT);
+		}
+		catch (AuthorizationException e) {
+			LOG.error("{} trying to update someone else's disc", owner.getEmail());
+			response.setStatus(SC_FORBIDDEN);
+		}
+		catch (IOException e) {
+			LOG.error("Cloudinary error uploading image", e);
+			response.setStatus(SC_INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody
-	DiscProjection haeKiekko(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
-		var owner = authService.getUser(request);
-		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	public @ResponseBody DiscProjection getDisc(@PathVariable Long id, @RequestAttribute("user") Members owner, HttpServletResponse response) {
+		try {
+			response.setStatus(SC_OK);
+			return discService.getDiscIfPublicOrOwn(owner, id);
+		}
+		catch (AuthorizationException ae) {
+			response.setStatus(SC_FORBIDDEN);
 			return null;
 		}
-		else {
-			try {
-				response.setStatus(HttpServletResponse.SC_OK);
-				return discService.getDiscIfPublicOrOwn(owner, id);
-			}
-			catch (AuthorizationException ae) {
-				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-				return null;
-			}
-		}
 	}
-	
+
 	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
-	public @ResponseBody
-	DiscProjection paivitaKiekko(@PathVariable Long id, @RequestBody KiekkoDto dto, HttpServletRequest request, HttpServletResponse response) {
-		var owner = authService.getUser(request);
-		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	public @ResponseBody DiscProjection updateDisc(@PathVariable Long id, @RequestBody DiscDto dto, @RequestAttribute("user") Members owner, HttpServletResponse response) {
+		try {
+			var newMold = moldService.getMold(dto.getMoldId()).orElse(null);
+			var newPlastic = plasticService.getPlastic(dto.getMuoviId()).orElse(null);
+			var newColor = colorService.getColor(dto.getVariId()).orElse(null);
+			response.setStatus(SC_OK);
+			return discService.updateDisc(dto, id, owner, newMold, newPlastic, newColor);
+		}
+		catch(AuthorizationException ae) {
+			response.setStatus(SC_FORBIDDEN);
 			return null;
 		}
-		else {
-			try {
-				var newMold = moldService.getMold(dto.getMoldId()).orElse(null);
-				var newPlastic = plasticService.getPlastic(dto.getMuoviId()).orElse(null);
-				var newColor = colorService.getColor(dto.getVariId()).orElse(null);
-				response.setStatus(HttpServletResponse.SC_OK);
-				return discService.updateDisc(dto, id, owner, newMold, newPlastic, newColor);
-			}
-			catch(AuthorizationException ae) {
-				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-				return null;
-			}
-			catch(HttpResponseException hre) {
-				LOG.error(hre.getMessage());
-				response.setStatus(hre.getStatusCode());
-				return null;
-			}
-			catch (Exception e) {
-				LOG.error(e.getMessage(), e);
-				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				return null;
-			}
+		catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			response.setStatus(SC_INTERNAL_SERVER_ERROR);
+			return null;
 		}
 	}
-	
+
 	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.DELETE)
-	public void poistaKiekko(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
-		var owner = authService.getUser(request);
-		if(owner == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	public void deleteDisc(@PathVariable Long id, @RequestAttribute("user") Members owner, HttpServletResponse response) {
+		try {
+			discService.deleteDisc(id, owner);
+			owner.removeDisc();
+			userService.saveUser(owner);
+			response.setStatus(SC_NO_CONTENT);
 		}
-		else {
-			try {
-				discService.deleteDisc(id, owner);
-				owner.removeDisc();
-				userService.saveUser(owner);
-			}
-			catch(AuthorizationException ae) {
-				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			}
+		catch(AuthorizationException ae) {
+			response.setStatus(SC_FORBIDDEN);
 		}
 	}
-	
-	@RequestMapping(value = "/kiekot/{id}/buy", method = RequestMethod.POST)
-	public @ResponseBody Ostot ostaKiekko(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
-		var user = authService.getUser(request);
-		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+	@RequestMapping(value = "/kiekot/{id}/buy", method = RequestMethod.POST, produces = "application/json")
+	public @ResponseBody Ostot buyDisc(@PathVariable Long id, @RequestAttribute("user") Members user, HttpServletResponse response) {
+		try {
+			var disc = discService.getDiscDb(id).orElse(null);
+
+			response.setStatus(SC_OK);
+			return buyService.buyDisc(user, disc);
+		}
+		catch (HttpResponseException e) {
+			LOG.error(e.getMessage());
+			response.setStatus(e.getStatusCode());
 			return null;
 		}
-		else {
-			try {
-				var discOpt = discService.getDiscDb(id);
-				if(discOpt.isEmpty()) {
-					response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-					return null;
-				}
-
-				var disc = discOpt.get();
-
-				return buyService.buyDisc(user, disc);
-			} catch (HttpResponseException e) {
-				LOG.error(e.getMessage());
-				response.setStatus(e.getStatusCode());
-				return null;
-			}
-		}
 	}
-	
+
 	@RequestMapping(value = "/kiekot/public-lists", method = RequestMethod.GET)
-	public List<ListausDto> haeJulkisetListat(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
-		var user = authService.getUser(request);
-		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return null;
-		}
-		else {
-			var usersWithPublicLists = userService.getUsersWithPublicList();
-			return discService.getPublicLists(usersWithPublicLists);
-		}
+	public List<ListingDto> getPublicLists() {
+		var usersWithPublicLists = userService.getUsersWithPublicList();
+		return discService.getPublicLists(usersWithPublicLists);
 	}
-	
+
 	@RequestMapping(value = "/kiekot/lost", method = RequestMethod.GET)
-	public Page<DiscProjection> getLost(HttpServletRequest request, HttpServletResponse response, Pageable pageable) {
-		var user = authService.getUser(request);
-		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return null;
-		}
-		else {
-			return discService.getLost(pageable);
+	public Page<DiscProjection> getLost(Pageable pageable) {
+		return discService.getLost(pageable);
+	}
+
+	@RequestMapping(value = "/kiekot/{id}/found", method = RequestMethod.PATCH)
+	public void markFound(@PathVariable Long id, @RequestAttribute("user") Members user, HttpServletResponse response) {
+		try {
+			discService.handleFoundDisc(user, id);
+			response.setStatus(SC_NO_CONTENT);
+		} catch (HttpResponseException e) {
+			LOG.error(e.getMessage());
+			response.setStatus(e.getStatusCode());
 		}
 	}
-	
-	@RequestMapping(value = "/kiekot/{id}/found", method = RequestMethod.PATCH)
-	public void found(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
-		var user = authService.getUser(request);
-		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_OK);
-			try {
-				discService.handleFoundDisc(user, id);
-			} catch (HttpResponseException e) {
-				LOG.error(e.getMessage());
-				response.setStatus(e.getStatusCode());
-			}
-		}
+
+	private boolean invalidUploadDto(UploadDto dto) {
+		return dto.getData() == null;
 	}
 }

@@ -11,56 +11,56 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class DropdownsService {
-	final MoldRepository moldRepo;
-	final ManufacturerRepository valmRepo;
-	final PlasticRepository muoviRepo;
-	final ColorRepository variRepo;
-	final DropdownRepository ddRepo;
+	final MoldRepository moldRepository;
+	final ManufacturerRepository manufacturerRepository;
+	final PlasticRepository plasticRepository;
+	final ColorRepository colorRepository;
+	final DropdownRepository dropdownRepository;
 
-	public DropdownsDto getDropdowns(Long valmId) {
-		var dto = new DropdownsDto();
-		dto.setValms(getValms())
-			.setMolds(getMolds(valmId))
-			.setMuovit(getMuovit(valmId))
-			.setVarit(getVarit())
-			.setKunto(getKunto())
-			.setTussit(getTussit());
-		return dto;
+	public DropdownsDto getDropdowns(Long manufacturerId) {
+		return DropdownsDto.builder()
+				.valms(getManufacturers())
+				.molds(getMolds(manufacturerId))
+				.muovit(getPlastics(manufacturerId))
+				.varit(getColors())
+				.kunto(getCondition())
+				.tussit(getMarkings())
+				.build();
 	}
 
-	private List<DropdownProjection> getTussit() {
-		return ddRepo.findByValikkoOrderByArvoAsc("tussit");
+	private List<DropdownProjection> getMarkings() {
+		return dropdownRepository.findByValikkoOrderByArvoAsc("tussit");
 	}
 
-	private List<DropdownProjection> getKunto() {
-		return ddRepo.findByValikkoOrderByArvoAsc("kunto");
+	private List<DropdownProjection> getCondition() {
+		return dropdownRepository.findByValikkoOrderByArvoAsc("kunto");
 	}
 
 	private List<MoldDropdownProjection> getMolds(Long valmId) {
 		if(valmId == null) {
-			return moldRepo.findAllByOrderByKiekkoAsc();
+			return moldRepository.findAllByOrderByKiekkoAsc();
 		}
 		else {
-			var valm = valmRepo.findById(valmId).orElseThrow();
-			return moldRepo.findByValmistajaOrderByKiekkoAsc(valm);
+			var valm = manufacturerRepository.findById(valmId).orElseThrow();
+			return moldRepository.findByValmistajaOrderByKiekkoAsc(valm);
 		}
 	}
 
-	private List<ManufacturerDropdownProjection> getValms() {
-		return valmRepo.findAllProjectedBy();
+	private List<ManufacturerDropdownProjection> getManufacturers() {
+		return manufacturerRepository.findAllProjectedBy();
 	}
 	
-	private List<PlasticDropdownProjection> getMuovit(Long valmId) {
+	private List<PlasticDropdownProjection> getPlastics(Long valmId) {
 		if(valmId == null) {
-			return muoviRepo.findAllByOrderByMuoviAsc();
+			return plasticRepository.findAllByOrderByMuoviAsc();
 		}
 		else {
-			var valm = valmRepo.findById(valmId).orElseThrow();
-			return muoviRepo.findByValmistajaOrderByMuoviAsc(valm);
+			var valm = manufacturerRepository.findById(valmId).orElseThrow();
+			return plasticRepository.findByValmistajaOrderByMuoviAsc(valm);
 		}
 	}
 	
-	private List<ColorDropdownProjection> getVarit() {
-		return variRepo.findAllProjectedBy();
+	private List<ColorDropdownProjection> getColors() {
+		return colorRepository.findAllProjectedBy();
 	}
 }

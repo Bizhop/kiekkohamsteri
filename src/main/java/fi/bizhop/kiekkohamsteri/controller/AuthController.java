@@ -11,20 +11,23 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+
 @RestController
 @RequiredArgsConstructor
 public class AuthController extends BaseController {
 	final AuthService authService;
 	
 	@RequestMapping(value = "/auth/login", method = RequestMethod.GET)
-	public @ResponseBody Members login(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public @ResponseBody Members login(HttpServletRequest request, HttpServletResponse response) {
 		Members user = authService.login(request);
 		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.setStatus(SC_UNAUTHORIZED);
 			return null;
 		}
 		else {
-			response.setStatus(HttpServletResponse.SC_ACCEPTED);
+			response.setStatus(SC_OK);
 			return user;
 		}
 	}

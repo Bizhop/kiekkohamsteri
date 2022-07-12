@@ -3,6 +3,7 @@ package fi.bizhop.kiekkohamsteri.controller;
 import javax.servlet.http.HttpServletResponse;
 
 import fi.bizhop.kiekkohamsteri.dto.RoundDto;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +15,11 @@ import fi.bizhop.kiekkohamsteri.service.RatingService;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class RatingController extends BaseController {
     private static final Logger LOG = LogManager.getLogger(RatingController.class);
-	@Autowired
-	RatingService ratingService;
+
+	final RatingService ratingService;
 	
 	@RequestMapping(value = "/rating/{pdga}", method = RequestMethod.GET, produces = "application/json")
 	public RatingDto getRounds(@PathVariable String pdga, HttpServletResponse response) {

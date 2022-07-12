@@ -21,17 +21,7 @@ public class PlasticController extends BaseController {
 	final ManufacturerService manufacturerService;
 	
 	@RequestMapping(value="/muovit", method=RequestMethod.GET, produces="application/json")
-	public @ResponseBody Page<PlasticProjection> getPlastics(@RequestParam(required=false) Long valmId, Pageable pageable, HttpServletRequest request, HttpServletResponse response) {
-		var user = authService.getUser(request);
-		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return null;
-		}
-		else if (user.getLevel() != 2) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			return null;
-		}
-
+	public @ResponseBody Page<PlasticProjection> getPlastics(@RequestParam(required=false) Long valmId, Pageable pageable, HttpServletResponse response) {
 		response.setStatus(HttpServletResponse.SC_OK);
 		if(valmId == null) return plasticService.getPlastics(pageable);
 
@@ -46,17 +36,7 @@ public class PlasticController extends BaseController {
 	
 	@RequestMapping(value="/muovit", method=RequestMethod.POST, consumes="application/json")
 	public @ResponseBody
-    PlasticProjection createMuovi(@RequestBody PlasticCreateDto dto, HttpServletRequest request, HttpServletResponse response) {
-		var user = authService.getUser(request);
-		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return null;
-		}
-		else if (user.getLevel() != 2) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			return null;
-		}
-
+    PlasticProjection createMuovi(@RequestBody PlasticCreateDto dto, HttpServletResponse response) {
 		response.setStatus(HttpServletResponse.SC_OK);
 
 		return manufacturerService.getManufacturer(dto.getValmId())

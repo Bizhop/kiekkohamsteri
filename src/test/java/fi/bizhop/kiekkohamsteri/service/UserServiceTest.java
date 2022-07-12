@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
+import static fi.bizhop.kiekkohamsteri.TestObjects.TEST_EMAIL;
 import static fi.bizhop.kiekkohamsteri.TestObjects.TEST_USER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -30,7 +31,7 @@ public class UserServiceTest {
 
     @Test
     void givenPublicListFalse_whenUpdateDetails_thenUpdateDetails() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(TEST_USER));
+        var user = new Members(TEST_EMAIL);
 
         var dto = UserUpdateDto.builder()
                 .etunimi("TEST")
@@ -38,10 +39,9 @@ public class UserServiceTest {
                 .publicList(false)
                 .build();
 
-        getUserService().updateDetails(1L, dto);
+        getUserService().updateDetails(user, dto, false);
 
         verify(userRepository, times(1)).save(userCaptor.capture());
-        verify(userRepository, times(2)).findById(1L);
         verify(userRepository, never()).makeDiscsPublic(any());
 
         var saved = userCaptor.getValue();
@@ -52,7 +52,7 @@ public class UserServiceTest {
 
     @Test
     void givenPublicListTrue_whenUpdateDetails_thenUpdateDetailsAndMakeDiscsPublic() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(TEST_USER));
+        var user = new Members(TEST_EMAIL);
 
         var dto = UserUpdateDto.builder()
                 .etunimi("TEST")
@@ -60,16 +60,43 @@ public class UserServiceTest {
                 .publicList(true)
                 .build();
 
-        getUserService().updateDetails(1L, dto);
+        getUserService().updateDetails(user, dto, false);
 
         verify(userRepository, times(1)).save(userCaptor.capture());
-        verify(userRepository, times(2)).findById(1L);
-        verify(userRepository, times(1)).makeDiscsPublic(TEST_USER);
+        verify(userRepository, times(1)).makeDiscsPublic(user);
 
         var saved = userCaptor.getValue();
         assertEquals("TEST", saved.getEtunimi());
         assertEquals("USER", saved.getSukunimi());
         assertTrue(saved.getPublicList());
+    }
+
+    @Test
+    void givenAdminRequest_whenUpdateDetailsWithLevel_thenUpdateDetailsWithLevel() {
+        var user = new Members(TEST_EMAIL);
+
+        var dto = UserUpdateDto.builder().level(2).build();
+
+        getUserService().updateDetails(user, dto, true);
+
+        verify(userRepository, times(1)).save(userCaptor.capture());
+
+        var saved = userCaptor.getValue();
+        assertEquals(2, saved.getLevel());
+    }
+
+    @Test
+    void givenNonAdminRequest_whenUpdateDetailsWithLevel_thenDontUpdateLevel() {
+        var user = new Members(TEST_EMAIL);
+
+        var dto = UserUpdateDto.builder().level(2).build();
+
+        getUserService().updateDetails(user, dto, false);
+
+        verify(userRepository, times(1)).save(userCaptor.capture());
+
+        var saved = userCaptor.getValue();
+        assertEquals(1, saved.getLevel());
     }
 
     private UserService getUserService() {

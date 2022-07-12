@@ -8,12 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import fi.bizhop.kiekkohamsteri.dto.MoldCreateDto;
 import fi.bizhop.kiekkohamsteri.model.Members;
@@ -29,17 +24,7 @@ public class MoldController extends BaseController {
 	final ManufacturerService manufacturerService;
 	
 	@RequestMapping(value="/molds", method=RequestMethod.GET, produces="application/json")
-	public @ResponseBody Page<MoldProjection> getMolds(@RequestParam(required=false) Long valmId, Pageable pageable, HttpServletRequest request, HttpServletResponse response) {
-		var user = authService.getUser(request);
-		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return null;
-		}
-		else if(user.getLevel() != 2) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			return null;
-		}
-
+	public @ResponseBody Page<MoldProjection> getMolds(@RequestParam(required=false) Long valmId, Pageable pageable, HttpServletResponse response) {
 		response.setStatus(HttpServletResponse.SC_OK);
 		if(valmId == null) return moldService.getMolds(pageable);
 
@@ -53,17 +38,7 @@ public class MoldController extends BaseController {
 	}
 	
 	@RequestMapping(value="/molds", method=RequestMethod.POST, consumes="application/json")
-	public @ResponseBody MoldProjection createMold(@RequestBody MoldCreateDto dto, HttpServletRequest request, HttpServletResponse response) {
-		var user = authService.getUser(request);
-		if(user == null) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return null;
-		}
-		else if(user.getLevel() != 2) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			return null;
-		}
-
+	public @ResponseBody MoldProjection createMold(@RequestBody MoldCreateDto dto, HttpServletResponse response) {
 		response.setStatus(HttpServletResponse.SC_OK);
 
 		return manufacturerService.getManufacturer(dto.getValmId())

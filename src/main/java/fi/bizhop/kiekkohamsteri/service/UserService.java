@@ -17,18 +17,20 @@ import java.util.List;
 public class UserService {
 	final UserRepository userRepo;
 
-	public Members updateDetails(Long id, UserUpdateDto dto) {
-		Members user = userRepo.findById(id).orElseThrow();
-		
-		String[] ignoreNulls = Utils.getNullPropertyNames(dto);
-		BeanUtils.copyProperties(dto, user, ignoreNulls);
+	public Members updateDetails(Members user, UserUpdateDto dto, boolean adminRequest) {
+		if(user == null) return null;
+
+		var ignores = Utils.getNullPropertyNames(dto);
+		if(!adminRequest) {
+			ignores.add("level");
+		}
+		BeanUtils.copyProperties(dto, user, ignores.toArray(String[]::new));
 		
 		if(dto.isPublicList()) {
 			userRepo.makeDiscsPublic(user);
 		}
 		
-		userRepo.save(user);
-		return userRepo.findById(id).orElse(null);
+		return userRepo.save(user);
 	}
 
 	// Passthrough methods to db

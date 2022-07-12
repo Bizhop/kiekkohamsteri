@@ -54,6 +54,7 @@ public class BuyServiceTest {
     @Test
     void givenOwnDisc_whenBuyDisc_thenThrowException() {
         var disc = TestObjects.getTestDiscFor(TEST_USER);
+        disc.setMyynnissa(true);
 
         try {
             getBuyService().buyDisc(TEST_USER, disc);
@@ -61,7 +62,7 @@ public class BuyServiceTest {
             fail(SHOULD_THROW_EXCEPTION);
         } catch (HttpResponseException e) {
             assertEquals(HttpServletResponse.SC_BAD_REQUEST, e.getStatusCode());
-            assertEquals("Et voi ostaa omaa kiekkoasi", e.getMessage());
+            assertEquals("You can't buy your own disc", e.getMessage());
         }
     }
 
@@ -76,7 +77,7 @@ public class BuyServiceTest {
             fail(SHOULD_THROW_EXCEPTION);
         } catch (HttpResponseException e) {
             assertEquals(HttpServletResponse.SC_FORBIDDEN, e.getStatusCode());
-            assertEquals("Ei myynnissä", e.getMessage());
+            assertEquals("Not for sale", e.getMessage());
         }
     }
 
@@ -96,7 +97,7 @@ public class BuyServiceTest {
             fail(SHOULD_THROW_EXCEPTION);
         } catch (HttpResponseException e) {
             assertEquals(HttpServletResponse.SC_BAD_REQUEST, e.getStatusCode());
-            assertEquals("Olet jo ostamassa tätä kiekkoa", e.getMessage());
+            assertEquals("You are already buying this disc", e.getMessage());
         }
     }
 
@@ -131,7 +132,7 @@ public class BuyServiceTest {
     }
 
     @Test
-    void givenUserIsNotSeller_whenConfirm_thenThrowException() throws AuthorizationException {
+    void givenUserIsNotSeller_whenConfirm_thenThrowException() {
         var buy = new Ostot(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED);
         when(buyRepository.findById(123L)).thenReturn(Optional.of(buy));
 

@@ -1,13 +1,14 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.DiscRepository;
-import fi.bizhop.kiekkohamsteri.dto.KiekkoDto;
-import fi.bizhop.kiekkohamsteri.dto.ListausDto;
+import fi.bizhop.kiekkohamsteri.dto.DiscDto;
+import fi.bizhop.kiekkohamsteri.dto.ListingDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.*;
 import fi.bizhop.kiekkohamsteri.projection.v1.DiscProjection;
 import fi.bizhop.kiekkohamsteri.util.Utils;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -25,7 +26,7 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class DiscService {
-	
+
 	private final DiscRepository discRepo;
 
 	public DiscProjection newDisc(Members owner, R_mold defaultMold, R_muovi defaultPlastic, R_vari defaultColor) {
@@ -34,41 +35,43 @@ public class DiscService {
 			disc.setPublicDisc(true);
 		}
 		disc = discRepo.save(disc);
-		
+
 		return discRepo.getKiekotById(disc.getId());
 	}
-	
+
 	public DiscProjection updateImage(Long id, String image) {
 		var disc = discRepo.findById(id).orElseThrow();
 		disc.setKuva(image);
 		disc = discRepo.save(disc);
 		return discRepo.getKiekotById(disc.getId());
 	}
-	
+
 	public void deleteDisc(Long id, Members owner) throws AuthorizationException {
 		var disc = discRepo.findById(id).orElse(null);
-		
+
 		if(disc == null || !disc.getMember().equals(owner)) {
 			throw new AuthorizationException();
 		}
-		
+
 		discRepo.deleteById(id);
 	}
-	
-	public DiscProjection updateDisc(KiekkoDto dto, Long id, Members owner, R_mold newMold, R_muovi newPlastic, R_vari newColor) throws AuthorizationException, HttpResponseException {
-		if(dto == null) throw new HttpResponseException(HttpServletResponse.SC_BAD_REQUEST, "Dto must not be null");
+
+	public DiscProjection updateDisc(DiscDto dto, Long id, Members owner, R_mold newMold, R_muovi newPlastic, R_vari newColor) throws AuthorizationException {
 		var disc = discRepo.findById(id).orElse(null);
-		
+
 		if(disc == null || !disc.getMember().equals(owner)) {
 			throw new AuthorizationException();
 		}
-		
+
 		String[] ignoreRelations = {"member", "muovi", "mold", "vari"};
 		var ignoreNulls = Utils.getNullPropertyNames(dto);
-		var ignores = Stream.concat(Arrays.stream(ignoreRelations), Arrays.stream(ignoreNulls)).toArray(String[]::new);
-		
+		var ignores = Stream.concat(
+						Arrays.stream(ignoreRelations),
+						ignoreNulls.stream())
+				.toArray(String[]::new);
+
 		BeanUtils.copyProperties(dto, disc, ignores);
-		
+
 		disc.setMold(newMold);
 		disc.setMuovi(newPlastic);
 		disc.setVari(newColor);
@@ -103,26 +106,20 @@ public class DiscService {
 		}
 	}
 
-	public List<ListausDto> getPublicLists(List<Members> usersWithPublicDiscs) {
+	public List<ListingDto> getPublicLists(List<Members> usersWithPublicDiscs) {
 		if(usersWithPublicDiscs == null || usersWithPublicDiscs.isEmpty()) return Collections.emptyList();
 
 		return discRepo.findByMemberInAndPublicDiscTrue(usersWithPublicDiscs)
 				.stream()
 				.collect(Collectors.groupingBy(DiscProjection::getOwnerEmail))
 				.entrySet().stream()
-				.map(entry -> new ListausDto(entry.getKey(), entry.getValue()))
-				.peek(listing -> {
-					var username = listing.getKiekot().stream()
-							.findFirst()
-							.map(DiscProjection::getOmistaja);
-					listing.setUsername(username.orElse(null));
-				})
+				.map(ListingDto::fromMapEntry)
 				.collect(Collectors.toList());
 	}
-	
+
 	public void handleFoundDisc(Members user, Long id) throws HttpResponseException {
-		var disc = discRepo.findById(id).orElseThrow();
-		if(!disc.getMember().equals(user)) {
+		var disc = discRepo.findById(id).orElse(null);
+		if(disc == null || !disc.getMember().equals(user)) {
 			throw new HttpResponseException(HttpServletResponse.SC_FORBIDDEN, "User is not disc owner");
 		}
 		else if(!Boolean.TRUE.equals(disc.getLost())) {
@@ -143,7 +140,7 @@ public class DiscService {
 		}
 	}
 
-	// Passthrough methods to db
+	// Pass-through methods to db
 	// Not covered (or to be covered by unit tests)
 
 	public Page<DiscProjection> getLost(Pageable pageable) {
