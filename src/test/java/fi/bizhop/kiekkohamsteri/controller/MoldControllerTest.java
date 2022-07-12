@@ -46,7 +46,6 @@ public class MoldControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(), Object.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -58,7 +57,6 @@ public class MoldControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(), Object.class);
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -68,7 +66,6 @@ public class MoldControllerTest extends SpringContextTestBase {
         var response = restTemplate.postForEntity(createUrl(), MoldCreateDto.builder().build(), Object.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -80,7 +77,6 @@ public class MoldControllerTest extends SpringContextTestBase {
         var response = restTemplate.postForEntity(createUrl(), MoldCreateDto.builder().build(), Object.class);
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -136,7 +132,7 @@ public class MoldControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenValidRequest_whenCreateMold_thenCreateMold() throws IOException {
+    void givenValidRequest_whenCreateMold_thenCreateMold() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
         var manufacturer = MANUFACTURERS.get(0);

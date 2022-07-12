@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class DiscService {
-	
+
 	private final DiscRepository discRepo;
 
 	public DiscProjection newDisc(Members owner, R_mold defaultMold, R_muovi defaultPlastic, R_vari defaultColor) {
@@ -35,40 +35,43 @@ public class DiscService {
 			disc.setPublicDisc(true);
 		}
 		disc = discRepo.save(disc);
-		
+
 		return discRepo.getKiekotById(disc.getId());
 	}
-	
+
 	public DiscProjection updateImage(Long id, String image) {
 		var disc = discRepo.findById(id).orElseThrow();
 		disc.setKuva(image);
 		disc = discRepo.save(disc);
 		return discRepo.getKiekotById(disc.getId());
 	}
-	
+
 	public void deleteDisc(Long id, Members owner) throws AuthorizationException {
 		var disc = discRepo.findById(id).orElse(null);
-		
+
 		if(disc == null || !disc.getMember().equals(owner)) {
 			throw new AuthorizationException();
 		}
-		
+
 		discRepo.deleteById(id);
 	}
-	
+
 	public DiscProjection updateDisc(DiscDto dto, Long id, Members owner, R_mold newMold, R_muovi newPlastic, R_vari newColor) throws AuthorizationException {
 		var disc = discRepo.findById(id).orElse(null);
-		
+
 		if(disc == null || !disc.getMember().equals(owner)) {
 			throw new AuthorizationException();
 		}
-		
+
 		String[] ignoreRelations = {"member", "muovi", "mold", "vari"};
 		var ignoreNulls = Utils.getNullPropertyNames(dto);
-		var ignores = Stream.concat(Arrays.stream(ignoreRelations), Arrays.stream(ignoreNulls)).toArray(String[]::new);
-		
+		var ignores = Stream.concat(
+						Arrays.stream(ignoreRelations),
+						ignoreNulls.stream())
+				.toArray(String[]::new);
+
 		BeanUtils.copyProperties(dto, disc, ignores);
-		
+
 		disc.setMold(newMold);
 		disc.setMuovi(newPlastic);
 		disc.setVari(newColor);
@@ -113,7 +116,7 @@ public class DiscService {
 				.map(ListingDto::fromMapEntry)
 				.collect(Collectors.toList());
 	}
-	
+
 	public void handleFoundDisc(Members user, Long id) throws HttpResponseException {
 		var disc = discRepo.findById(id).orElse(null);
 		if(disc == null || !disc.getMember().equals(user)) {

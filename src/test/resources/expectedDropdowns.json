@@ -1,0 +1,98 @@
+{
+  "molds": [
+    {
+      "kiekko": "FD",
+      "id": 0
+    },
+    {
+      "kiekko": "PD",
+      "id": 1
+    },
+    {
+      "kiekko": "Destroyer",
+      "id": 10
+    },
+    {
+      "kiekko": "Roc",
+      "id": 11
+    },
+    {
+      "kiekko": "Harp",
+      "id": 20
+    },
+    {
+      "kiekko": "Hatchet",
+      "id": 21
+    }
+  ],
+  "valms": [
+    {
+      "valmistaja": "Discmania",
+      "id": 0
+    },
+    {
+      "valmistaja": "Innova",
+      "id": 1
+    },
+    {
+      "valmistaja": "Westside",
+      "id": 2
+    }
+  ],
+  "muovit": [
+    {
+      "muovi": "S-Line",
+      "id": 0
+    },
+    {
+      "muovi": "C-Line",
+      "id": 1
+    },
+    {
+      "muovi": "Star",
+      "id": 10
+    },
+    {
+      "muovi": "Champion",
+      "id": 11
+    },
+    {
+      "muovi": "VIP",
+      "id": 20
+    }
+  ],
+  "varit": [
+    {
+      "vari": "Valkoinen",
+      "id": 0
+    },
+    {
+      "vari": "Keltainen",
+      "id": 1
+    }
+  ],
+  "kunto": [
+    {
+      "nimi": "10/10",
+      "id": 10
+    },
+    {
+      "nimi": "8/10",
+      "id": 8
+    },
+    {
+      "nimi": "5/10",
+      "id": 5
+    },
+    {
+      "nimi": "4/10",
+      "id": 4
+    }
+  ],
+  "tussit": [
+    {
+      "nimi": "Ei merkintöjä",
+      "id": 0
+    }
+  ]
+}

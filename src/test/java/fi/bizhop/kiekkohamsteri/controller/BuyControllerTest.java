@@ -50,7 +50,6 @@ public class BuyControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(endpoint), Object.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @ParameterizedTest
@@ -61,7 +60,6 @@ public class BuyControllerTest extends SpringContextTestBase {
         var response = restTemplate.postForEntity(createUrl(endpoint), null, Object.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test

@@ -25,10 +25,9 @@ public class UserController extends BaseController {
 	final DiscService discService;
 
 	@RequestMapping(value = "/user", method = GET, produces = "application/json")
-	public @ResponseBody List<Members> getUsers(HttpServletRequest request, HttpServletResponse response) {
-		var user = authService.getUser(request);
-		if(user == null || user.getLevel() != 2) {
-			response.setStatus(user == null ? SC_UNAUTHORIZED : SC_FORBIDDEN);
+	public @ResponseBody List<Members> getUsers(@RequestAttribute("user") Members user, HttpServletResponse response) {
+		if(user.getLevel() != 2) {
+			response.setStatus(SC_FORBIDDEN);
 			return null;
 		}
 
@@ -39,12 +38,11 @@ public class UserController extends BaseController {
 	}
 
 	@RequestMapping(value = "/user/{id}", method = GET, produces = "application/json")
-	public @ResponseBody Members getDetails(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
-		var authUser = authService.getUser(request);
+	public @ResponseBody Members getDetails(@PathVariable Long id, @RequestAttribute("user") Members authUser, HttpServletResponse response) {
 		var user = userService.getUser(id);
 
-		if(authUser == null || (!authUser.equals(user) && (authUser.getLevel() != 2))) {
-			response.setStatus(authUser == null ? SC_UNAUTHORIZED : SC_FORBIDDEN);
+		if(!authUser.equals(user) && authUser.getLevel() != 2) {
+			response.setStatus(SC_FORBIDDEN);
 			return null;
 		}
 
@@ -53,25 +51,24 @@ public class UserController extends BaseController {
 	}
 
 	@RequestMapping(value = "/user/{id}", method = PATCH, produces = "application/json", consumes = "application/json")
-	public @ResponseBody Members updateDetails(@PathVariable Long id, @RequestBody UserUpdateDto dto, HttpServletRequest request, HttpServletResponse response) {
-		var authUser = authService.getUser(request);
+	public @ResponseBody Members updateDetails(@PathVariable Long id, @RequestBody UserUpdateDto dto, @RequestAttribute("user") Members authUser, HttpServletResponse response) {
 		var user = userService.getUser(id);
 
-		if(authUser == null || ((!authUser.equals(user) && (authUser.getLevel() != 2)))) {
-			response.setStatus(authUser == null ? SC_UNAUTHORIZED : SC_FORBIDDEN);
+		boolean adminRequest = authUser.getLevel() == 2;
+		if(!authUser.equals(user) && !adminRequest) {
+			response.setStatus(SC_FORBIDDEN);
 			return null;
 		}
 
 		response.setStatus(SC_OK);
-		return userService.updateDetails(user, dto);
+		return userService.updateDetails(user, dto, adminRequest);
 	}
 
 	@RequestMapping(value = "/user/{id}/level/{level}", method = PATCH, produces = "application/json")
-	public @ResponseBody Members setUserLevel(@PathVariable Long id, @PathVariable Integer level, HttpServletRequest request, HttpServletResponse response) {
-		var authUser = authService.getUser(request);
-
-		if(authUser == null || authUser.getLevel() != 2) {
-			response.setStatus(authUser == null ? SC_UNAUTHORIZED : SC_FORBIDDEN);
+	@Deprecated
+	public @ResponseBody Members setUserLevel(@PathVariable Long id, @PathVariable Integer level, @RequestAttribute("user") Members authUser, HttpServletResponse response) {
+		if(authUser.getLevel() != 2) {
+			response.setStatus(SC_FORBIDDEN);
 			return null;
 		}
 
@@ -80,23 +77,16 @@ public class UserController extends BaseController {
 	}
 
 	@RequestMapping(value = "/user/leaders", method = GET, produces = "application/json")
-	public @ResponseBody List<LeaderProjection> getLeaders(HttpServletRequest request, HttpServletResponse response) {
-		var authUser = authService.getUser(request);
-		if(authUser == null) {
-			response.setStatus(SC_UNAUTHORIZED);
-			return null;
-		}
-
+	public @ResponseBody List<LeaderProjection> getLeaders(HttpServletResponse response) {
 		response.setStatus(SC_OK);
 		updateDiscCounts(userService.getUsers());
 		return userService.getLeaders();
 	}
 
 	@RequestMapping(value = "/user/me", method = GET, produces = "application/json")
-	public @ResponseBody Members getMe(HttpServletRequest request, HttpServletResponse response) {
-		var authUser = authService.getUser(request);
-		response.setStatus(authUser == null ? SC_UNAUTHORIZED : SC_OK);
-		return authUser;
+	public @ResponseBody Members getMe(@RequestAttribute("user") Members user, HttpServletResponse response) {
+		response.setStatus(SC_OK);
+		return user;
 	}
 
 	private void updateDiscCounts(List<Members> users) {

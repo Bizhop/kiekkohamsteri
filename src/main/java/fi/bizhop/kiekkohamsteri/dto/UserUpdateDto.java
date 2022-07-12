@@ -14,4 +14,5 @@ public class UserUpdateDto {
 	Integer pdga_num;
 	boolean publicDiscCount;
 	boolean publicList;
+	Integer level;
 }

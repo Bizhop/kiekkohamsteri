@@ -60,7 +60,6 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(endpoint), Object.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @ParameterizedTest
@@ -71,7 +70,6 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.postForEntity(createUrl(endpoint), null, Object.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @ParameterizedTest
@@ -82,7 +80,6 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl(endpoint), PATCH, null, Object.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @ParameterizedTest
@@ -93,7 +90,6 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl(endpoint), DELETE, null, Object.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -103,7 +99,6 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.postForEntity(createUrl(""), uploadDto().build(), String.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -114,7 +109,6 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl("1/update-image"), PATCH, requestEntity, Object.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -125,7 +119,6 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl("1"), PUT, requestEntity, String.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test

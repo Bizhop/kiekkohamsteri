@@ -17,11 +17,14 @@ import java.util.List;
 public class UserService {
 	final UserRepository userRepo;
 
-	public Members updateDetails(Members user, UserUpdateDto dto) {
+	public Members updateDetails(Members user, UserUpdateDto dto, boolean adminRequest) {
 		if(user == null) return null;
 
-		String[] ignoreNulls = Utils.getNullPropertyNames(dto);
-		BeanUtils.copyProperties(dto, user, ignoreNulls);
+		var ignores = Utils.getNullPropertyNames(dto);
+		if(!adminRequest) {
+			ignores.add("level");
+		}
+		BeanUtils.copyProperties(dto, user, ignores.toArray(String[]::new));
 		
 		if(dto.isPublicList()) {
 			userRepo.makeDiscsPublic(user);

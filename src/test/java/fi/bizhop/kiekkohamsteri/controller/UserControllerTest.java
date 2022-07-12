@@ -46,7 +46,6 @@ public class UserControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(endpoint), String.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @ParameterizedTest
@@ -62,7 +61,7 @@ public class UserControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenAdminUser_whenGetUsers_thenGetUsers() throws IOException {
+    void givenAdminUser_whenGetUsers_thenGetUsers() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
         when(userService.getUsers()).thenReturn(USERS);
 
@@ -101,14 +100,17 @@ public class UserControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenUser_whenUpdateOwnDetails_thenUpdateDetails() throws IOException {
+    void givenUser_whenUpdateOwnDetails_thenUpdateDetails() {
         when(authService.getUser(any())).thenReturn(TEST_USER);
         when(userService.getUser(1L)).thenReturn(TEST_USER);
 
         var dto = UserUpdateDto.builder().build();
-        when(userService.updateDetails(TEST_USER, dto)).thenReturn(TEST_USER);
+        when(userService.updateDetails(TEST_USER, dto, false)).thenReturn(TEST_USER);
 
         var response = restTemplate.exchange(createUrl("1"), PATCH, new HttpEntity<>(dto), String.class);
+
+        //non admin user should invoke non admin request
+        verify(userService, times(1)).updateDetails(TEST_USER, dto, false);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
         assertEqualsJson("expectedTestUser.json", response.getBody());
@@ -122,7 +124,6 @@ public class UserControllerTest extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl("1"), PATCH, new HttpEntity<>(dto), String.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -138,14 +139,17 @@ public class UserControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenAdminUser_whenUpdateOtherUserDetails_thenUpdateDetails() throws IOException {
+    void givenAdminUser_whenUpdateOtherUserDetails_thenUpdateDetails() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
         when(userService.getUser(1L)).thenReturn(TEST_USER);
 
         var dto = UserUpdateDto.builder().build();
-        when(userService.updateDetails(TEST_USER, dto)).thenReturn(TEST_USER);
+        when(userService.updateDetails(TEST_USER, dto, true)).thenReturn(TEST_USER);
 
         var response = restTemplate.exchange(createUrl("1"), PATCH, new HttpEntity<>(dto), String.class);
+
+        //admin user should invoke admin request
+        verify(userService, times(1)).updateDetails(TEST_USER, dto, true);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
         assertEqualsJson("expectedTestUser.json", response.getBody());
@@ -155,20 +159,20 @@ public class UserControllerTest extends SpringContextTestBase {
     void givenUnableToAuthenticateUser_whenSetUserLevel_thenUnauthorized() {
         when(authService.getUser(any())).thenReturn(null);
 
+        //called endpoint is deprecated
         var response = restTemplate.exchange(createUrl("1/level/2"), PATCH, null, String.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
     void givenNonAdminUser_whenSetUserLevel_thenForbidden() {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
+        //called endpoint is deprecated
         var response = restTemplate.exchange(createUrl("1/level/2"), PATCH, null, String.class);
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -179,12 +183,14 @@ public class UserControllerTest extends SpringContextTestBase {
         userWithLevel2.setLevel(2);
         when(userService.setUserLevel(1L,2)).thenReturn(userWithLevel2);
 
+        //called endpoint is deprecated
         var response = restTemplate.exchange(createUrl("1/level/2"), PATCH, null, String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
 
         assertEqualsJson("expectedUserLevel2.json", response.getBody());
     }
+
 
     // HELPER METHODS
 

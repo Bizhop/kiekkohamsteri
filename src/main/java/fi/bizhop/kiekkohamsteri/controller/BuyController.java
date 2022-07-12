@@ -5,14 +5,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.service.DiscService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import fi.bizhop.kiekkohamsteri.dto.BuysDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
@@ -31,37 +27,19 @@ public class BuyController extends BaseController {
 	final DiscService discService;
 
 	@RequestMapping(value = "/ostot", method = RequestMethod.GET)
-	public @ResponseBody List<Ostot> listing(@RequestParam(value = "status", required = false) Status status, HttpServletRequest request, HttpServletResponse response ) {
-		var user = authService.getUser(request);
-		if(user == null) {
-			response.setStatus(SC_UNAUTHORIZED);
-			return null;
-		}
-
+	public @ResponseBody List<Ostot> listing(@RequestParam(value = "status", required = false) Status status, HttpServletResponse response ) {
 		response.setStatus(SC_OK);
 		return buyService.getListing(status);
 	}
 
 	@RequestMapping(value = "/ostot/omat", method = RequestMethod.GET)
-	public @ResponseBody BuysDto summary(HttpServletRequest request, HttpServletResponse response) {
-		var user = authService.getUser(request);
-		if(user == null) {
-			response.setStatus(SC_UNAUTHORIZED);
-			return null;
-		}
-
+	public @ResponseBody BuysDto summary(@RequestAttribute("user") Members user, HttpServletResponse response) {
 		response.setStatus(SC_OK);
 		return buyService.getSummary(user);
 	}
 
 	@RequestMapping(value = "/ostot/{id}/confirm", method = RequestMethod.POST)
-	public void confirm(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
-		var user = authService.getUser(request);
-		if(user == null) {
-			response.setStatus(SC_UNAUTHORIZED);
-			return;
-		}
-
+	public void confirm(@PathVariable Long id, @RequestAttribute("user") Members user, HttpServletResponse response) {
 		try {
 			response.setStatus(SC_OK);
 			var disc = buyService.confirm(id, user);
@@ -73,13 +51,7 @@ public class BuyController extends BaseController {
 	}
 
 	@RequestMapping(value = "/ostot/{id}/reject", method = RequestMethod.POST)
-	public void reject(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
-		var user = authService.getUser(request);
-		if(user == null) {
-			response.setStatus(SC_UNAUTHORIZED);
-			return;
-		}
-
+	public void reject(@PathVariable Long id, @RequestAttribute("user") Members user, HttpServletResponse response) {
 		try {
 			response.setStatus(SC_OK);
 			buyService.reject(id, user);

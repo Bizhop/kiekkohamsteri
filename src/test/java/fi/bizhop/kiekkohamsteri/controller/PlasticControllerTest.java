@@ -1,7 +1,6 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.dto.MoldCreateDto;
 import fi.bizhop.kiekkohamsteri.dto.PlasticCreateDto;
 import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.model.R_muovi;
@@ -22,13 +21,11 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
-import static fi.bizhop.kiekkohamsteri.TestUtils.*;
+import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -48,7 +45,6 @@ public class PlasticControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(), Object.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -60,7 +56,6 @@ public class PlasticControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(), Object.class);
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -70,7 +65,6 @@ public class PlasticControllerTest extends SpringContextTestBase {
         var response = restTemplate.postForEntity(createUrl(), PlasticCreateDto.builder().build(), Object.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -82,7 +76,6 @@ public class PlasticControllerTest extends SpringContextTestBase {
         var response = restTemplate.postForEntity(createUrl(), PlasticCreateDto.builder().build(), Object.class);
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
