@@ -1,6 +1,7 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
+import fi.bizhop.kiekkohamsteri.TestUtils.BaseAdder;
 import fi.bizhop.kiekkohamsteri.model.Stats;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.StatsService;
@@ -31,6 +32,8 @@ public class StatsControllerTest  extends SpringContextTestBase {
     @MockBean AuthService authService;
     @MockBean StatsService statsService;
 
+    BaseAdder adder = new BaseAdder("expected/controller/stats/");
+
     @Test
     void givenUnableToAuthenticateUser_whenGetStats_thenResponseCodeUnauthorized() {
         when(authService.getUser(any())).thenReturn(null);
@@ -57,7 +60,7 @@ public class StatsControllerTest  extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedStats.json", response.getBody());
+        assertEqualsJson(adder.create("stats.json"), response.getBody());
     }
 
 

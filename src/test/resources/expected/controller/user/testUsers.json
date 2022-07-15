@@ -1,8 +1,5 @@
 [
   {
-    "createdAt": null,
-    "updatedAt": null,
-    "id": null,
     "username": "User",
     "email": "test@example.com",
     "level": 1,
@@ -15,9 +12,6 @@
     "discCount": 0
   },
   {
-    "createdAt": null,
-    "updatedAt": null,
-    "id": null,
     "username": "Other",
     "email": "other@example.com",
     "level": 1,
@@ -30,9 +24,6 @@
     "discCount": 0
   },
   {
-    "createdAt": null,
-    "updatedAt": null,
-    "id": null,
     "username": "Admin",
     "email": "admin@example.com",
     "level": 2,

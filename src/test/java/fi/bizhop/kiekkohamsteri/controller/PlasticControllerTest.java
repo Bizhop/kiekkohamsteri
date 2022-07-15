@@ -1,6 +1,8 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
+import fi.bizhop.kiekkohamsteri.TestUtils;
+import fi.bizhop.kiekkohamsteri.TestUtils.BaseAdder;
 import fi.bizhop.kiekkohamsteri.dto.PlasticCreateDto;
 import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.model.R_muovi;
@@ -37,6 +39,8 @@ public class PlasticControllerTest extends SpringContextTestBase {
     @MockBean AuthService authService;
     @MockBean PlasticService plasticService;
     @MockBean ManufacturerService manufacturerService;
+
+    BaseAdder adder = new BaseAdder("expected/controller/plastic/");
 
     @Test
     void givenUnableToAuthenticateUser_whenCallingGetPlastics_thenRespondWithUnauthorized() {
@@ -92,7 +96,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
         verify(plasticService, never()).getPlasticsByManufacturer(any(), any());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedAllPlastics.json", response.getBody());
+        assertEqualsJson(adder.create("allPlastics.json"), response.getBody());
     }
 
     @Test
@@ -111,7 +115,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
         verify(plasticService, times(1)).getPlasticsByManufacturer(eq(manufacturer), any());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedDiscmaniaPlastics.json", response.getBody());
+        assertEqualsJson(adder.create("discmaniaPlastics.json"), response.getBody());
     }
 
     @Test
@@ -146,7 +150,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
         verify(plasticService, times(1)).createPlastic(dto, manufacturer);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedNewPlastic.json", response.getBody());
+        assertEqualsJson(adder.create("newPlastic.json"), response.getBody());
     }
 
     @Test

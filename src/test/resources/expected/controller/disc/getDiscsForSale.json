@@ -7,8 +7,6 @@
       "ownerEmail": "other@example.com",
       "publicDisc": true,
       "myynnissa": false,
-      "createdAt": null,
-      "updatedAt": null,
       "valmId": 2,
       "kuva": "",
       "moldId": 20,
@@ -31,8 +29,7 @@
       "nopeus": 4.0,
       "liito": 3.0,
       "vakaus": 0.0,
-      "feidi": 3.0,
-      "id": null
+      "feidi": 3.0
     }
   ],
   "pageable": "INSTANCE",

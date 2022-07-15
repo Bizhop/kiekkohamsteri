@@ -1,6 +1,7 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
+import fi.bizhop.kiekkohamsteri.TestUtils.BaseAdder;
 import fi.bizhop.kiekkohamsteri.controller.provider.UUIDProvider;
 import fi.bizhop.kiekkohamsteri.dto.DiscDto;
 import fi.bizhop.kiekkohamsteri.dto.UploadDto;
@@ -29,7 +30,8 @@ import java.util.Optional;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
 import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpMethod.*;
@@ -51,6 +53,8 @@ public class DiscControllerTest extends SpringContextTestBase {
     @MockBean UUIDProvider uuidProvider;
 
     @Captor ArgumentCaptor<Members> userCaptor;
+
+    BaseAdder adder = new BaseAdder("expected/controller/disc/");
 
     @ParameterizedTest
     @ValueSource(strings = {"", "myytavat", "1", "public-lists", "lost"})
@@ -132,7 +136,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(""), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedGetDiscs.json", response.getBody());
+        assertEqualsJson(adder.create("getDiscs.json"), response.getBody());
     }
 
     @Test
@@ -146,7 +150,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl("myytavat"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedGetDiscsForSale.json", response.getBody());
+        assertEqualsJson(adder.create("getDiscsForSale.json"), response.getBody());
     }
 
     @Test
@@ -176,7 +180,7 @@ public class DiscControllerTest extends SpringContextTestBase {
 
         assertEquals(SC_OK, response.getStatusCodeValue());
 
-        assertEqualsJson("expectedNewDisc.json", response.getBody());
+        assertEqualsJson(adder.create("newDisc.json"), response.getBody());
     }
 
     @Test
@@ -314,7 +318,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl("123"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedMyDisc.json", response.getBody());
+        assertEqualsJson(adder.create("myDisc.json"), response.getBody());
     }
 
     @Test
@@ -329,7 +333,7 @@ public class DiscControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenValidRequest_whenUpdateDisc_thenUpdateDisc() throws IOException, AuthorizationException {
+    void givenValidRequest_whenUpdateDisc_thenUpdateDisc() throws AuthorizationException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
         var dto = DiscDto.builder()
@@ -343,7 +347,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl("123"), PUT, new HttpEntity<>(dto), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedMyDisc.json", response.getBody());
+        assertEqualsJson(adder.create("myDisc.json"), response.getBody());
     }
 
     @Test
@@ -429,7 +433,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         verify(buyService, times(1)).buyDisc(TEST_USER, disc);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedBuyDiscRequest.json", response.getBody());
+        assertEqualsJson(adder.create("buyDiscRequest.json"), response.getBody());
     }
 
     @Test

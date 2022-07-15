@@ -7,8 +7,6 @@
       "ownerEmail": "test@example.com",
       "publicDisc": true,
       "myynnissa": false,
-      "createdAt": null,
-      "updatedAt": null,
       "valmId": 0,
       "kuva": "",
       "moldId": 0,
@@ -31,8 +29,7 @@
       "feidi": 1.0,
       "omistaja": "User",
       "valmistaja": "Discmania",
-      "nopeus": 7.0,
-      "id": null
+      "nopeus": 7.0
     },
     {
       "mold": "Destroyer",
@@ -41,8 +38,6 @@
       "ownerEmail": "test@example.com",
       "publicDisc": false,
       "myynnissa": false,
-      "createdAt": null,
-      "updatedAt": null,
       "valmId": 1,
       "kuva": "",
       "moldId": 10,
@@ -65,8 +60,7 @@
       "feidi": 3.0,
       "omistaja": "User",
       "valmistaja": "Innova",
-      "nopeus": 12.0,
-      "id": null
+      "nopeus": 12.0
     }
   ],
   "pageable": "INSTANCE",

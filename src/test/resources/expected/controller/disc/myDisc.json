@@ -5,8 +5,6 @@
   "ownerEmail": "test@example.com",
   "publicDisc": true,
   "muovi": "S-Line",
-  "createdAt": null,
-  "updatedAt": null,
   "valmId": 0,
   "kuva": "",
   "moldId": 0,
@@ -29,6 +27,5 @@
   "nopeus": 7.0,
   "liito": 6.0,
   "vakaus": -1.0,
-  "feidi": 1.0,
-  "id": null
+  "feidi": 1.0
 }

@@ -38,6 +38,8 @@ public class UserControllerTest extends SpringContextTestBase {
     @MockBean UserService userService;
     @MockBean DiscService discService;
 
+    BaseAdder adder = new BaseAdder("expected/controller/user/");
+
     @ParameterizedTest
     @ValueSource(strings = {"", "1", "leaders", "me"})
     void givenUnableToAuthenticateUser_whenCallingGetEndpoints_thenRespondWithUnauthorized(String endpoint) {
@@ -74,7 +76,7 @@ public class UserControllerTest extends SpringContextTestBase {
         verify(userService, times(1)).getUsers();
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedTestUsers.json", response.getBody());
+        assertEqualsJson(adder.create("testUsers.json"), response.getBody());
     }
 
     @Test
@@ -85,7 +87,7 @@ public class UserControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl("1"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedTestUser.json", response.getBody());
+        assertEqualsJson(adder.create("testUser.json"), response.getBody());
     }
 
     @Test
@@ -96,7 +98,7 @@ public class UserControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl("1"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedTestUser.json", response.getBody());
+        assertEqualsJson(adder.create("testUser.json"), response.getBody());
     }
 
     @Test
@@ -113,7 +115,7 @@ public class UserControllerTest extends SpringContextTestBase {
         verify(userService, times(1)).updateDetails(TEST_USER, dto, false);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedTestUser.json", response.getBody());
+        assertEqualsJson(adder.create("testUser.json"), response.getBody());
     }
 
     @Test
@@ -152,7 +154,7 @@ public class UserControllerTest extends SpringContextTestBase {
         verify(userService, times(1)).updateDetails(TEST_USER, dto, true);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedTestUser.json", response.getBody());
+        assertEqualsJson(adder.create("testUser.json"), response.getBody());
     }
 
     @Test
@@ -188,7 +190,7 @@ public class UserControllerTest extends SpringContextTestBase {
 
         assertEquals(SC_OK, response.getStatusCodeValue());
 
-        assertEqualsJson("expectedUserLevel2.json", response.getBody());
+        assertEqualsJson(adder.create("userLevel2.json"), response.getBody());
     }
 
 

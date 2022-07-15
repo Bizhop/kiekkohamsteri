@@ -1,15 +1,6 @@
 {
-  "createdAt": null,
-  "updatedAt": null,
-  "id": null,
   "kiekko": {
-    "createdAt": null,
-    "updatedAt": null,
-    "id": null,
     "member": {
-      "createdAt": null,
-      "updatedAt": null,
-      "id": null,
       "username": "Other",
       "email": "other@example.com",
       "level": 1,
@@ -22,12 +13,8 @@
       "discCount": 0
     },
     "mold": {
-      "createdAt": null,
-      "updatedAt": null,
       "id": 0,
       "valmistaja": {
-        "createdAt": null,
-        "updatedAt": null,
         "id": 0,
         "valmistaja": "Discmania"
       },
@@ -38,20 +25,14 @@
       "feidi": 1.0
     },
     "muovi": {
-      "createdAt": null,
-      "updatedAt": null,
       "id": 0,
       "valmistaja": {
-        "createdAt": null,
-        "updatedAt": null,
         "id": 0,
         "valmistaja": "Discmania"
       },
       "muovi": "S-Line"
     },
     "vari": {
-      "createdAt": null,
-      "updatedAt": null,
       "id": 0,
       "vari": "Valkoinen"
     },
@@ -72,9 +53,6 @@
     "lost": false
   },
   "myyja": {
-    "createdAt": null,
-    "updatedAt": null,
-    "id": null,
     "username": "Other",
     "email": "other@example.com",
     "level": 1,
@@ -87,9 +65,6 @@
     "discCount": 0
   },
   "ostaja": {
-    "createdAt": null,
-    "updatedAt": null,
-    "id": null,
     "username": "User",
     "email": "test@example.com",
     "level": 1,

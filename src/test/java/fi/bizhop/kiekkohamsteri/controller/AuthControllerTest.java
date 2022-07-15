@@ -1,7 +1,8 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.model.Members;
+import fi.bizhop.kiekkohamsteri.TestUtils;
+import fi.bizhop.kiekkohamsteri.TestUtils.BaseAdder;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ public class AuthControllerTest extends SpringContextTestBase {
     @Autowired TestRestTemplate restTemplate;
     @MockBean AuthService authService;
 
+    BaseAdder adder = new BaseAdder("expected/controller/user/");
+
     @Test
     void givenUnableToAuthenticateUser_whenLogin_thenResponseCodeUnauthorized() {
         when(authService.login(any())).thenReturn(null);
@@ -44,7 +47,7 @@ public class AuthControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedTestUser.json", response.getBody());
+        assertEqualsJson(adder.create("testUser.json"), response.getBody());
     }
 
     private String createUrl() {

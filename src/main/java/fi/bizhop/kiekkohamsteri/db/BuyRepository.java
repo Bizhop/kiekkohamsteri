@@ -22,5 +22,5 @@ public interface BuyRepository extends CrudRepository<Ostot, Long> {
 	List<Ostot> findByStatusAndMyyja(Status status, Members myyja);
 	List<Ostot> findByStatusAndOstaja(Status status, Members ostaja);
 
-	Integer countByUpdatedAtBetweenAndStatus(Date beginDate, Date endDate, Status confirmed);
+	Integer countByUpdatedAtBetweenAndStatus(Date beginDate, Date endDate, Status status);
 }

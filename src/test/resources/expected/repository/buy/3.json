@@ -1,0 +1,87 @@
+[
+  {
+    "id": 3,
+    "kiekko": {
+      "id": 2,
+      "member": {
+        "id": 2,
+        "username": "Other",
+        "email": "other@example.com",
+        "level": 1,
+        "etunimi": "Uusi",
+        "sukunimi": "Käyttäjä",
+        "pdga_num": 0,
+        "jwt": null,
+        "publicList": false,
+        "publicDiscCount": false,
+        "discCount": 0
+      },
+      "mold": {
+        "id": 1,
+        "valmistaja": {
+          "id": 1,
+          "valmistaja": "Test manufacturer"
+        },
+        "kiekko": "Test mold",
+        "nopeus": 0,
+        "liito": 0,
+        "vakaus": 0,
+        "feidi": 0
+      },
+      "muovi": {
+        "id": 1,
+        "valmistaja": {
+          "id": 1,
+          "valmistaja": "Test manufacturer"
+        },
+        "muovi": "Test plastic"
+      },
+      "vari": {
+        "id": 1,
+        "vari": "Test color"
+      },
+      "kuva": "",
+      "paino": 175,
+      "kunto": 10,
+      "hohto": false,
+      "spessu": false,
+      "dyed": false,
+      "swirly": false,
+      "tussit": 1,
+      "myynnissa": false,
+      "hinta": 0,
+      "muuta": "",
+      "loytokiekko": false,
+      "itb": false,
+      "publicDisc": false,
+      "lost": false
+    },
+    "myyja": {
+      "id": 2,
+      "username": "Other",
+      "email": "other@example.com",
+      "level": 1,
+      "etunimi": "Uusi",
+      "sukunimi": "Käyttäjä",
+      "pdga_num": 0,
+      "jwt": null,
+      "publicList": false,
+      "publicDiscCount": false,
+      "discCount": 0
+    },
+    "ostaja": {
+      "id": 1,
+      "username": "User",
+      "email": "test@example.com",
+      "level": 1,
+      "etunimi": "Uusi",
+      "sukunimi": "Käyttäjä",
+      "pdga_num": 0,
+      "jwt": null,
+      "publicList": false,
+      "publicDiscCount": false,
+      "discCount": 0
+    },
+    "status": "CONFIRMED"
+  }
+]

@@ -1,7 +1,4 @@
 {
-  "createdAt": null,
-  "updatedAt": null,
-  "id": null,
   "username": "User",
   "email": "test@example.com",
   "level": 1,

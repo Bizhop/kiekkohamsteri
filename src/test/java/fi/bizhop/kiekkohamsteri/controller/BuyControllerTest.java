@@ -1,6 +1,8 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
+import fi.bizhop.kiekkohamsteri.TestUtils;
+import fi.bizhop.kiekkohamsteri.TestUtils.BaseAdder;
 import fi.bizhop.kiekkohamsteri.dto.BuysDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.model.Kiekot;
@@ -42,6 +44,8 @@ public class BuyControllerTest extends SpringContextTestBase {
     @Captor
     ArgumentCaptor<Kiekot> discCaptor;
 
+    BaseAdder adder = new BaseAdder("expected/controller/buy/");
+
     @ParameterizedTest
     @ValueSource(strings = {"", "omat"})
     void givenUnableToAuthenticateUser_whenCallingGetEndpoint_thenRespondWithUnauthorized(String endpoint) {
@@ -73,7 +77,7 @@ public class BuyControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(""), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedBuyListing.json", response.getBody());
+        assertEqualsJson(adder.create("buyListing.json"), response.getBody());
     }
 
     @Test
@@ -92,7 +96,7 @@ public class BuyControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl("omat"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedBuySummary.json", response.getBody());
+        assertEqualsJson(adder.create("buySummary.json"), response.getBody());
     }
 
     @Test

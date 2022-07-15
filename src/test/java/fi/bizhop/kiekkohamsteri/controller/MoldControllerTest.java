@@ -17,7 +17,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
@@ -38,6 +37,8 @@ public class MoldControllerTest extends SpringContextTestBase {
     @MockBean AuthService authService;
     @MockBean MoldService moldService;
     @MockBean ManufacturerService manufacturerService;
+
+    BaseAdder adder = new BaseAdder("expected/controller/mold/");
 
     @Test
     void givenUnableToAuthenticateUser_whenCallingGetMolds_thenRespondWithUnauthorized() {
@@ -80,7 +81,7 @@ public class MoldControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenValidRequestWithoutManufacturerId_whenGetMolds_thenReturnAllMolds() throws IOException {
+    void givenValidRequestWithoutManufacturerId_whenGetMolds_thenReturnAllMolds() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
         var page = new PageImpl<>(getMolds());
@@ -93,11 +94,11 @@ public class MoldControllerTest extends SpringContextTestBase {
         verify(moldService, never()).getMoldsByManufacturer(any(), any());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedAllMolds.json", response.getBody());
+        assertEqualsJson(adder.create("allMolds.json"), response.getBody());
     }
 
     @Test
-    void givenValidRequestWithManufacturerId_whenGetMolds_thenReturnMoldsByManufacturer() throws IOException {
+    void givenValidRequestWithManufacturerId_whenGetMolds_thenReturnMoldsByManufacturer() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
         var manufacturer = MANUFACTURERS.get(0);
@@ -112,7 +113,7 @@ public class MoldControllerTest extends SpringContextTestBase {
         verify(moldService, times(1)).getMoldsByManufacturer(eq(manufacturer), any());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedDiscmaniaMolds.json", response.getBody());
+        assertEqualsJson(adder.create("discmaniaMolds.json"), response.getBody());
     }
 
     @Test
@@ -147,7 +148,7 @@ public class MoldControllerTest extends SpringContextTestBase {
         verify(moldService, times(1)).createMold(dto, manufacturer);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedNewMold.json", response.getBody());
+        assertEqualsJson(adder.create("newMold.json"), response.getBody());
     }
 
     @Test
