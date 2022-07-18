@@ -1,5 +1,6 @@
 package fi.bizhop.kiekkohamsteri.db;
 
+import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.model.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.REPOSITORY;
 import static fi.bizhop.kiekkohamsteri.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -29,6 +31,8 @@ public class DiscRepositoryTest extends SpringContextTestBase {
     @Autowired PlasticRepository plasticRepository;
 
     static Map<String, Object> testDataContainer = null;
+
+    BaseAdder adder = new BaseAdder("disc", REPOSITORY);
 
     @BeforeEach
     void setupTestData() {
@@ -68,7 +72,7 @@ public class DiscRepositoryTest extends SpringContextTestBase {
         var user = (Members) testDataContainer.get(TEST_USER_KEY);
         var result = discRepository.findByMemberAndLostFalse(user, Pageable.unpaged());
 
-        assertEqualsJson("expected/repository/disc/byMemberAndLostFalse.json", result);
+        assertEqualsJson(adder.create("byMemberAndLostFalse.json"), result);
     }
 
     @Test
@@ -77,14 +81,14 @@ public class DiscRepositoryTest extends SpringContextTestBase {
         var other = (Members) testDataContainer.get(OTHER_USER_KEY);
         var result = discRepository.findByMemberInAndPublicDiscTrue(List.of(user, other));
 
-        assertEqualsJson("expected/repository/disc/byMemberInAndPublicDiscTrue.json", result);
+        assertEqualsJson(adder.create("byMemberInAndPublicDiscTrue.json"), result);
     }
 
     @Test
     void findByLostTrueTest() {
         var result = discRepository.findByLostTrue(Pageable.unpaged());
 
-        assertEqualsJson("expected/repository/disc/byLostTrue.json", result);
+        assertEqualsJson(adder.create("byLostTrue.json"), result);
     }
 
     @Test
@@ -92,14 +96,14 @@ public class DiscRepositoryTest extends SpringContextTestBase {
         var disc = discRepository.findAll().iterator().next();
         var result = discRepository.getKiekotById(disc.getId());
 
-        assertEqualsJson("expected/repository/disc/byId.json", result);
+        assertEqualsJson(adder.create("byId.json"), result);
     }
 
     @Test
     void findByMyynnissaTrueTest() {
         var result = discRepository.findByMyynnissaTrue(Pageable.unpaged());
 
-        assertEqualsJson("expected/repository/disc/byMyynnissaTrue.json", result);
+        assertEqualsJson(adder.create("byMyynnissaTrue.json"), result);
     }
 
     @Test

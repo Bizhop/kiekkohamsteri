@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @MappedSuperclass
 @Setter
 public class TimestampBase {
-	  @Column(name = "created_at")
+	  @Column(name = "created_at", updatable = false)
 	  @Temporal(TemporalType.TIMESTAMP)
 	  @CreationTimestamp
 	  private Date createdAt;

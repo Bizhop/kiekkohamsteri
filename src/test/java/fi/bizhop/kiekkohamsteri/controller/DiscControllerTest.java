@@ -1,7 +1,7 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
+import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.TestUtils.BaseAdder;
 import fi.bizhop.kiekkohamsteri.controller.provider.UUIDProvider;
 import fi.bizhop.kiekkohamsteri.dto.DiscDto;
 import fi.bizhop.kiekkohamsteri.dto.UploadDto;
@@ -27,6 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.IOException;
 import java.util.Optional;
 
+import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
 import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static javax.servlet.http.HttpServletResponse.*;
@@ -54,7 +55,7 @@ public class DiscControllerTest extends SpringContextTestBase {
 
     @Captor ArgumentCaptor<Members> userCaptor;
 
-    BaseAdder adder = new BaseAdder("expected/controller/disc/");
+    BaseAdder adder = new BaseAdder("disc", CONTROLLER);
 
     @ParameterizedTest
     @ValueSource(strings = {"", "myytavat", "1", "public-lists", "lost"})

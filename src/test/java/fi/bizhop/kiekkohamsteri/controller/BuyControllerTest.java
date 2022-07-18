@@ -1,8 +1,7 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
+import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.TestUtils;
-import fi.bizhop.kiekkohamsteri.TestUtils.BaseAdder;
 import fi.bizhop.kiekkohamsteri.dto.BuysDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.model.Kiekot;
@@ -24,11 +23,13 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
+import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
 import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static fi.bizhop.kiekkohamsteri.model.Ostot.Status.REQUESTED;
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -44,7 +45,7 @@ public class BuyControllerTest extends SpringContextTestBase {
     @Captor
     ArgumentCaptor<Kiekot> discCaptor;
 
-    BaseAdder adder = new BaseAdder("expected/controller/buy/");
+    BaseAdder adder = new BaseAdder("buy", CONTROLLER);
 
     @ParameterizedTest
     @ValueSource(strings = {"", "omat"})

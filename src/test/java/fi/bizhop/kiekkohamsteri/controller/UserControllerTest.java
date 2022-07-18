@@ -1,5 +1,6 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
+import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.dto.UserUpdateDto;
 import fi.bizhop.kiekkohamsteri.model.Members;
@@ -19,8 +20,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 
+import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
-import static fi.bizhop.kiekkohamsteri.TestUtils.*;
+import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -38,7 +40,7 @@ public class UserControllerTest extends SpringContextTestBase {
     @MockBean UserService userService;
     @MockBean DiscService discService;
 
-    BaseAdder adder = new BaseAdder("expected/controller/user/");
+    BaseAdder adder = new BaseAdder("user", CONTROLLER);
 
     @ParameterizedTest
     @ValueSource(strings = {"", "1", "leaders", "me"})

@@ -1,0 +1,50 @@
+{
+  "content": [
+    {
+      "valmistaja": "Discmania",
+      "kiekko": "PD",
+      "nopeus": 10.0,
+      "liito": 4.0,
+      "vakaus": 0.0,
+      "feidi": 3.0
+    },
+    {
+      "valmistaja": "Discmania",
+      "kiekko": "FD",
+      "nopeus": 7.0,
+      "liito": 6.0,
+      "vakaus": -1.0,
+      "feidi": 1.0
+    },
+    {
+      "valmistaja": "Innova",
+      "kiekko": "Destroyer",
+      "nopeus": 12.0,
+      "liito": 5.0,
+      "vakaus": -1.0,
+      "feidi": 3.0
+    },
+    {
+      "valmistaja": "Innova",
+      "kiekko": "Roc",
+      "nopeus": 4.0,
+      "liito": 4.0,
+      "vakaus": 0.0,
+      "feidi": 3.0
+    }
+  ],
+  "pageable": "INSTANCE",
+  "last": true,
+  "totalPages": 1,
+  "totalElements": 4,
+  "first": true,
+  "number": 0,
+  "sort": {
+    "sorted": false,
+    "unsorted": true,
+    "empty": true
+  },
+  "numberOfElements": 4,
+  "size": 4,
+  "empty": false
+}

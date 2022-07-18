@@ -1,8 +1,7 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
+import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.TestUtils;
-import fi.bizhop.kiekkohamsteri.TestUtils.BaseAdder;
 import fi.bizhop.kiekkohamsteri.dto.PlasticCreateDto;
 import fi.bizhop.kiekkohamsteri.model.Members;
 import fi.bizhop.kiekkohamsteri.model.R_muovi;
@@ -22,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.IOException;
 import java.util.Optional;
 
+import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
 import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static javax.servlet.http.HttpServletResponse.*;
@@ -40,7 +40,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
     @MockBean PlasticService plasticService;
     @MockBean ManufacturerService manufacturerService;
 
-    BaseAdder adder = new BaseAdder("expected/controller/plastic/");
+    BaseAdder adder = new BaseAdder("plastic", CONTROLLER);
 
     @Test
     void givenUnableToAuthenticateUser_whenCallingGetPlastics_thenRespondWithUnauthorized() {

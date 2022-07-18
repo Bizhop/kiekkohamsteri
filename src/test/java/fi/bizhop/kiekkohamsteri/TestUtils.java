@@ -83,10 +83,10 @@ public class TestUtils {
         var testUser = userRepository.save(TEST_USER);
         var otherUser = userRepository.save(OTHER_USER);
 
-        var manufacturer = manufacturerRepository.save(new R_valm(0L, "Test manufacturer"));
-        var mold = moldRepository.save(new R_mold(0L, manufacturer, "Test mold", 0.0, 0.0, 0.0, 0.0));
-        var color = colorRepository.save(new R_vari(0L, "Test color"));
-        var plastic = plasticRepository.save(new R_muovi(0L, manufacturer, "Test plastic"));
+        var manufacturer = manufacturerRepository.save(new R_valm(null, "Test manufacturer"));
+        var mold = moldRepository.save(new R_mold(null, manufacturer, "Test mold", 0.0, 0.0, 0.0, 0.0));
+        var color = colorRepository.save(new R_vari(null, "Test color"));
+        var plastic = plasticRepository.save(new R_muovi(null, manufacturer, "Test plastic"));
 
         var testDisc = discRepository.save(new Kiekot(testUser, mold, plastic, color));
         var otherDisc = discRepository.save(new Kiekot(otherUser, mold, plastic, color));
@@ -108,14 +108,5 @@ public class TestUtils {
         cal.setTime(input);
         cal.add(Calendar.DATE, dayOffset);
         return cal.getTime();
-    }
-
-    @RequiredArgsConstructor
-    public static class BaseAdder {
-        private final String base;
-
-        public String create(String filename) {
-            return String.format("%s%s", base, filename);
-        }
     }
 }

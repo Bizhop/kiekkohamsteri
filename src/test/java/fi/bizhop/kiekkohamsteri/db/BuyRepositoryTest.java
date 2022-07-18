@@ -1,5 +1,6 @@
 package fi.bizhop.kiekkohamsteri.db;
 
+import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.model.Kiekot;
 import fi.bizhop.kiekkohamsteri.model.Members;
@@ -13,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.Date;
 import java.util.Map;
 
+import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.REPOSITORY;
 import static fi.bizhop.kiekkohamsteri.TestUtils.*;
 import static fi.bizhop.kiekkohamsteri.model.Ostot.Status.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +31,7 @@ public class BuyRepositoryTest extends SpringContextTestBase {
 
     @Autowired BuyRepository buyRepository;
 
-    BaseAdder adder = new BaseAdder("expected/repository/buy/");
+    BaseAdder adder = new BaseAdder("buy", REPOSITORY);
 
     static Map<String, Object> testDataContainer;
 
