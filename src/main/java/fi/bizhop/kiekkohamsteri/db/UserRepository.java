@@ -16,11 +16,13 @@ public interface UserRepository extends CrudRepository<Members, Long> {
 	List<Members> findAllByOrderById();
 	List<LeaderProjection> findByPublicDiscCountTrueOrderByDiscCountDesc();
 	List<Members> findByPublicListTrue();
-	
+
+	//TODO: move this elsewhere, disc repo?
 	@Modifying(clearAutomatically = true, flushAutomatically = true)
 	@Query("update Kiekot k set k.publicDisc = true where k.member = ?1")
 	void makeDiscsPublic(Members user);
 
+	//TODO: move this as part of user update
 	@Modifying(clearAutomatically = true, flushAutomatically = true)
 	@Query("update Members u set u.level = ?2 where u.id = ?1")
 	void updateUserLevel(Long id, Integer level);
