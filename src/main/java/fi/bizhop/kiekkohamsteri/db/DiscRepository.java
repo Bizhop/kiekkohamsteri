@@ -7,19 +7,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import fi.bizhop.kiekkohamsteri.model.Kiekot;
-import fi.bizhop.kiekkohamsteri.model.Members;
+import fi.bizhop.kiekkohamsteri.model.Disc;
+import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.projection.v1.DiscProjection;
 
-public interface DiscRepository extends PagingAndSortingRepository<Kiekot, Long> {
-	Page<DiscProjection> findByMemberAndLostFalse(Members member, Pageable pageable);
-	List<DiscProjection> findByMemberInAndPublicDiscTrue(List<Members> memberList);
+public interface DiscRepository extends PagingAndSortingRepository<Disc, Long> {
+	Page<DiscProjection> findByOwnerAndLostFalse(User user, Pageable pageable);
+	List<DiscProjection> findByOwnerInAndPublicDiscTrue(List<User> users);
 	Page<DiscProjection> findByLostTrue(Pageable pageable);
 
-	DiscProjection getKiekotById(Long id);
+	DiscProjection getDiscById(Long id);
 
-	Page<DiscProjection> findByMyynnissaTrue(Pageable pageable);
+	Page<DiscProjection> findByForSaleTrue(Pageable pageable);
 	
 	Integer countByCreatedAtBetween(Date begin, Date end);
-	Integer countByMember(Members l);
+	Integer countByOwner(User user);
 }

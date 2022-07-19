@@ -2,7 +2,7 @@ package fi.bizhop.kiekkohamsteri.db;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.model.Members;
+import fi.bizhop.kiekkohamsteri.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +31,8 @@ public class UserRepositoryTest extends SpringContextTestBase {
     void setupTestData() {
         userRepository.deleteAll();
 
-        var testUser = new Members(TEST_EMAIL);
-        var otherUser = new Members(OTHER_EMAIL);
+        var testUser = new User(TEST_EMAIL);
+        var otherUser = new User(OTHER_EMAIL);
 
         testUser.setUsername("test user");
         testUser.setDiscCount(55);

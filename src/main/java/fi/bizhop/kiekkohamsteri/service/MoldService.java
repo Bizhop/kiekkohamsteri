@@ -1,9 +1,9 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.MoldRepository;
-import fi.bizhop.kiekkohamsteri.dto.MoldCreateDto;
-import fi.bizhop.kiekkohamsteri.model.R_mold;
-import fi.bizhop.kiekkohamsteri.model.R_valm;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.MoldCreateDto;
+import fi.bizhop.kiekkohamsteri.model.Mold;
+import fi.bizhop.kiekkohamsteri.model.Manufacturer;
 import fi.bizhop.kiekkohamsteri.projection.v1.MoldProjection;
 import fi.bizhop.kiekkohamsteri.util.Utils;
 import lombok.RequiredArgsConstructor;
@@ -21,18 +21,31 @@ public class MoldService {
 
 	final MoldRepository moldRepo;
 
-	private R_mold DEFAULT_MOLD;
+	private Mold DEFAULT_MOLD;
 
-	public MoldProjection createMold(MoldCreateDto dto, R_valm manufacturer) {
-		var mold = new R_mold();
-		mold.setValmistaja(manufacturer);
-		BeanUtils.copyProperties(dto, mold, "id", "valmistaja");
-		
-		var saved = moldRepo.save(mold);
-		return moldRepo.getR_moldById(saved.getId());
+	public MoldProjection createMold(fi.bizhop.kiekkohamsteri.dto.v1.in.MoldCreateDto dto, Manufacturer manufacturer) {
+		var dtoV2 = MoldCreateDto.builder()
+				.manufacturerId(dto.getValmId())
+				.name(dto.getKiekko())
+				.speed(dto.getNopeus())
+				.glide(dto.getLiito())
+				.stability(dto.getVakaus())
+				.fade(dto.getFeidi())
+				.build();
+
+		return createMold(dtoV2, manufacturer);
 	}
 
-	public R_mold getDefaultMold() {
+	public MoldProjection createMold(MoldCreateDto dto, Manufacturer manufacturer) {
+		var mold = new Mold();
+		mold.setManufacturer(manufacturer);
+		BeanUtils.copyProperties(dto, mold, "id", "manufacturer");
+		
+		var saved = moldRepo.save(mold);
+		return moldRepo.getMoldById(saved.getId());
+	}
+
+	public Mold getDefaultMold() {
 		if(DEFAULT_MOLD == null) {
 			DEFAULT_MOLD = moldRepo.findById(DEFAULT_MOLD_ID).orElseThrow();
 		}
@@ -46,11 +59,11 @@ public class MoldService {
 		return moldRepo.findAllProjectedBy(pageable);
 	}
 
-	public Page<MoldProjection> getMoldsByManufacturer(R_valm manufacturer, Pageable pageable) {
-		return moldRepo.findByValmistaja(manufacturer, pageable);
+	public Page<MoldProjection> getMoldsByManufacturer(Manufacturer manufacturer, Pageable pageable) {
+		return moldRepo.findByManufacturer(manufacturer, pageable);
 	}
 
-	public Optional<R_mold> getMold(Long id) {
+	public Optional<Mold> getMold(Long id) {
 		return moldRepo.findById(id);
 	}
 }

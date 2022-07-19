@@ -2,7 +2,7 @@ package fi.bizhop.kiekkohamsteri.db;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.model.R_vari;
+import fi.bizhop.kiekkohamsteri.model.Color;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class ColorRepositoryTest extends SpringContextTestBase {
     @BeforeEach
     void setupTestData() {
         colorRepository.deleteAll();
-        var testColor = new R_vari(0L, "test color");
+        var testColor = new Color(0L, "test color");
         colorRepository.save(testColor);
     }
 

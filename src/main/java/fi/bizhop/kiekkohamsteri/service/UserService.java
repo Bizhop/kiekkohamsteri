@@ -1,8 +1,8 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.UserRepository;
-import fi.bizhop.kiekkohamsteri.dto.UserUpdateDto;
-import fi.bizhop.kiekkohamsteri.model.Members;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.UserUpdateDto;
+import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.projection.v1.LeaderProjection;
 import fi.bizhop.kiekkohamsteri.util.Utils;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,13 @@ import java.util.List;
 public class UserService {
 	final UserRepository userRepo;
 
-	public Members updateDetails(Members user, UserUpdateDto dto, boolean adminRequest) {
+	//V1 compatibility
+	public User updateDetails(User user, fi.bizhop.kiekkohamsteri.dto.v1.in.UserUpdateDto dto, boolean adminRequest) {
+		var dtoV2 = UserUpdateDto.fromV1(dto);
+		return updateDetails(user, dtoV2, adminRequest);
+	}
+
+	public User updateDetails(User user, UserUpdateDto dto, boolean adminRequest) {
 		if(user == null) return null;
 
 		var ignores = Utils.getNullPropertyNames(dto);
@@ -36,25 +42,19 @@ public class UserService {
 	// Passthrough methods to db
 	// Not covered (or to be covered by unit tests)
 
-	@Transactional
-	public Members setUserLevel(Long id, Integer level) {
-		userRepo.updateUserLevel(id, level);
-		return userRepo.findById(id).orElse(null);
-	}
-
-	public Members getUser(Long id) {
+	public User getUser(Long id) {
 		return userRepo.findById(id).orElseThrow();
 	}
 
-	public List<Members> getUsers() {
+	public List<User> getUsers() {
 		return userRepo.findAllByOrderById();
 	}
 
-	public void saveUser(Members user) {
+	public void saveUser(User user) {
 		userRepo.save(user);
 	}
 
-	public void saveUsers(List<Members> users) {
+	public void saveUsers(List<User> users) {
 		userRepo.saveAll(users);
 	}
 
@@ -62,7 +62,7 @@ public class UserService {
 		return userRepo.findByPublicDiscCountTrueOrderByDiscCountDesc();
 	}
 
-	public List<Members> getUsersWithPublicList() {
+	public List<User> getUsersWithPublicList() {
 		return userRepo.findByPublicListTrue();
 	}
 }

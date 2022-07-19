@@ -2,8 +2,8 @@ package fi.bizhop.kiekkohamsteri.db;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.model.R_mold;
-import fi.bizhop.kiekkohamsteri.model.R_valm;
+import fi.bizhop.kiekkohamsteri.model.Mold;
+import fi.bizhop.kiekkohamsteri.model.Manufacturer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,26 +32,26 @@ public class MoldRepositoryTest extends SpringContextTestBase {
         moldRepository.deleteAll();
         manufacturerRepository.deleteAll();
 
-        var innova = manufacturerRepository.save(new R_valm(null, "Innova"));
-        var discmania = manufacturerRepository.save(new R_valm(null, "Discmania"));
+        var innova = manufacturerRepository.save(new Manufacturer(null, "Innova"));
+        var discmania = manufacturerRepository.save(new Manufacturer(null, "Discmania"));
 
-        moldRepository.save(new R_mold(null, discmania, "PD", 10.0, 4.0, 0.0, 3.0));
-        moldRepository.save(new R_mold(null, discmania, "FD", 7.0, 6.0, -1.0, 1.0));
-        moldRepository.save(new R_mold(null, innova, "Destroyer", 12.0, 5.0, -1.0, 3.0));
-        moldRepository.save(new R_mold(null, innova, "Roc", 4.0, 4.0, 0.0, 3.0));
+        moldRepository.save(new Mold(null, discmania, "PD", 10.0, 4.0, 0.0, 3.0));
+        moldRepository.save(new Mold(null, discmania, "FD", 7.0, 6.0, -1.0, 1.0));
+        moldRepository.save(new Mold(null, innova, "Destroyer", 12.0, 5.0, -1.0, 3.0));
+        moldRepository.save(new Mold(null, innova, "Roc", 4.0, 4.0, 0.0, 3.0));
     }
 
     @Test
-    void findAllByOrderByKiekkoAscTest() {
-        var result = moldRepository.findAllByOrderByKiekkoAsc();
+    void findAllByOrderByNameAscTest() {
+        var result = moldRepository.findAllByOrderByNameAsc();
 
         assertEqualsJson(adder.create("allDD.json"), result);
     }
 
     @Test
-    void findByValmistajaOrderByKiekkoAscTest() {
-        var innovaResult = moldRepository.findByValmistajaOrderByKiekkoAsc(findManufacturer("Innova"));
-        var discmaniaResult = moldRepository.findByValmistajaOrderByKiekkoAsc(findManufacturer("Discmania"));
+    void findByManufacturerOrderByNameAscTest() {
+        var innovaResult = moldRepository.findByManufacturerOrderByNameAsc(findManufacturer("Innova"));
+        var discmaniaResult = moldRepository.findByManufacturerOrderByNameAsc(findManufacturer("Discmania"));
 
         assertEqualsJson(adder.create("innovaDD.json"), innovaResult);
         assertEqualsJson(adder.create("discmaniaDD.json"), discmaniaResult);
@@ -65,9 +65,9 @@ public class MoldRepositoryTest extends SpringContextTestBase {
     }
 
     @Test
-    void findByValmistajaTest() {
-        var innovaResult = moldRepository.findByValmistaja(findManufacturer("Innova"), Pageable.unpaged());
-        var discmaniaResult = moldRepository.findByValmistaja(findManufacturer("Discmania"), Pageable.unpaged());
+    void findByManufacturerTest() {
+        var innovaResult = moldRepository.findByManufacturer(findManufacturer("Innova"), Pageable.unpaged());
+        var discmaniaResult = moldRepository.findByManufacturer(findManufacturer("Discmania"), Pageable.unpaged());
 
         assertEqualsJson(adder.create("innova.json"), innovaResult);
         assertEqualsJson(adder.create("discmania.json"), discmaniaResult);
@@ -87,9 +87,9 @@ public class MoldRepositoryTest extends SpringContextTestBase {
         assertEquals(0, outsideRange);
     }
 
-    private R_valm findManufacturer(String manufacturer) {
+    private Manufacturer findManufacturer(String manufacturer) {
         return manufacturerRepository.findAll().stream()
-                .filter(m -> manufacturer.equals(m.getValmistaja()))
+                .filter(m -> manufacturer.equals(m.getName()))
                 .findFirst()
                 .orElseThrow();
     }

@@ -2,7 +2,7 @@ package fi.bizhop.kiekkohamsteri.controller;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.dto.DropdownsDto;
+import fi.bizhop.kiekkohamsteri.dto.v1.out.DropdownsDto;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.DropdownsService;
 import org.junit.jupiter.api.Test;

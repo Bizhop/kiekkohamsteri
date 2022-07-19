@@ -1,9 +1,9 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.PlasticRepository;
-import fi.bizhop.kiekkohamsteri.dto.PlasticCreateDto;
-import fi.bizhop.kiekkohamsteri.model.R_muovi;
-import fi.bizhop.kiekkohamsteri.model.R_valm;
+import fi.bizhop.kiekkohamsteri.dto.v1.in.PlasticCreateDto;
+import fi.bizhop.kiekkohamsteri.model.Plastic;
+import fi.bizhop.kiekkohamsteri.model.Manufacturer;
 import fi.bizhop.kiekkohamsteri.projection.v1.PlasticProjection;
 import fi.bizhop.kiekkohamsteri.util.Utils;
 import lombok.RequiredArgsConstructor;
@@ -19,18 +19,18 @@ public class PlasticService {
 	final PlasticRepository plasticRepository;
 
 	private static final Long DEFAULT_PLASTIC_ID = Utils.getLongFromEnv("DEFAULT_PLASTIC_ID", 13L);
-	private R_muovi DEFAULT_PLASTIC;
+	private Plastic DEFAULT_PLASTIC;
 
-	public PlasticProjection createPlastic(PlasticCreateDto dto, R_valm manufacturer) {
-		var plastic = new R_muovi();
-		plastic.setValmistaja(manufacturer);
-		plastic.setMuovi(dto.getMuovi());
+	public PlasticProjection createPlastic(PlasticCreateDto dto, Manufacturer manufacturer) {
+		var plastic = new Plastic();
+		plastic.setManufacturer(manufacturer);
+		plastic.setName(dto.getMuovi());
 		
 		var saved = plasticRepository.save(plastic);
-		return plasticRepository.getR_muoviById(saved.getId());
+		return plasticRepository.getPlasticById(saved.getId());
 	}
 
-    public R_muovi getDefaultPlastic() {
+    public Plastic getDefaultPlastic() {
 		if(DEFAULT_PLASTIC == null) {
 			DEFAULT_PLASTIC = plasticRepository.findById(DEFAULT_PLASTIC_ID).orElseThrow();
 		}
@@ -40,7 +40,7 @@ public class PlasticService {
 	// Passthrough methods to db
 	// Not covered (or to be covered by unit tests)
 
-	public Optional<R_muovi> getPlastic(long id) {
+	public Optional<Plastic> getPlastic(long id) {
 		return plasticRepository.findById(id);
 	}
 
@@ -48,7 +48,7 @@ public class PlasticService {
 		return plasticRepository.findAllProjectedBy(pageable);
 	}
 
-	public Page<PlasticProjection> getPlasticsByManufacturer(R_valm manufacturer, Pageable pageable) {
-		return plasticRepository.findByValmistaja(manufacturer, pageable);
+	public Page<PlasticProjection> getPlasticsByManufacturer(Manufacturer manufacturer, Pageable pageable) {
+		return plasticRepository.findByManufacturer(manufacturer, pageable);
 	}
 }

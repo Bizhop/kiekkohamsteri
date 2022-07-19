@@ -2,7 +2,7 @@ package fi.bizhop.kiekkohamsteri.db;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.model.DDArvot;
+import fi.bizhop.kiekkohamsteri.model.DropdownValues;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,29 +23,29 @@ public class DropdownRepositoryTest extends SpringContextTestBase {
     void setupTestData() {
         dropdownRepository.deleteAll();
 
-        var condition = new DDArvot();
-        condition.setValikko("kunto");
-        condition.setNimi("10/10");
-        condition.setArvo(10);
+        var condition = new DropdownValues();
+        condition.setMenu("kunto");
+        condition.setName("10/10");
+        condition.setValue(10);
         dropdownRepository.save(condition);
 
-        var markings1 = new DDArvot();
-        markings1.setValikko("tussit");
-        markings1.setNimi("rimmissä");
-        markings1.setArvo(1);
+        var markings1 = new DropdownValues();
+        markings1.setMenu("tussit");
+        markings1.setName("rimmissä");
+        markings1.setValue(1);
         dropdownRepository.save(markings1);
 
-        var markings2 = new DDArvot();
-        markings2.setValikko("tussit");
-        markings2.setNimi("pohjassa");
-        markings2.setArvo(2);
+        var markings2 = new DropdownValues();
+        markings2.setMenu("tussit");
+        markings2.setName("pohjassa");
+        markings2.setValue(2);
         dropdownRepository.save(markings2);
     }
 
     @Test
-    void findByValikkoOrderByArvoAscTest() {
-        var conditions = dropdownRepository.findByValikkoOrderByArvoAsc("kunto");
-        var markings = dropdownRepository.findByValikkoOrderByArvoAsc("tussit");
+    void findByMenuOrderByValueAscTest() {
+        var conditions = dropdownRepository.findByMenuOrderByValueAsc("kunto");
+        var markings = dropdownRepository.findByMenuOrderByValueAsc("tussit");
 
         assertEqualsJson(adder.create("conditions.json"), conditions);
         assertEqualsJson(adder.create("markings.json"), markings);

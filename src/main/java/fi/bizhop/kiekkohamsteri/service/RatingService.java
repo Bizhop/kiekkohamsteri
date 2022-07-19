@@ -11,8 +11,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
-import fi.bizhop.kiekkohamsteri.dto.RatingDto;
-import fi.bizhop.kiekkohamsteri.dto.RoundDto;
+import fi.bizhop.kiekkohamsteri.dto.v1.RatingDto;
+import fi.bizhop.kiekkohamsteri.dto.v1.RoundDto;
 
 @Service
 public class RatingService {

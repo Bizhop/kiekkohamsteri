@@ -4,15 +4,7 @@
       "kiekko": {
         "member": {
           "username": "User",
-          "email": "test@example.com",
-          "level": 1,
-          "etunimi": "Uusi",
-          "sukunimi": "Käyttäjä",
-          "pdga_num": 0,
-          "jwt": null,
-          "publicList": false,
-          "publicDiscCount": false,
-          "discCount": 0
+          "email": "test@example.com"
         },
         "mold": {
           "id": 0,
@@ -56,27 +48,11 @@
       },
       "myyja": {
         "username": "User",
-        "email": "test@example.com",
-        "level": 1,
-        "etunimi": "Uusi",
-        "sukunimi": "Käyttäjä",
-        "pdga_num": 0,
-        "jwt": null,
-        "publicList": false,
-        "publicDiscCount": false,
-        "discCount": 0
+        "email": "test@example.com"
       },
       "ostaja": {
         "username": "Other",
-        "email": "other@example.com",
-        "level": 1,
-        "etunimi": "Uusi",
-        "sukunimi": "Käyttäjä",
-        "pdga_num": 0,
-        "jwt": null,
-        "publicList": false,
-        "publicDiscCount": false,
-        "discCount": 0
+        "email": "other@example.com"
       },
       "status": "REQUESTED"
     }
@@ -86,15 +62,7 @@
       "kiekko": {
         "member": {
           "username": "Other",
-          "email": "other@example.com",
-          "level": 1,
-          "etunimi": "Uusi",
-          "sukunimi": "Käyttäjä",
-          "pdga_num": 0,
-          "jwt": null,
-          "publicList": false,
-          "publicDiscCount": false,
-          "discCount": 0
+          "email": "other@example.com"
         },
         "mold": {
           "id": 0,
@@ -138,27 +106,11 @@
       },
       "myyja": {
         "username": "Other",
-        "email": "other@example.com",
-        "level": 1,
-        "etunimi": "Uusi",
-        "sukunimi": "Käyttäjä",
-        "pdga_num": 0,
-        "jwt": null,
-        "publicList": false,
-        "publicDiscCount": false,
-        "discCount": 0
+        "email": "other@example.com"
       },
       "ostaja": {
         "username": "User",
-        "email": "test@example.com",
-        "level": 1,
-        "etunimi": "Uusi",
-        "sukunimi": "Käyttäjä",
-        "pdga_num": 0,
-        "jwt": null,
-        "publicList": false,
-        "publicDiscCount": false,
-        "discCount": 0
+        "email": "test@example.com"
       },
       "status": "REQUESTED"
     },
@@ -166,15 +118,7 @@
       "kiekko": {
         "member": {
           "username": "Other",
-          "email": "other@example.com",
-          "level": 1,
-          "etunimi": "Uusi",
-          "sukunimi": "Käyttäjä",
-          "pdga_num": 0,
-          "jwt": null,
-          "publicList": false,
-          "publicDiscCount": false,
-          "discCount": 0
+          "email": "other@example.com"
         },
         "mold": {
           "id": 0,
@@ -218,27 +162,11 @@
       },
       "myyja": {
         "username": "Other",
-        "email": "other@example.com",
-        "level": 1,
-        "etunimi": "Uusi",
-        "sukunimi": "Käyttäjä",
-        "pdga_num": 0,
-        "jwt": null,
-        "publicList": false,
-        "publicDiscCount": false,
-        "discCount": 0
+        "email": "other@example.com"
       },
       "ostaja": {
         "username": "User",
-        "email": "test@example.com",
-        "level": 1,
-        "etunimi": "Uusi",
-        "sukunimi": "Käyttäjä",
-        "pdga_num": 0,
-        "jwt": null,
-        "publicList": false,
-        "publicDiscCount": false,
-        "discCount": 0
+        "email": "test@example.com"
       },
       "status": "REQUESTED"
     }

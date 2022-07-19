@@ -1,0 +1,12 @@
+{
+  "username": "User",
+  "email": "test@example.com",
+  "level": 1,
+  "etunimi": "New",
+  "sukunimi": "User",
+  "pdga_num": 0,
+  "jwt": null,
+  "publicList": false,
+  "publicDiscCount": false,
+  "discCount": 0
+}

@@ -1,8 +1,8 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.MoldRepository;
-import fi.bizhop.kiekkohamsteri.dto.MoldCreateDto;
-import fi.bizhop.kiekkohamsteri.model.R_mold;
+import fi.bizhop.kiekkohamsteri.dto.v1.in.MoldCreateDto;
+import fi.bizhop.kiekkohamsteri.model.Mold;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -22,7 +22,7 @@ public class MoldServiceTest {
     MoldRepository moldRepo;
 
     @Captor
-    ArgumentCaptor<R_mold> moldCaptor;
+    ArgumentCaptor<Mold> moldCaptor;
 
     @BeforeEach
     void init() {
@@ -31,9 +31,9 @@ public class MoldServiceTest {
 
     @Test
     void getDefaultMoldTest() {
-        var defaultMold = new R_mold();
+        var defaultMold = new Mold();
         defaultMold.setId(893L);
-        defaultMold.setKiekko("ANY");
+        defaultMold.setName("ANY");
 
         when(moldRepo.findById(893L)).thenReturn(Optional.of(defaultMold));
 
@@ -52,15 +52,15 @@ public class MoldServiceTest {
                 .kiekko("TEST")
                 .build();
 
-        when(moldRepo.save(any(R_mold.class))).then(returnsFirstArg());
+        when(moldRepo.save(any(Mold.class))).then(returnsFirstArg());
 
         getMoldService().createMold(dto, manufacturer);
 
         verify(moldRepo, times(1)).save(moldCaptor.capture());
 
         var saved = moldCaptor.getValue();
-        assertEquals("TEST", saved.getKiekko());
-        assertEquals(manufacturer.getId(), saved.getValmistaja().getId());
+        assertEquals("TEST", saved.getName());
+        assertEquals(manufacturer.getId(), saved.getManufacturer().getId());
     }
 
     private MoldService getMoldService() {

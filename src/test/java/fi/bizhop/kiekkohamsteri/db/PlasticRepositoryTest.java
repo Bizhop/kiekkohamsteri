@@ -2,8 +2,8 @@ package fi.bizhop.kiekkohamsteri.db;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.model.R_muovi;
-import fi.bizhop.kiekkohamsteri.model.R_valm;
+import fi.bizhop.kiekkohamsteri.model.Plastic;
+import fi.bizhop.kiekkohamsteri.model.Manufacturer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,18 +27,18 @@ public class PlasticRepositoryTest extends SpringContextTestBase {
         plasticRepository.deleteAll();
         manufacturerRepository.deleteAll();
 
-        var innova = manufacturerRepository.save(new R_valm(null, "Innova"));
-        var discmania = manufacturerRepository.save(new R_valm(null, "Discmania"));
+        var innova = manufacturerRepository.save(new Manufacturer(null, "Innova"));
+        var discmania = manufacturerRepository.save(new Manufacturer(null, "Discmania"));
 
-        plasticRepository.save(new R_muovi(null, innova, "Champion"));
-        plasticRepository.save(new R_muovi(null, innova, "Star"));
-        plasticRepository.save(new R_muovi(null, discmania, "C-Line"));
-        plasticRepository.save(new R_muovi(null, discmania, "S-Line"));
+        plasticRepository.save(new Plastic(null, innova, "Champion"));
+        plasticRepository.save(new Plastic(null, innova, "Star"));
+        plasticRepository.save(new Plastic(null, discmania, "C-Line"));
+        plasticRepository.save(new Plastic(null, discmania, "S-Line"));
     }
 
     @Test
     void findAllByOrderByMuoviAscTest() {
-        var result = plasticRepository.findAllByOrderByMuoviAsc();
+        var result = plasticRepository.findAllByOrderByNameAsc();
 
         assertEqualsJson(adder.create("allDD.json"), result);
     }

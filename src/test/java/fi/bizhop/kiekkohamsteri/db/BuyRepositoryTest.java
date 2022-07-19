@@ -2,9 +2,9 @@ package fi.bizhop.kiekkohamsteri.db;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.model.Kiekot;
-import fi.bizhop.kiekkohamsteri.model.Members;
-import fi.bizhop.kiekkohamsteri.model.Ostot;
+import fi.bizhop.kiekkohamsteri.model.Disc;
+import fi.bizhop.kiekkohamsteri.model.User;
+import fi.bizhop.kiekkohamsteri.model.Buy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.REPOSITORY;
 import static fi.bizhop.kiekkohamsteri.TestUtils.*;
-import static fi.bizhop.kiekkohamsteri.model.Ostot.Status.*;
+import static fi.bizhop.kiekkohamsteri.model.Buy.Status.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -41,25 +41,25 @@ public class BuyRepositoryTest extends SpringContextTestBase {
         if(testDataContainer == null) {
             testDataContainer = initBaseData(userRepository, discRepository, manufacturerRepository, moldRepository, colorRepository, plasticRepository);
 
-            var testDisc = (Kiekot) testDataContainer.get(TEST_DISC_KEY);
-            var testUser = (Members) testDataContainer.get(TEST_USER_KEY);
-            var otherUser = (Members) testDataContainer.get(OTHER_USER_KEY);
-            var otherDisc = (Kiekot) testDataContainer.get(OTHER_DISC_KEY);
+            var testDisc = (Disc) testDataContainer.get(TEST_DISC_KEY);
+            var testUser = (User) testDataContainer.get(TEST_USER_KEY);
+            var otherUser = (User) testDataContainer.get(OTHER_USER_KEY);
+            var otherDisc = (Disc) testDataContainer.get(OTHER_DISC_KEY);
 
             buyRepository.deleteAll();
-            buyRepository.save(new Ostot(
+            buyRepository.save(new Buy(
                     testDisc,
                     testUser, //seller
                     otherUser, //buyer
                     REQUESTED));
 
-            buyRepository.save(new Ostot(
+            buyRepository.save(new Buy(
                     otherDisc,
                     otherUser, //seller
                     testUser, //buyer
                     REQUESTED));
 
-            buyRepository.save(new Ostot(
+            buyRepository.save(new Buy(
                     otherDisc,
                     otherUser, //seller
                     testUser, //buyer
@@ -86,25 +86,25 @@ public class BuyRepositoryTest extends SpringContextTestBase {
     }
 
     @Test
-    void findByKiekkoTest() {
-        var byTestDisc = buyRepository.findByKiekko((Kiekot)testDataContainer.get(TEST_DISC_KEY));
-        var byOtherDisc = buyRepository.findByKiekko((Kiekot)testDataContainer.get(OTHER_DISC_KEY));
+    void findByDiscTest() {
+        var byTestDisc = buyRepository.findByDisc((Disc)testDataContainer.get(TEST_DISC_KEY));
+        var byOtherDisc = buyRepository.findByDisc((Disc)testDataContainer.get(OTHER_DISC_KEY));
 
         assertEqualsJson(adder.create("1.json"), byTestDisc);
         assertEqualsJson(adder.create("2-3.json"), byOtherDisc);
     }
 
     @Test
-    void findByStatusAndMyyjaTest() {
-        var testUser = (Members) testDataContainer.get("testUser");
-        var testSellerRequested = buyRepository.findByStatusAndMyyja(REQUESTED, testUser);
-        var testSellerConfirmed = buyRepository.findByStatusAndMyyja(CONFIRMED, testUser);
-        var testSellerRejected = buyRepository.findByStatusAndMyyja(REJECTED, testUser);
+    void findByStatusAndSellerTest() {
+        var testUser = (User) testDataContainer.get("testUser");
+        var testSellerRequested = buyRepository.findByStatusAndSeller(REQUESTED, testUser);
+        var testSellerConfirmed = buyRepository.findByStatusAndSeller(CONFIRMED, testUser);
+        var testSellerRejected = buyRepository.findByStatusAndSeller(REJECTED, testUser);
 
-        var otherUser = (Members) testDataContainer.get("otherUser");
-        var otherSellerRequested = buyRepository.findByStatusAndMyyja(REQUESTED, otherUser);
-        var otherSellerConfirmed = buyRepository.findByStatusAndMyyja(CONFIRMED, otherUser);
-        var otherSellerRejected = buyRepository.findByStatusAndMyyja(REJECTED, otherUser);
+        var otherUser = (User) testDataContainer.get("otherUser");
+        var otherSellerRequested = buyRepository.findByStatusAndSeller(REQUESTED, otherUser);
+        var otherSellerConfirmed = buyRepository.findByStatusAndSeller(CONFIRMED, otherUser);
+        var otherSellerRejected = buyRepository.findByStatusAndSeller(REJECTED, otherUser);
 
         assertEqualsJson(adder.create("1.json"), testSellerRequested);
         assertEqualsJson("expected/emptyArray.json", testSellerConfirmed);
@@ -116,16 +116,16 @@ public class BuyRepositoryTest extends SpringContextTestBase {
     }
 
     @Test
-    void findByStatusAndOstajaTest() {
-        var testUser = (Members) testDataContainer.get(TEST_USER_KEY);
-        var testBuyerRequested = buyRepository.findByStatusAndOstaja(REQUESTED, testUser);
-        var testBuyerConfirmed = buyRepository.findByStatusAndOstaja(CONFIRMED, testUser);
-        var testBuyerRejected = buyRepository.findByStatusAndOstaja(REJECTED, testUser);
+    void findByStatusAndBuyerTest() {
+        var testUser = (User) testDataContainer.get(TEST_USER_KEY);
+        var testBuyerRequested = buyRepository.findByStatusAndBuyer(REQUESTED, testUser);
+        var testBuyerConfirmed = buyRepository.findByStatusAndBuyer(CONFIRMED, testUser);
+        var testBuyerRejected = buyRepository.findByStatusAndBuyer(REJECTED, testUser);
 
-        var otherUser = (Members) testDataContainer.get(OTHER_USER_KEY);
-        var otherBuyerRequested = buyRepository.findByStatusAndOstaja(REQUESTED, otherUser);
-        var otherBuyerConfirmed = buyRepository.findByStatusAndOstaja(CONFIRMED, otherUser);
-        var otherBuyerRejected = buyRepository.findByStatusAndOstaja(REJECTED, otherUser);
+        var otherUser = (User) testDataContainer.get(OTHER_USER_KEY);
+        var otherBuyerRequested = buyRepository.findByStatusAndBuyer(REQUESTED, otherUser);
+        var otherBuyerConfirmed = buyRepository.findByStatusAndBuyer(CONFIRMED, otherUser);
+        var otherBuyerRejected = buyRepository.findByStatusAndBuyer(REJECTED, otherUser);
 
         assertEqualsJson(adder.create("2.json"), testBuyerRequested);
         assertEqualsJson(adder.create("3.json"), testBuyerConfirmed);
@@ -137,12 +137,12 @@ public class BuyRepositoryTest extends SpringContextTestBase {
     }
 
     @Test
-    void findByKiekkoAndOstajaAndStatusTest() {
-        var otherUser = (Members) testDataContainer.get(OTHER_USER_KEY);
-        var testDisc = (Kiekot) testDataContainer.get(TEST_DISC_KEY);
+    void findByDiscAndBuyerAndStatusTest() {
+        var otherUser = (User) testDataContainer.get(OTHER_USER_KEY);
+        var testDisc = (Disc) testDataContainer.get(TEST_DISC_KEY);
 
-        var shouldBeThere = buyRepository.findByKiekkoAndOstajaAndStatus(testDisc, otherUser, REQUESTED);
-        var shouldNotBeThere = buyRepository.findByKiekkoAndOstajaAndStatus(testDisc, otherUser, CONFIRMED);
+        var shouldBeThere = buyRepository.findByDiscAndBuyerAndStatus(testDisc, otherUser, REQUESTED);
+        var shouldNotBeThere = buyRepository.findByDiscAndBuyerAndStatus(testDisc, otherUser, CONFIRMED);
 
         assertNotNull(shouldBeThere);
         assertNull(shouldNotBeThere);

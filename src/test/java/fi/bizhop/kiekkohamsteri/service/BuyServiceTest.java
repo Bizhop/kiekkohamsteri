@@ -4,8 +4,8 @@ import fi.bizhop.kiekkohamsteri.TestObjects;
 import fi.bizhop.kiekkohamsteri.db.BuyRepository;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
-import fi.bizhop.kiekkohamsteri.model.Members;
-import fi.bizhop.kiekkohamsteri.model.Ostot;
+import fi.bizhop.kiekkohamsteri.model.User;
+import fi.bizhop.kiekkohamsteri.model.Buy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
-import static fi.bizhop.kiekkohamsteri.model.Ostot.Status.*;
+import static fi.bizhop.kiekkohamsteri.model.Buy.Status.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,10 +29,10 @@ public class BuyServiceTest {
     BuyRepository buyRepository;
 
     @Captor
-    ArgumentCaptor<Ostot> buysCaptor;
+    ArgumentCaptor<Buy> buysCaptor;
 
     @Captor
-    ArgumentCaptor<List<Ostot>> buysListCaptor;
+    ArgumentCaptor<List<Buy>> buysListCaptor;
 
     @BeforeEach
     void init() {
@@ -42,9 +42,9 @@ public class BuyServiceTest {
     @Test
     void givenNotOwnDiscAndIsMyynnissa_whenBuyDisc_thenReturnBuyWithRequestedStatus() throws HttpResponseException {
         var disc = TestObjects.getTestDiscFor(TEST_USER);
-        disc.setMyynnissa(true);
+        disc.setForSale(true);
 
-        when(buyRepository.save(any(Ostot.class))).then(returnsFirstArg());
+        when(buyRepository.save(any(Buy.class))).then(returnsFirstArg());
 
         var buy = getBuyService().buyDisc(OTHER_USER, disc);
 
@@ -54,7 +54,7 @@ public class BuyServiceTest {
     @Test
     void givenOwnDisc_whenBuyDisc_thenThrowException() {
         var disc = TestObjects.getTestDiscFor(TEST_USER);
-        disc.setMyynnissa(true);
+        disc.setForSale(true);
 
         try {
             getBuyService().buyDisc(TEST_USER, disc);
@@ -69,7 +69,7 @@ public class BuyServiceTest {
     @Test
     void givenDiscNotMyynnissa_whenBuyDisc_thenThrowException() {
         var disc = TestObjects.getTestDiscFor(TEST_USER);
-        disc.setMyynnissa(false);
+        disc.setForSale(false);
 
         try {
             getBuyService().buyDisc(OTHER_USER, disc);
@@ -84,11 +84,11 @@ public class BuyServiceTest {
     @Test
     void givenAlreadyBuyingDisc_whenBuyDisc_thenThrowException() {
         var disc = TestObjects.getTestDiscFor(TEST_USER);
-        disc.setMyynnissa(true);
+        disc.setForSale(true);
 
-        var buy = new Ostot(disc, TEST_USER, OTHER_USER, REQUESTED);
+        var buy = new Buy(disc, TEST_USER, OTHER_USER, REQUESTED);
 
-        when(buyRepository.findByKiekkoAndOstajaAndStatus(disc, OTHER_USER, REQUESTED))
+        when(buyRepository.findByDiscAndBuyerAndStatus(disc, OTHER_USER, REQUESTED))
                 .thenReturn(buy);
 
         try {
@@ -103,11 +103,11 @@ public class BuyServiceTest {
 
     @Test
     void getSummaryTest() {
-        var sells = List.of(new Ostot());
-        var buys = List.of(new Ostot(), new Ostot());
+        var sells = List.of(new Buy());
+        var buys = List.of(new Buy(), new Buy());
 
-        when(buyRepository.findByStatusAndMyyja(REQUESTED, TEST_USER)).thenReturn(sells);
-        when(buyRepository.findByStatusAndOstaja(REQUESTED, TEST_USER)).thenReturn(buys);
+        when(buyRepository.findByStatusAndSeller(REQUESTED, TEST_USER)).thenReturn(sells);
+        when(buyRepository.findByStatusAndBuyer(REQUESTED, TEST_USER)).thenReturn(buys);
 
         var response = getBuyService().getSummary(TEST_USER);
 
@@ -133,7 +133,7 @@ public class BuyServiceTest {
 
     @Test
     void givenUserIsNotSeller_whenConfirm_thenThrowException() {
-        var buy = new Ostot(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED);
+        var buy = new Buy(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED);
         when(buyRepository.findById(123L)).thenReturn(Optional.of(buy));
 
         try {
@@ -155,38 +155,38 @@ public class BuyServiceTest {
     @Test
     void givenValidRequest_whenConfirm_thenReturnModifiedDisc() throws AuthorizationException {
         var disc = getTestDiscFor(TEST_USER);
-        disc.setMyynnissa(true);
+        disc.setForSale(true);
         disc.setItb(true);
 
-        var buy = new Ostot(disc, TEST_USER, OTHER_USER, REQUESTED);
+        var buy = new Buy(disc, TEST_USER, OTHER_USER, REQUESTED);
         when(buyRepository.findById(123L)).thenReturn(Optional.of(buy));
 
         var response = getBuyService().confirm(123L, TEST_USER);
 
-        assertEquals(OTHER_USER, response.getMember());
-        assertFalse(response.getMyynnissa());
+        assertEquals(OTHER_USER, response.getOwner());
+        assertFalse(response.getForSale());
         assertFalse(response.getItb());
     }
 
     @Test
     void givenOtherRequestsExist_whenConfirm_thenClearOtherRequests() throws AuthorizationException {
         var disc = getTestDiscFor(TEST_USER);
-        disc.setMyynnissa(true);
+        disc.setForSale(true);
         disc.setItb(true);
 
-        var buy = new Ostot(disc, TEST_USER, OTHER_USER, REQUESTED);
+        var buy = new Buy(disc, TEST_USER, OTHER_USER, REQUESTED);
         buy.setId(1L);
         when(buyRepository.findById(1L)).thenReturn(Optional.of(buy));
 
-        var fakeBuyer = new Members("fake@example.com");
-        var otherBuy = new Ostot(disc, TEST_USER, fakeBuyer, REQUESTED);
+        var fakeBuyer = new User("fake@example.com");
+        var otherBuy = new Buy(disc, TEST_USER, fakeBuyer, REQUESTED);
         otherBuy.setId(2L);
-        when(buyRepository.findByKiekko(disc)).thenReturn(List.of(buy, otherBuy));
+        when(buyRepository.findByDisc(disc)).thenReturn(List.of(buy, otherBuy));
 
         var response = getBuyService().confirm(1L, TEST_USER);
 
-        assertEquals(OTHER_USER, response.getMember());
-        assertFalse(response.getMyynnissa());
+        assertEquals(OTHER_USER, response.getOwner());
+        assertFalse(response.getForSale());
         assertFalse(response.getItb());
 
         verify(buyRepository, times(1)).save(buysCaptor.capture());
@@ -197,13 +197,13 @@ public class BuyServiceTest {
         var rejectedBuys = buysListCaptor.getValue();
         assertEquals(1, rejectedBuys.size());
         var rejectedBuy = rejectedBuys.get(0);
-        assertEquals(fakeBuyer, rejectedBuy.getOstaja());
+        assertEquals(fakeBuyer, rejectedBuy.getBuyer());
         assertEquals(REJECTED, rejectedBuy.getStatus());
     }
 
     @Test
     void givenUserIsSeller_whenReject_thenReject() throws AuthorizationException {
-        var buy = new Ostot(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED);
+        var buy = new Buy(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED);
         buy.setId(1L);
 
         when(buyRepository.findById(1L)).thenReturn(Optional.of(buy));
@@ -217,7 +217,7 @@ public class BuyServiceTest {
 
     @Test
     void givenUserIsBuyer_whenReject_thenReject() throws AuthorizationException {
-        var buy = new Ostot(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED);
+        var buy = new Buy(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED);
         buy.setId(1L);
 
         when(buyRepository.findById(1L)).thenReturn(Optional.of(buy));
@@ -231,13 +231,13 @@ public class BuyServiceTest {
 
     @Test
     void givenUserIsNotSellerOrBuyer_whenReject_thenThrowException() {
-        var buy = new Ostot(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED);
+        var buy = new Buy(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED);
         buy.setId(1L);
 
         when(buyRepository.findById(1L)).thenReturn(Optional.of(buy));
 
         try {
-            getBuyService().reject(1L, new Members("fake@example.com"));
+            getBuyService().reject(1L, new User("fake@example.com"));
 
             fail(SHOULD_THROW_EXCEPTION);
         } catch (AuthorizationException ignored) {}

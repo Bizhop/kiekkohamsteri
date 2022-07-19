@@ -1,7 +1,7 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.ManufacturerRepository;
-import fi.bizhop.kiekkohamsteri.model.R_valm;
+import fi.bizhop.kiekkohamsteri.model.Manufacturer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ public class ManufacturerService {
     // Passthrough methods to db
     // Not covered (or to be covered by unit tests)
 
-    public Optional<R_valm> getManufacturer(Long manufacturerId) {
+    public Optional<Manufacturer> getManufacturer(Long manufacturerId) {
         return manufacturerRepository.findById(manufacturerId);
     }
 }

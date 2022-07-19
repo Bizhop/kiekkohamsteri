@@ -1,14 +1,13 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.DiscRepository;
-import fi.bizhop.kiekkohamsteri.dto.DiscDto;
-import fi.bizhop.kiekkohamsteri.dto.ListingDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.DiscInputDto;
+import fi.bizhop.kiekkohamsteri.dto.v1.out.ListingDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.*;
 import fi.bizhop.kiekkohamsteri.projection.v1.DiscProjection;
 import fi.bizhop.kiekkohamsteri.util.Utils;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -29,41 +28,48 @@ public class DiscService {
 
 	private final DiscRepository discRepo;
 
-	public DiscProjection newDisc(Members owner, R_mold defaultMold, R_muovi defaultPlastic, R_vari defaultColor) {
-		var disc = new Kiekot(owner, defaultMold, defaultPlastic, defaultColor);
+	public DiscProjection newDisc(User owner, Mold defaultMold, Plastic defaultPlastic, Color defaultColor) {
+		var disc = new Disc(owner, defaultMold, defaultPlastic, defaultColor);
 		if(owner.getPublicList()) {
 			disc.setPublicDisc(true);
 		}
 		disc = discRepo.save(disc);
 
-		return discRepo.getKiekotById(disc.getId());
+		return discRepo.getDiscById(disc.getId());
 	}
 
 	public DiscProjection updateImage(Long id, String image) {
 		var disc = discRepo.findById(id).orElseThrow();
-		disc.setKuva(image);
+		disc.setImage(image);
 		disc = discRepo.save(disc);
-		return discRepo.getKiekotById(disc.getId());
+		return discRepo.getDiscById(disc.getId());
 	}
 
-	public void deleteDisc(Long id, Members owner) throws AuthorizationException {
+	public void deleteDisc(Long id, User owner) throws AuthorizationException {
 		var disc = discRepo.findById(id).orElse(null);
 
-		if(disc == null || !disc.getMember().equals(owner)) {
+		if(disc == null || !disc.getOwner().equals(owner)) {
 			throw new AuthorizationException();
 		}
 
 		discRepo.deleteById(id);
 	}
 
-	public DiscProjection updateDisc(DiscDto dto, Long id, Members owner, R_mold newMold, R_muovi newPlastic, R_vari newColor) throws AuthorizationException {
+	//V1 compatibility
+	public DiscProjection updateDisc(fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto dto, Long id, User owner, Mold newMold, Plastic newPlastic, Color newColor) throws AuthorizationException {
+		var inputV2 = DiscInputDto.fromV1(dto);
+
+		return updateDisc(inputV2, id, owner, newMold, newPlastic, newColor);
+	}
+
+	public DiscProjection updateDisc(DiscInputDto dto, Long id, User owner, Mold newMold, Plastic newPlastic, Color newColor) throws AuthorizationException {
 		var disc = discRepo.findById(id).orElse(null);
 
-		if(disc == null || !disc.getMember().equals(owner)) {
+		if(disc == null || !disc.getOwner().equals(owner)) {
 			throw new AuthorizationException();
 		}
 
-		String[] ignoreRelations = {"member", "muovi", "mold", "vari"};
+		String[] ignoreRelations = {"owner", "plastic", "mold", "color"};
 		var ignoreNulls = Utils.getNullPropertyNames(dto);
 		var ignores = Stream.concat(
 						Arrays.stream(ignoreRelations),
@@ -73,20 +79,20 @@ public class DiscService {
 		BeanUtils.copyProperties(dto, disc, ignores);
 
 		disc.setMold(newMold);
-		disc.setMuovi(newPlastic);
-		disc.setVari(newColor);
+		disc.setPlastic(newPlastic);
+		disc.setColor(newColor);
 
 		if(Boolean.TRUE.equals(dto.getLost())) {
 			disc.setItb(false);
-			disc.setMyynnissa(false);
+			disc.setForSale(false);
 		}
 
 		discRepo.save(disc);
-		return discRepo.getKiekotById(id);
+		return discRepo.getDiscById(id);
 	}
 
-	public DiscProjection getDisc(Members owner, Long id) throws AuthorizationException {
-		var disc = discRepo.getKiekotById(id);
+	public DiscProjection getDisc(User owner, Long id) throws AuthorizationException {
+		var disc = discRepo.getDiscById(id);
 		if(owner.getEmail().equals(disc.getOwnerEmail())) {
 			return disc;
 		}
@@ -95,8 +101,8 @@ public class DiscService {
 		}
 	}
 
-	public DiscProjection getDiscIfPublicOrOwn(Members owner, Long id) throws AuthorizationException {
-		var disc = discRepo.getKiekotById(id);
+	public DiscProjection getDiscIfPublicOrOwn(User owner, Long id) throws AuthorizationException {
+		var disc = discRepo.getDiscById(id);
 		if(owner.getEmail().equals(disc.getOwnerEmail()) ||
 				Boolean.TRUE.equals(disc.getPublicDisc())) {
 			return disc;
@@ -106,10 +112,10 @@ public class DiscService {
 		}
 	}
 
-	public List<ListingDto> getPublicLists(List<Members> usersWithPublicDiscs) {
+	public List<ListingDto> getPublicLists(List<User> usersWithPublicDiscs) {
 		if(usersWithPublicDiscs == null || usersWithPublicDiscs.isEmpty()) return Collections.emptyList();
 
-		return discRepo.findByMemberInAndPublicDiscTrue(usersWithPublicDiscs)
+		return discRepo.findByOwnerInAndPublicDiscTrue(usersWithPublicDiscs)
 				.stream()
 				.collect(Collectors.groupingBy(DiscProjection::getOwnerEmail))
 				.entrySet().stream()
@@ -117,9 +123,9 @@ public class DiscService {
 				.collect(Collectors.toList());
 	}
 
-	public void handleFoundDisc(Members user, Long id) throws HttpResponseException {
+	public void handleFoundDisc(User user, Long id) throws HttpResponseException {
 		var disc = discRepo.findById(id).orElse(null);
-		if(disc == null || !disc.getMember().equals(user)) {
+		if(disc == null || !disc.getOwner().equals(user)) {
 			throw new HttpResponseException(HttpServletResponse.SC_FORBIDDEN, "User is not disc owner");
 		}
 		else if(!Boolean.TRUE.equals(disc.getLost())) {
@@ -127,15 +133,15 @@ public class DiscService {
 		}
 		else {
 			disc.setLost(false);
-			disc.setMyynnissa(false);
+			disc.setForSale(false);
 			disc.setItb(false);
 			discRepo.save(disc);
 		}
 	}
 
-	public void updateDiscCounts(List<Members> users) {
+	public void updateDiscCounts(List<User> users) {
 		for(var user : users) {
-			var count = discRepo.countByMember(user);
+			var count = discRepo.countByOwner(user);
 			user.setDiscCount(count);
 		}
 	}
@@ -147,12 +153,12 @@ public class DiscService {
 		return discRepo.findByLostTrue(pageable);
 	}
 
-	public Page<DiscProjection> getDiscs(Members owner, Pageable pageable) {
-		return discRepo.findByMemberAndLostFalse(owner, pageable);
+	public Page<DiscProjection> getDiscs(User owner, Pageable pageable) {
+		return discRepo.findByOwnerAndLostFalse(owner, pageable);
 	}
 
 	public Page<DiscProjection> getDiscsForSale(Pageable pageable) {
-		return discRepo.findByMyynnissaTrue(pageable);
+		return discRepo.findByForSaleTrue(pageable);
 	}
 
 	//Forced method without owner check. Use with care.
@@ -160,11 +166,11 @@ public class DiscService {
 		discRepo.deleteById(id);
 	}
 
-	public Optional<Kiekot> getDiscDb(Long id) {
+	public Optional<Disc> getDiscDb(Long id) {
 		return discRepo.findById(id);
 	}
 
-	public void saveDisc(Kiekot disc) {
+	public void saveDisc(Disc disc) {
 		discRepo.save(disc);
 	}
 }

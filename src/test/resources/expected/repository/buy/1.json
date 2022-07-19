@@ -1,16 +1,16 @@
 [
   {
     "id": 1,
-    "kiekko": {
+    "disc": {
       "id": 1,
-      "member": {
+      "owner": {
         "id": 1,
         "username": "User",
         "email": "test@example.com",
         "level": 1,
-        "etunimi": "Uusi",
-        "sukunimi": "Käyttäjä",
-        "pdga_num": 0,
+        "firstName": "New",
+        "lastName": "User",
+        "pdgaNumber": 0,
         "jwt": null,
         "publicList": false,
         "publicDiscCount": false,
@@ -18,65 +18,65 @@
       },
       "mold": {
         "id": 1,
-        "valmistaja": {
+        "manufacturer": {
           "id": 1,
-          "valmistaja": "Test manufacturer"
+          "name": "Test manufacturer"
         },
-        "kiekko": "Test mold",
-        "nopeus": 0,
-        "liito": 0,
-        "vakaus": 0,
-        "feidi": 0
+        "name": "Test mold",
+        "speed": 0,
+        "glide": 0,
+        "stability": 0,
+        "fade": 0
       },
-      "muovi": {
+      "plastic": {
         "id": 1,
-        "valmistaja": {
+        "manufacturer": {
           "id": 1,
-          "valmistaja": "Test manufacturer"
+          "name": "Test manufacturer"
         },
-        "muovi": "Test plastic"
+        "name": "Test plastic"
       },
-      "vari": {
+      "color": {
         "id": 1,
-        "vari": "Test color"
+        "name": "Test color"
       },
-      "kuva": "",
-      "paino": 175,
-      "kunto": 10,
-      "hohto": false,
-      "spessu": false,
+      "image": "",
+      "weight": 175,
+      "condition": 10,
+      "glow": false,
+      "special": false,
       "dyed": false,
       "swirly": false,
-      "tussit": 1,
-      "myynnissa": false,
-      "hinta": 0,
-      "muuta": "",
-      "loytokiekko": false,
+      "markings": 1,
+      "forSale": false,
+      "price": 0,
+      "description": "",
+      "lostAndFound": false,
       "itb": false,
       "publicDisc": false,
       "lost": false
     },
-    "myyja": {
+    "seller": {
       "id": 1,
       "username": "User",
       "email": "test@example.com",
       "level": 1,
-      "etunimi": "Uusi",
-      "sukunimi": "Käyttäjä",
-      "pdga_num": 0,
+      "firstName": "New",
+      "lastName": "User",
+      "pdgaNumber": 0,
       "jwt": null,
       "publicList": false,
       "publicDiscCount": false,
       "discCount": 0
     },
-    "ostaja": {
+    "buyer": {
       "id": 2,
       "username": "Other",
       "email": "other@example.com",
       "level": 1,
-      "etunimi": "Uusi",
-      "sukunimi": "Käyttäjä",
-      "pdga_num": 0,
+      "firstName": "New",
+      "lastName": "User",
+      "pdgaNumber": 0,
       "jwt": null,
       "publicList": false,
       "publicDiscCount": false,

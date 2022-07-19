@@ -2,7 +2,7 @@ package fi.bizhop.kiekkohamsteri.db;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.model.R_valm;
+import fi.bizhop.kiekkohamsteri.model.Manufacturer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +27,12 @@ public class ManufacturerRepositoryTest extends SpringContextTestBase {
     void setupTestData() {
         manufacturerRepository.deleteAll();
 
-        var innova = new R_valm();
-        innova.setValmistaja("Innova");
+        var innova = new Manufacturer();
+        innova.setName("Innova");
         manufacturerRepository.save(innova);
 
-        var discmania = new R_valm();
-        discmania.setValmistaja("Discmania");
+        var discmania = new Manufacturer();
+        discmania.setName("Discmania");
         manufacturerRepository.save(discmania);
     }
 

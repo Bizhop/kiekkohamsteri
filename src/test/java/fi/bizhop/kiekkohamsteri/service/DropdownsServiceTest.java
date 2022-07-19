@@ -35,12 +35,12 @@ class DropdownsServiceTest {
 
     @Test
     void getDropdownsTest() {
-        when(moldRepo.findAllByOrderByKiekkoAsc()).thenReturn(getMoldsDD());
+        when(moldRepo.findAllByOrderByNameAsc()).thenReturn(getMoldsDD());
         when(manufacturerRepo.findAllProjectedBy()).thenReturn(getManufacturersDD());
-        when(plasticRepo.findAllByOrderByMuoviAsc()).thenReturn(getPlasticsDD());
+        when(plasticRepo.findAllByOrderByNameAsc()).thenReturn(getPlasticsDD());
         when(colorRepo.findAllProjectedBy()).thenReturn(getColorsDD());
-        when(ddRepo.findByValikkoOrderByArvoAsc("kunto")).thenReturn(getConditionsDD());
-        when(ddRepo.findByValikkoOrderByArvoAsc("tussit")).thenReturn(getMarkingsDD());
+        when(ddRepo.findByMenuOrderByValueAsc("kunto")).thenReturn(getConditionsDD());
+        when(ddRepo.findByMenuOrderByValueAsc("tussit")).thenReturn(getMarkingsDD());
 
         var dto = getDropdownsService().getDropdowns(null);
 
@@ -59,11 +59,11 @@ class DropdownsServiceTest {
         when(manufacturerRepo.findAllProjectedBy()).thenReturn(getManufacturersDD());
         when(manufacturerRepo.findById(manufacturer.getId())).thenReturn(Optional.of(MANUFACTURERS.get(0)));
         when(colorRepo.findAllProjectedBy()).thenReturn(getColorsDD());
-        when(ddRepo.findByValikkoOrderByArvoAsc("kunto")).thenReturn(getConditionsDD());
-        when(ddRepo.findByValikkoOrderByArvoAsc("tussit")).thenReturn(getMarkingsDD());
+        when(ddRepo.findByMenuOrderByValueAsc("kunto")).thenReturn(getConditionsDD());
+        when(ddRepo.findByMenuOrderByValueAsc("tussit")).thenReturn(getMarkingsDD());
 
-        when(moldRepo.findByValmistajaOrderByKiekkoAsc(manufacturer)).thenReturn(getMoldsDD(manufacturer));
-        when(plasticRepo.findByValmistajaOrderByMuoviAsc(manufacturer)).thenReturn(getPlasticsDD(manufacturer));
+        when(moldRepo.findByManufacturerOrderByNameAsc(manufacturer)).thenReturn(getMoldsDD(manufacturer));
+        when(plasticRepo.findByManufacturerOrderByNameAsc(manufacturer)).thenReturn(getPlasticsDD(manufacturer));
 
         var dto = getDropdownsService().getDropdowns(manufacturer.getId());
 

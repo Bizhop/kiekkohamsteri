@@ -2,10 +2,10 @@ package fi.bizhop.kiekkohamsteri.controller;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.dto.PlasticCreateDto;
-import fi.bizhop.kiekkohamsteri.model.Members;
-import fi.bizhop.kiekkohamsteri.model.R_muovi;
-import fi.bizhop.kiekkohamsteri.model.R_valm;
+import fi.bizhop.kiekkohamsteri.dto.v1.in.PlasticCreateDto;
+import fi.bizhop.kiekkohamsteri.model.User;
+import fi.bizhop.kiekkohamsteri.model.Plastic;
+import fi.bizhop.kiekkohamsteri.model.Manufacturer;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.ManufacturerService;
 import fi.bizhop.kiekkohamsteri.service.PlasticService;
@@ -53,7 +53,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
 
     @Test
     void givenNonAdminUser_whenCallingGetPlastics_thenRespondForbidden() {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
         user.setLevel(1);
         when(authService.getUser(any())).thenReturn(user);
 
@@ -73,7 +73,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
 
     @Test
     void givenNonAdminUser_whenCreatingPlastic_thenRespondWithUnauthorized() {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
         user.setLevel(1);
         when(authService.getUser(any())).thenReturn(user);
 
@@ -176,11 +176,11 @@ public class PlasticControllerTest extends SpringContextTestBase {
         return String.format("http://localhost:%d/api/muovit/", port);
     }
 
-    private R_muovi getTestPlastic(R_valm manufacturer) {
-        var plastic = new R_muovi();
+    private Plastic getTestPlastic(Manufacturer manufacturer) {
+        var plastic = new Plastic();
         plastic.setId(66L);
-        plastic.setValmistaja(manufacturer);
-        plastic.setMuovi("New Plastic");
+        plastic.setManufacturer(manufacturer);
+        plastic.setName("New Plastic");
         return plastic;
     }
 }

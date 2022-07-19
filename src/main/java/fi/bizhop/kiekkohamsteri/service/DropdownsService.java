@@ -1,7 +1,7 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.*;
-import fi.bizhop.kiekkohamsteri.dto.DropdownsDto;
+import fi.bizhop.kiekkohamsteri.dto.v1.out.DropdownsDto;
 import fi.bizhop.kiekkohamsteri.projection.v1.dropdown.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,35 +29,29 @@ public class DropdownsService {
 	}
 
 	private List<DropdownProjection> getMarkings() {
-		return dropdownRepository.findByValikkoOrderByArvoAsc("tussit");
+		return dropdownRepository.findByMenuOrderByValueAsc("tussit");
 	}
 
 	private List<DropdownProjection> getCondition() {
-		return dropdownRepository.findByValikkoOrderByArvoAsc("kunto");
+		return dropdownRepository.findByMenuOrderByValueAsc("kunto");
 	}
 
-	private List<MoldDropdownProjection> getMolds(Long valmId) {
-		if(valmId == null) {
-			return moldRepository.findAllByOrderByKiekkoAsc();
-		}
-		else {
-			var valm = manufacturerRepository.findById(valmId).orElseThrow();
-			return moldRepository.findByValmistajaOrderByKiekkoAsc(valm);
-		}
+	private List<MoldDropdownProjection> getMolds(Long manufacturerId) {
+		if(manufacturerId == null) return moldRepository.findAllByOrderByNameAsc();
+
+		var manufacturer = manufacturerRepository.findById(manufacturerId).orElseThrow();
+		return moldRepository.findByManufacturerOrderByNameAsc(manufacturer);
 	}
 
 	private List<ManufacturerDropdownProjection> getManufacturers() {
 		return manufacturerRepository.findAllProjectedBy();
 	}
 	
-	private List<PlasticDropdownProjection> getPlastics(Long valmId) {
-		if(valmId == null) {
-			return plasticRepository.findAllByOrderByMuoviAsc();
-		}
-		else {
-			var valm = manufacturerRepository.findById(valmId).orElseThrow();
-			return plasticRepository.findByValmistajaOrderByMuoviAsc(valm);
-		}
+	private List<PlasticDropdownProjection> getPlastics(Long manufacturerId) {
+		if(manufacturerId == null) return plasticRepository.findAllByOrderByNameAsc();
+
+		var manufacturer = manufacturerRepository.findById(manufacturerId).orElseThrow();
+		return plasticRepository.findByManufacturerOrderByNameAsc(manufacturer);
 	}
 	
 	private List<ColorDropdownProjection> getColors() {

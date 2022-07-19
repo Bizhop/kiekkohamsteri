@@ -2,8 +2,8 @@ package fi.bizhop.kiekkohamsteri.controller;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.dto.UserUpdateDto;
-import fi.bizhop.kiekkohamsteri.model.Members;
+import fi.bizhop.kiekkohamsteri.dto.v1.in.UserUpdateDto;
+import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.DiscService;
 import fi.bizhop.kiekkohamsteri.service.UserService;
@@ -183,9 +183,13 @@ public class UserControllerTest extends SpringContextTestBase {
     void givenAdminUser_whenSetUserLevel_thenSetLevel() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
-        var userWithLevel2 = new Members(TEST_EMAIL);
+        var userWithLevel2 = new User(TEST_EMAIL);
         userWithLevel2.setLevel(2);
-        when(userService.setUserLevel(1L,2)).thenReturn(userWithLevel2);
+
+        var dto = UserUpdateDto.builder().level(2).build();
+
+        when(userService.getUser(1L)).thenReturn(TEST_USER);
+        when(userService.updateDetails(TEST_USER, dto, true)).thenReturn(userWithLevel2);
 
         //called endpoint is deprecated
         var response = restTemplate.exchange(createUrl("1/level/2"), PATCH, null, String.class);

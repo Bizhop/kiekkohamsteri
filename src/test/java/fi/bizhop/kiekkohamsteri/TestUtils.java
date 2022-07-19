@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fi.bizhop.kiekkohamsteri.db.*;
 import fi.bizhop.kiekkohamsteri.model.*;
-import lombok.RequiredArgsConstructor;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
@@ -32,6 +31,7 @@ public class TestUtils {
     public static final String OTHER_DISC_KEY = "otherDisc";
 
     public static void assertEqualsJson(String filename, String content) {
+        System.out.println(content);
         var expected = readFile(filename);
         assertEqualsJsonInternal(expected, content);
     }
@@ -83,13 +83,13 @@ public class TestUtils {
         var testUser = userRepository.save(TEST_USER);
         var otherUser = userRepository.save(OTHER_USER);
 
-        var manufacturer = manufacturerRepository.save(new R_valm(null, "Test manufacturer"));
-        var mold = moldRepository.save(new R_mold(null, manufacturer, "Test mold", 0.0, 0.0, 0.0, 0.0));
-        var color = colorRepository.save(new R_vari(null, "Test color"));
-        var plastic = plasticRepository.save(new R_muovi(null, manufacturer, "Test plastic"));
+        var manufacturer = manufacturerRepository.save(new Manufacturer(null, "Test manufacturer"));
+        var mold = moldRepository.save(new Mold(null, manufacturer, "Test mold", 0.0, 0.0, 0.0, 0.0));
+        var color = colorRepository.save(new Color(null, "Test color"));
+        var plastic = plasticRepository.save(new Plastic(null, manufacturer, "Test plastic"));
 
-        var testDisc = discRepository.save(new Kiekot(testUser, mold, plastic, color));
-        var otherDisc = discRepository.save(new Kiekot(otherUser, mold, plastic, color));
+        var testDisc = discRepository.save(new Disc(testUser, mold, plastic, color));
+        var otherDisc = discRepository.save(new Disc(otherUser, mold, plastic, color));
 
         var response = new HashMap<String, Object>();
         response.put(TEST_USER_KEY, testUser);

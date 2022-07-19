@@ -28,7 +28,7 @@ public class AuthControllerTest extends SpringContextTestBase {
     @Autowired TestRestTemplate restTemplate;
     @MockBean AuthService authService;
 
-    BaseAdder adder = new BaseAdder("user", CONTROLLER);
+    BaseAdder adder = new BaseAdder("auth", CONTROLLER);
 
     @Test
     void givenUnableToAuthenticateUser_whenLogin_thenResponseCodeUnauthorized() {

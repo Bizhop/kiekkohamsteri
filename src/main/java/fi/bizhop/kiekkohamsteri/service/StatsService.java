@@ -17,11 +17,10 @@ import fi.bizhop.kiekkohamsteri.db.PlasticRepository;
 import fi.bizhop.kiekkohamsteri.db.BuyRepository;
 import fi.bizhop.kiekkohamsteri.db.StatsRepository;
 import fi.bizhop.kiekkohamsteri.db.ManufacturerRepository;
-import fi.bizhop.kiekkohamsteri.model.Ostot.Status;
 import fi.bizhop.kiekkohamsteri.model.Stats;
 import fi.bizhop.kiekkohamsteri.util.Utils;
 
-import static fi.bizhop.kiekkohamsteri.model.Ostot.Status.CONFIRMED;
+import static fi.bizhop.kiekkohamsteri.model.Buy.Status.CONFIRMED;
 import static fi.bizhop.kiekkohamsteri.service.StatsService.UpdateStatus.DONE;
 import static fi.bizhop.kiekkohamsteri.service.StatsService.UpdateStatus.FAILED;
 

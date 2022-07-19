@@ -41,8 +41,8 @@ public class DiscRepositoryTest extends SpringContextTestBase {
             testDataContainer = initBaseData(userRepository, discRepository, manufacturerRepository, moldRepository, colorRepository, plasticRepository);
             discRepository.deleteAll();
 
-            var testUser = (Members) testDataContainer.get(TEST_USER_KEY);
-            var otherUser = (Members) testDataContainer.get(OTHER_USER_KEY);
+            var testUser = (User) testDataContainer.get(TEST_USER_KEY);
+            var otherUser = (User) testDataContainer.get(OTHER_USER_KEY);
 
             addDiscsFor(testUser, 4, false, false, false);
             addDiscsFor(testUser, 1, false, false, true);
@@ -51,35 +51,35 @@ public class DiscRepositoryTest extends SpringContextTestBase {
         }
     }
 
-    private void addDiscsFor(Members user, int numberOfDiscs, boolean lost, boolean publicDisc, boolean forSale) {
-        var mold = (R_mold) testDataContainer.get(MOLD_KEY);
-        var plastic = (R_muovi) testDataContainer.get(PLASTIC_KEY);
-        var color = (R_vari) testDataContainer.get(COLOR_KEY);
+    private void addDiscsFor(User user, int numberOfDiscs, boolean lost, boolean publicDisc, boolean forSale) {
+        var mold = (Mold) testDataContainer.get(MOLD_KEY);
+        var plastic = (Plastic) testDataContainer.get(PLASTIC_KEY);
+        var color = (Color) testDataContainer.get(COLOR_KEY);
 
         var newDiscs = IntStream.range(0, numberOfDiscs)
-                .mapToObj(i -> new Kiekot(user, mold, plastic, color))
+                .mapToObj(i -> new Disc(user, mold, plastic, color))
                 .peek(disc -> {
                     disc.setLost(lost);
                     disc.setPublicDisc(publicDisc);
-                    disc.setMyynnissa(forSale);
+                    disc.setForSale(forSale);
                 })
                 .collect(Collectors.toList());
         discRepository.saveAll(newDiscs);
     }
 
     @Test
-    void findByMemberAndLostFalseTest() {
-        var user = (Members) testDataContainer.get(TEST_USER_KEY);
-        var result = discRepository.findByMemberAndLostFalse(user, Pageable.unpaged());
+    void findByOwnerAndLostFalseTest() {
+        var user = (User) testDataContainer.get(TEST_USER_KEY);
+        var result = discRepository.findByOwnerAndLostFalse(user, Pageable.unpaged());
 
         assertEqualsJson(adder.create("byMemberAndLostFalse.json"), result);
     }
 
     @Test
-    void findByMemberInAndPublicDiscTrueTest() {
-        var user = (Members) testDataContainer.get(TEST_USER_KEY);
-        var other = (Members) testDataContainer.get(OTHER_USER_KEY);
-        var result = discRepository.findByMemberInAndPublicDiscTrue(List.of(user, other));
+    void findByOwnerInAndPublicDiscTrueTest() {
+        var user = (User) testDataContainer.get(TEST_USER_KEY);
+        var other = (User) testDataContainer.get(OTHER_USER_KEY);
+        var result = discRepository.findByOwnerInAndPublicDiscTrue(List.of(user, other));
 
         assertEqualsJson(adder.create("byMemberInAndPublicDiscTrue.json"), result);
     }
@@ -92,16 +92,16 @@ public class DiscRepositoryTest extends SpringContextTestBase {
     }
 
     @Test
-    void getKiekotByIdTest() {
+    void getDiscByIdTest() {
         var disc = discRepository.findAll().iterator().next();
-        var result = discRepository.getKiekotById(disc.getId());
+        var result = discRepository.getDiscById(disc.getId());
 
         assertEqualsJson(adder.create("byId.json"), result);
     }
 
     @Test
-    void findByMyynnissaTrueTest() {
-        var result = discRepository.findByMyynnissaTrue(Pageable.unpaged());
+    void findByForSaleTrueTest() {
+        var result = discRepository.findByForSaleTrue(Pageable.unpaged());
 
         assertEqualsJson(adder.create("byMyynnissaTrue.json"), result);
     }
@@ -123,11 +123,11 @@ public class DiscRepositoryTest extends SpringContextTestBase {
 
     @Test
     void countByMemberTest() {
-        var testUser = (Members) testDataContainer.get(TEST_USER_KEY);
-        var otherUser = (Members) testDataContainer.get(OTHER_USER_KEY);
+        var testUser = (User) testDataContainer.get(TEST_USER_KEY);
+        var otherUser = (User) testDataContainer.get(OTHER_USER_KEY);
 
-        var testUserDiscs = discRepository.countByMember(testUser);
-        var otherUserDiscs = discRepository.countByMember(otherUser);
+        var testUserDiscs = discRepository.countByOwner(testUser);
+        var otherUserDiscs = discRepository.countByOwner(otherUser);
 
         assertEquals(5, testUserDiscs);
         assertEquals(7, otherUserDiscs);

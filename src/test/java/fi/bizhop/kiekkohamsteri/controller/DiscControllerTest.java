@@ -3,12 +3,12 @@ package fi.bizhop.kiekkohamsteri.controller;
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.controller.provider.UUIDProvider;
-import fi.bizhop.kiekkohamsteri.dto.DiscDto;
-import fi.bizhop.kiekkohamsteri.dto.UploadDto;
+import fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto;
+import fi.bizhop.kiekkohamsteri.dto.v1.in.UploadDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
-import fi.bizhop.kiekkohamsteri.model.Members;
-import fi.bizhop.kiekkohamsteri.model.Ostot;
+import fi.bizhop.kiekkohamsteri.model.User;
+import fi.bizhop.kiekkohamsteri.model.Buy;
 import fi.bizhop.kiekkohamsteri.service.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -53,7 +53,7 @@ public class DiscControllerTest extends SpringContextTestBase {
     @MockBean ColorService colorService;
     @MockBean UUIDProvider uuidProvider;
 
-    @Captor ArgumentCaptor<Members> userCaptor;
+    @Captor ArgumentCaptor<User> userCaptor;
 
     BaseAdder adder = new BaseAdder("disc", CONTROLLER);
 
@@ -120,7 +120,7 @@ public class DiscControllerTest extends SpringContextTestBase {
     void givenUnableToAuthenticateUser_whenCallingUpdateDisc_thenRespondWithUnauthorized() {
         when(authService.getUser(any())).thenReturn(null);
 
-        var requestEntity = new HttpEntity<>(DiscDto.builder().build());
+        var requestEntity = new HttpEntity<>(DiscInputDto.builder().build());
         var response = restTemplate.exchange(createUrl("1"), PUT, requestEntity, String.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
@@ -156,7 +156,7 @@ public class DiscControllerTest extends SpringContextTestBase {
 
     @Test
     void givenImageUploadSuccess_whenCreateDisc_thenSaveDiscAndUpdateImageReference() throws IOException {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
         when(authService.getUser(any())).thenReturn(user);
         whenDefaultMoldPlasticAndColor();
 
@@ -186,7 +186,7 @@ public class DiscControllerTest extends SpringContextTestBase {
 
     @Test
     void givenImageUploadFails_whenCreateDisc_thenDiscIsDeleted() throws IOException {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
         when(authService.getUser(any())).thenReturn(user);
         whenDefaultMoldPlasticAndColor();
 
@@ -232,7 +232,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var disc = getTestDiscFor(TEST_USER);
         var discId = 123L;
         disc.setId(discId);
-        disc.setKuva("Test-123");
+        disc.setImage("Test-123");
         var discProjection = projectionFromDisc(disc);
 
         when(discService.getDisc(TEST_USER, 123L)).thenReturn(discProjection);
@@ -259,7 +259,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var disc = getTestDiscFor(TEST_USER);
         var discId = 123L;
         disc.setId(discId);
-        disc.setKuva("Test-123");
+        disc.setImage("Test-123");
         var discProjection = projectionFromDisc(disc);
 
         when(discService.getDisc(TEST_USER, 123L)).thenReturn(discProjection);
@@ -282,7 +282,7 @@ public class DiscControllerTest extends SpringContextTestBase {
 
     @Test
     void givenNotYourDisc_whenUpdateImage_thenRespondForbidden() throws AuthorizationException, IOException {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
         when(authService.getUser(any())).thenReturn(user);
 
         when(discService.getDisc(TEST_USER, 456L)).thenThrow(new AuthorizationException());
@@ -337,7 +337,7 @@ public class DiscControllerTest extends SpringContextTestBase {
     void givenValidRequest_whenUpdateDisc_thenUpdateDisc() throws AuthorizationException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
-        var dto = DiscDto.builder()
+        var dto = DiscInputDto.builder()
                 .moldId(0L)
                 .muoviId(0L)
                 .variId(0L)
@@ -355,7 +355,7 @@ public class DiscControllerTest extends SpringContextTestBase {
     void givenNotYourDisc_whenUpdateDisc_thenRespondForbidden() throws AuthorizationException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
-        var dto = DiscDto.builder()
+        var dto = DiscInputDto.builder()
                 .moldId(1L)
                 .muoviId(1L)
                 .variId(1L)
@@ -373,7 +373,7 @@ public class DiscControllerTest extends SpringContextTestBase {
     void givenRuntimeException_whenUpdateDisc_thenRespond500() throws AuthorizationException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
-        var dto = DiscDto.builder()
+        var dto = DiscInputDto.builder()
                 .moldId(0L)
                 .muoviId(0L)
                 .variId(0L)
@@ -389,7 +389,7 @@ public class DiscControllerTest extends SpringContextTestBase {
 
     @Test
     void givenValidRequest_whenDeleteDisc_thenDeleteDiscAndDecreaseDiscCountAndSaveUser() throws AuthorizationException {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
         user.setDiscCount(1);
         when(authService.getUser(any())).thenReturn(user);
 
@@ -425,7 +425,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var disc = getTestDiscFor(OTHER_USER);
         when(discService.getDiscDb(123L)).thenReturn(Optional.of(disc));
 
-        var buys = new Ostot(disc, disc.getMember(), TEST_USER, Ostot.Status.REQUESTED);
+        var buys = new Buy(disc, disc.getOwner(), TEST_USER, Buy.Status.REQUESTED);
         when(buyService.buyDisc(TEST_USER, disc)).thenReturn(buys);
 
         var response = restTemplate.postForEntity(createUrl("123/buy"), null, String.class);
