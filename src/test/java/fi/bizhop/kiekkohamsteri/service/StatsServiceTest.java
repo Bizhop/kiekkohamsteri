@@ -11,7 +11,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Date;
 
-import static fi.bizhop.kiekkohamsteri.model.Ostot.Status.CONFIRMED;
+import static fi.bizhop.kiekkohamsteri.model.Buy.Status.CONFIRMED;
 import static fi.bizhop.kiekkohamsteri.service.StatsService.UpdateStatus.DONE;
 import static fi.bizhop.kiekkohamsteri.service.StatsService.UpdateStatus.FAILED;
 import static org.junit.jupiter.api.Assertions.assertEquals;

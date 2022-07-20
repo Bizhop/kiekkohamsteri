@@ -1,7 +1,7 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.ColorRepository;
-import fi.bizhop.kiekkohamsteri.model.R_vari;
+import fi.bizhop.kiekkohamsteri.model.Color;
 import fi.bizhop.kiekkohamsteri.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,9 +15,9 @@ public class ColorService {
 
     final ColorRepository colorRepo;
 
-    private R_vari DEFAULT_COLOR;
+    private Color DEFAULT_COLOR;
 
-    public R_vari getDefaultColor() {
+    public Color getDefaultColor() {
         if(DEFAULT_COLOR == null) {
             DEFAULT_COLOR = colorRepo.findById(DEFAULT_COLOR_ID).orElseThrow();
         }
@@ -27,7 +27,7 @@ public class ColorService {
     // Passthrough methods to db
     // Not covered (or to be covered by unit tests)
 
-    public Optional<R_vari> getColor(Long id) {
+    public Optional<Color> getColor(Long id) {
         return colorRepo.findById(id);
     }
 }

@@ -1,7 +1,8 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
+import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.dto.DropdownsDto;
+import fi.bizhop.kiekkohamsteri.dto.v1.out.DropdownsDto;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.DropdownsService;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 
+import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
 import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -27,6 +29,8 @@ public class DropdownsControllerTest extends SpringContextTestBase {
     @Autowired TestRestTemplate restTemplate;
     @MockBean AuthService authService;
     @MockBean DropdownsService dropdownsService;
+
+    BaseAdder adder = new BaseAdder("dropdown", CONTROLLER);
 
     @Test
     void givenUnableToAuthenticateUser_whenGetDropdowns_thenResponseCodeUnauthorized() {
@@ -55,7 +59,7 @@ public class DropdownsControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedDropdowns.json", response.getBody());
+        assertEqualsJson(adder.create("dropdowns.json"), response.getBody());
     }
 
 

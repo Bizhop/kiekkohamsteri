@@ -1,10 +1,12 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
+import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.dto.BuysDto;
+import fi.bizhop.kiekkohamsteri.dto.v1.out.BuyOutputDto;
+import fi.bizhop.kiekkohamsteri.dto.v1.out.BuySummaryDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
-import fi.bizhop.kiekkohamsteri.model.Kiekot;
-import fi.bizhop.kiekkohamsteri.model.Ostot;
+import fi.bizhop.kiekkohamsteri.model.Disc;
+import fi.bizhop.kiekkohamsteri.model.Buy;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.BuyService;
 import fi.bizhop.kiekkohamsteri.service.DiscService;
@@ -22,11 +24,13 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
+import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
 import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
-import static fi.bizhop.kiekkohamsteri.model.Ostot.Status.REQUESTED;
+import static fi.bizhop.kiekkohamsteri.model.Buy.Status.REQUESTED;
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -40,7 +44,9 @@ public class BuyControllerTest extends SpringContextTestBase {
     @MockBean DiscService discService;
 
     @Captor
-    ArgumentCaptor<Kiekot> discCaptor;
+    ArgumentCaptor<Disc> discCaptor;
+
+    BaseAdder adder = new BaseAdder("buy", CONTROLLER);
 
     @ParameterizedTest
     @ValueSource(strings = {"", "omat"})
@@ -66,24 +72,24 @@ public class BuyControllerTest extends SpringContextTestBase {
     void givenValidUser_whenGetListing_thenReturnListing() {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
-        var buy1 = new Ostot(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED);
-        var buy2 = new Ostot(getTestDiscFor(OTHER_USER), OTHER_USER, TEST_USER, REQUESTED);
+        var buy1 = new Buy(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED);
+        var buy2 = new Buy(getTestDiscFor(OTHER_USER), OTHER_USER, TEST_USER, REQUESTED);
         when(buyService.getListing(null)).thenReturn(List.of(buy1, buy2));
 
         var response = restTemplate.getForEntity(createUrl(""), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedBuyListing.json", response.getBody());
+        assertEqualsJson(adder.create("buyListing.json"), response.getBody());
     }
 
     @Test
     void givenValidUser_whenGetSummary_thenReturnSummary() {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
-        var sell = new Ostot(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED);
-        var buy1 = new Ostot(getTestDiscFor(OTHER_USER), OTHER_USER, TEST_USER, REQUESTED);
-        var buy2 = new Ostot(getTestDiscFor(OTHER_USER), OTHER_USER, TEST_USER, REQUESTED);
-        var buys = BuysDto.builder()
+        var sell = BuyOutputDto.fromDb(new Buy(getTestDiscFor(TEST_USER), TEST_USER, OTHER_USER, REQUESTED));
+        var buy1 = BuyOutputDto.fromDb(new Buy(getTestDiscFor(OTHER_USER), OTHER_USER, TEST_USER, REQUESTED));
+        var buy2 = BuyOutputDto.fromDb(new Buy(getTestDiscFor(OTHER_USER), OTHER_USER, TEST_USER, REQUESTED));
+        var buys = BuySummaryDto.builder()
                 .myyjana(List.of(sell))
                 .ostajana(List.of(buy1, buy2))
                 .build();
@@ -92,7 +98,7 @@ public class BuyControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl("omat"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedBuySummary.json", response.getBody());
+        assertEqualsJson(adder.create("buySummary.json"), response.getBody());
     }
 
     @Test

@@ -17,9 +17,12 @@ import fi.bizhop.kiekkohamsteri.db.PlasticRepository;
 import fi.bizhop.kiekkohamsteri.db.BuyRepository;
 import fi.bizhop.kiekkohamsteri.db.StatsRepository;
 import fi.bizhop.kiekkohamsteri.db.ManufacturerRepository;
-import fi.bizhop.kiekkohamsteri.model.Ostot.Status;
 import fi.bizhop.kiekkohamsteri.model.Stats;
 import fi.bizhop.kiekkohamsteri.util.Utils;
+
+import static fi.bizhop.kiekkohamsteri.model.Buy.Status.CONFIRMED;
+import static fi.bizhop.kiekkohamsteri.service.StatsService.UpdateStatus.DONE;
+import static fi.bizhop.kiekkohamsteri.service.StatsService.UpdateStatus.FAILED;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +39,7 @@ public class StatsService {
 
 	public UpdateStatus generateStatsByYearAndMonth(int year, int month) {
 		if(year < 2017 || month < 1 || month > 12) {
-			return UpdateStatus.FAILED;
+			return FAILED;
 		}
 
 		try {
@@ -56,14 +59,14 @@ public class StatsService {
 			stats.setNewManufacturers(manufacturerRepo.countByCreatedAtBetween(beginDate, endDate));
 			stats.setNewPlastics(plasticRepo.countByCreatedAtBetween(beginDate, endDate));
 			stats.setNewMolds(moldRepo.countByCreatedAtBetween(beginDate, endDate));
-			stats.setSalesCompleted(buyRepo.countByUpdatedAtBetweenAndStatus(beginDate, endDate, Status.CONFIRMED));
+			stats.setSalesCompleted(buyRepo.countByUpdatedAtBetweenAndStatus(beginDate, endDate, CONFIRMED));
 
 			statsRepo.save(stats);
-			return UpdateStatus.DONE;
+			return DONE;
 		}
 		catch (Exception e) {
 			LOG.error("Stats generation failed", e);
-			return UpdateStatus.FAILED;
+			return FAILED;
 		}
 	}
 

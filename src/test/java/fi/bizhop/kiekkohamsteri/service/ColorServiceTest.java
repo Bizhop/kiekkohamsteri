@@ -1,7 +1,7 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.ColorRepository;
-import fi.bizhop.kiekkohamsteri.model.R_vari;
+import fi.bizhop.kiekkohamsteri.model.Color;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -23,9 +23,9 @@ public class ColorServiceTest {
 
     @Test
     void getDefaultColorTest() {
-        var defaultColor = new R_vari();
+        var defaultColor = new Color();
         defaultColor.setId(1L);
-        defaultColor.setVari("ANY");
+        defaultColor.setName("ANY");
 
         when(colorRepo.findById(1L)).thenReturn(Optional.of(defaultColor));
 

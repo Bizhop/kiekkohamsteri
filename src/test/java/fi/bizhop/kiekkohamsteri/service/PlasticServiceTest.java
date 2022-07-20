@@ -1,10 +1,8 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.PlasticRepository;
-import fi.bizhop.kiekkohamsteri.dto.MoldCreateDto;
-import fi.bizhop.kiekkohamsteri.dto.PlasticCreateDto;
-import fi.bizhop.kiekkohamsteri.model.R_mold;
-import fi.bizhop.kiekkohamsteri.model.R_muovi;
+import fi.bizhop.kiekkohamsteri.dto.v1.in.PlasticCreateDto;
+import fi.bizhop.kiekkohamsteri.model.Plastic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -24,7 +22,7 @@ public class PlasticServiceTest {
     PlasticRepository plasticRepository;
 
     @Captor
-    ArgumentCaptor<R_muovi> plasticCaptor;
+    ArgumentCaptor<Plastic> plasticCaptor;
 
     @BeforeEach
     void init() {
@@ -33,9 +31,9 @@ public class PlasticServiceTest {
 
     @Test
     void getDefaultPlasticTest() {
-        var defaultPlastic = new R_muovi();
+        var defaultPlastic = new Plastic();
         defaultPlastic.setId(13L);
-        defaultPlastic.setMuovi("ANY");
+        defaultPlastic.setName("ANY");
 
         when(plasticRepository.findById(13L)).thenReturn(Optional.of(defaultPlastic));
 
@@ -54,7 +52,7 @@ public class PlasticServiceTest {
                 .muovi("TEST")
                 .build();
 
-        when(plasticRepository.save(any(R_muovi.class))).then(returnsFirstArg());
+        when(plasticRepository.save(any(Plastic.class))).then(returnsFirstArg());
 
         getPlasticService().createPlastic(dto, manufacturer);
 
@@ -62,8 +60,8 @@ public class PlasticServiceTest {
 
         var saved = plasticCaptor.getValue();
 
-        assertEquals("TEST", saved.getMuovi());
-        assertEquals(manufacturer.getId(), saved.getValmistaja().getId());
+        assertEquals("TEST", saved.getName());
+        assertEquals(manufacturer.getId(), saved.getManufacturer().getId());
     }
 
     private PlasticService getPlasticService() {

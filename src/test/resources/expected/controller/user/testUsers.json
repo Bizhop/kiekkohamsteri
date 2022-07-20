@@ -1,0 +1,38 @@
+[
+  {
+    "username": "User",
+    "email": "test@example.com",
+    "level": 1,
+    "firstName": "New",
+    "lastName": "User",
+    "pdgaNumber": 0,
+    "jwt": null,
+    "publicList": false,
+    "publicDiscCount": false,
+    "discCount": 0
+  },
+  {
+    "username": "Other",
+    "email": "other@example.com",
+    "level": 1,
+    "firstName": "New",
+    "lastName": "User",
+    "pdgaNumber": 0,
+    "jwt": null,
+    "publicList": false,
+    "publicDiscCount": false,
+    "discCount": 0
+  },
+  {
+    "username": "Admin",
+    "email": "admin@example.com",
+    "level": 2,
+    "firstName": "New",
+    "lastName": "User",
+    "pdgaNumber": 0,
+    "jwt": null,
+    "publicList": false,
+    "publicDiscCount": false,
+    "discCount": 0
+  }
+]

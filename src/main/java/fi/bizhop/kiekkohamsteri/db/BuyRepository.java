@@ -5,22 +5,26 @@ import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
 
-import fi.bizhop.kiekkohamsteri.model.Kiekot;
-import fi.bizhop.kiekkohamsteri.model.Members;
-import fi.bizhop.kiekkohamsteri.model.Ostot;
-import fi.bizhop.kiekkohamsteri.model.Ostot.Status;
+import fi.bizhop.kiekkohamsteri.model.Disc;
+import fi.bizhop.kiekkohamsteri.model.User;
+import fi.bizhop.kiekkohamsteri.model.Buy;
+import fi.bizhop.kiekkohamsteri.model.Buy.Status;
 
-public interface BuyRepository extends CrudRepository<Ostot, Long> {
-	Ostot findByKiekkoAndOstajaAndStatus(Kiekot kiekko, Members ostaja, Status status);
+import javax.annotation.Nonnull;
 
-	List<Ostot> findAll();
-	
-	List<Ostot> findByStatus(Status status);
-	
-	List<Ostot> findByKiekko(Kiekot kiekko);
-	
-	List<Ostot> findByStatusAndMyyja(Status status, Members myyja);
-	List<Ostot> findByStatusAndOstaja(Status status, Members ostaja);
+public interface BuyRepository extends CrudRepository<Buy, Long> {
+	Buy findByDiscAndBuyerAndStatus(Disc disc, User buyer, Status status);
 
-	Integer countByUpdatedAtBetweenAndStatus(Date beginDate, Date endDate, Status confirmed);
+	@Override
+	@Nonnull
+	List<Buy> findAll();
+	
+	List<Buy> findByStatus(Status status);
+	
+	List<Buy> findByDisc(Disc disc);
+	
+	List<Buy> findByStatusAndSeller(Status status, User seller);
+	List<Buy> findByStatusAndBuyer(Status status, User buyer);
+
+	Integer countByUpdatedAtBetweenAndStatus(Date beginDate, Date endDate, Status status);
 }

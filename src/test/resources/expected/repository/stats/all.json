@@ -1,0 +1,38 @@
+{
+  "content": [
+    {
+      "year": 2020,
+      "month": 6,
+      "newDiscs": 11,
+      "newUsers": 22,
+      "newManufacturers": 33,
+      "newPlastics": 44,
+      "newMolds": 55,
+      "salesCompleted": 66
+    },
+    {
+      "year": 2021,
+      "month": 5,
+      "newDiscs": 66,
+      "newUsers": 55,
+      "newManufacturers": 44,
+      "newPlastics": 33,
+      "newMolds": 22,
+      "salesCompleted": 11
+    }
+  ],
+  "pageable": "INSTANCE",
+  "last": true,
+  "totalPages": 1,
+  "totalElements": 2,
+  "sort": {
+    "sorted": false,
+    "unsorted": true,
+    "empty": true
+  },
+  "number": 0,
+  "first": true,
+  "numberOfElements": 2,
+  "size": 2,
+  "empty": false
+}

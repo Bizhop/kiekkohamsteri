@@ -1,10 +1,11 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
+import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.dto.PlasticCreateDto;
-import fi.bizhop.kiekkohamsteri.model.Members;
-import fi.bizhop.kiekkohamsteri.model.R_muovi;
-import fi.bizhop.kiekkohamsteri.model.R_valm;
+import fi.bizhop.kiekkohamsteri.dto.v1.in.PlasticCreateDto;
+import fi.bizhop.kiekkohamsteri.model.User;
+import fi.bizhop.kiekkohamsteri.model.Plastic;
+import fi.bizhop.kiekkohamsteri.model.Manufacturer;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.ManufacturerService;
 import fi.bizhop.kiekkohamsteri.service.PlasticService;
@@ -20,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.IOException;
 import java.util.Optional;
 
+import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
 import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static javax.servlet.http.HttpServletResponse.*;
@@ -38,6 +40,8 @@ public class PlasticControllerTest extends SpringContextTestBase {
     @MockBean PlasticService plasticService;
     @MockBean ManufacturerService manufacturerService;
 
+    BaseAdder adder = new BaseAdder("plastic", CONTROLLER);
+
     @Test
     void givenUnableToAuthenticateUser_whenCallingGetPlastics_thenRespondWithUnauthorized() {
         when(authService.getUser(any())).thenReturn(null);
@@ -49,7 +53,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
 
     @Test
     void givenNonAdminUser_whenCallingGetPlastics_thenRespondForbidden() {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
         user.setLevel(1);
         when(authService.getUser(any())).thenReturn(user);
 
@@ -69,7 +73,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
 
     @Test
     void givenNonAdminUser_whenCreatingPlastic_thenRespondWithUnauthorized() {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
         user.setLevel(1);
         when(authService.getUser(any())).thenReturn(user);
 
@@ -92,7 +96,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
         verify(plasticService, never()).getPlasticsByManufacturer(any(), any());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedAllPlastics.json", response.getBody());
+        assertEqualsJson(adder.create("allPlastics.json"), response.getBody());
     }
 
     @Test
@@ -111,7 +115,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
         verify(plasticService, times(1)).getPlasticsByManufacturer(eq(manufacturer), any());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedDiscmaniaPlastics.json", response.getBody());
+        assertEqualsJson(adder.create("discmaniaPlastics.json"), response.getBody());
     }
 
     @Test
@@ -146,7 +150,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
         verify(plasticService, times(1)).createPlastic(dto, manufacturer);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedNewPlastic.json", response.getBody());
+        assertEqualsJson(adder.create("newPlastic.json"), response.getBody());
     }
 
     @Test
@@ -172,11 +176,11 @@ public class PlasticControllerTest extends SpringContextTestBase {
         return String.format("http://localhost:%d/api/muovit/", port);
     }
 
-    private R_muovi getTestPlastic(R_valm manufacturer) {
-        var plastic = new R_muovi();
+    private Plastic getTestPlastic(Manufacturer manufacturer) {
+        var plastic = new Plastic();
         plastic.setId(66L);
-        plastic.setValmistaja(manufacturer);
-        plastic.setMuovi("New Plastic");
+        plastic.setManufacturer(manufacturer);
+        plastic.setName("New Plastic");
         return plastic;
     }
 }

@@ -1,7 +1,7 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.UserRepository;
-import fi.bizhop.kiekkohamsteri.model.Members;
+import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.security.GoogleAuthentication;
 import fi.bizhop.kiekkohamsteri.security.JWTAuthentication;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class AuthService {
 	private final JWTAuthentication jwtAuthentication;
 	private final GoogleAuthentication googleAuthentication;
 	
-	public Members getUser(HttpServletRequest request) {
+	public User getUser(HttpServletRequest request) {
 		var userEmail = getEmail(request);
 		if(userEmail == null) return null;
 
@@ -33,13 +33,13 @@ public class AuthService {
 		}
 	}
 	
-	public Members login(HttpServletRequest request) {
+	public User login(HttpServletRequest request) {
 		var userEmail = getEmail(request);
 		if(userEmail == null) return null;
 
 		var user = membersRepo.findByEmail(userEmail);
 		if(user == null) {
-			user = new Members(userEmail);
+			user = new User(userEmail);
 			user = membersRepo.save(user);
 			user.setUsername(String.format("Uusi%d", user.getId()));
 			user = membersRepo.save(user);
@@ -51,6 +51,8 @@ public class AuthService {
 
 	private String getEmail(HttpServletRequest request) {
         var token = request.getHeader(HEADER_STRING);
+		if(token == null) return null;
+
 		String userEmail = null;
         if(token.startsWith(JWTAuthentication.JWT_TOKEN_PREFIX)) {
             userEmail = jwtAuthentication.getUserEmail(token);

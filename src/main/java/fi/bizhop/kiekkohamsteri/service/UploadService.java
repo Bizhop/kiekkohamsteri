@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Singleton;
 
-import fi.bizhop.kiekkohamsteri.dto.UploadDto;
+import fi.bizhop.kiekkohamsteri.dto.v1.in.UploadDto;
 
 @Service
 public class UploadService {

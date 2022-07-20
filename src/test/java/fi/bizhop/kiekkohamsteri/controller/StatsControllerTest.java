@@ -1,5 +1,6 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
+import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.model.Stats;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
@@ -15,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
+import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.TEST_USER;
 import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -31,6 +33,8 @@ public class StatsControllerTest  extends SpringContextTestBase {
     @MockBean AuthService authService;
     @MockBean StatsService statsService;
 
+    BaseAdder adder = new BaseAdder("stats", CONTROLLER);
+
     @Test
     void givenUnableToAuthenticateUser_whenGetStats_thenResponseCodeUnauthorized() {
         when(authService.getUser(any())).thenReturn(null);
@@ -44,20 +48,14 @@ public class StatsControllerTest  extends SpringContextTestBase {
     void givenValidUser_whenGetStats_thenGetStats() {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
-        var stats = new Stats(2020, 1);
-        stats.setNewDiscs(11);
-        stats.setNewMolds(22);
-        stats.setNewUsers(33);
-        stats.setNewManufacturers(44);
-        stats.setNewPlastics(55);
-        stats.setSalesCompleted(66);
+        var stats = new Stats(null, 2020, 1, 11, 33, 44, 55, 22 ,66);
 
         when(statsService.getStats(any())).thenReturn(new PageImpl<>(List.of(stats)));
 
         var response = restTemplate.getForEntity(createUrl(), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedStats.json", response.getBody());
+        assertEqualsJson(adder.create("stats.json"), response.getBody());
     }
 
 

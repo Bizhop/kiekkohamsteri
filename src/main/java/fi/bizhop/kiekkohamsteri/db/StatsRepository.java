@@ -6,7 +6,12 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import fi.bizhop.kiekkohamsteri.model.Stats;
 
+import javax.annotation.Nonnull;
+
 public interface StatsRepository extends PagingAndSortingRepository<Stats, Integer> {
-	Page<Stats> findAll(Pageable pageable);
+	@Override
+	@Nonnull
+	Page<Stats> findAll(@Nonnull Pageable pageable);
+
 	Stats findByYearAndMonth(int year, int month);
 }

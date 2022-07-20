@@ -2,11 +2,10 @@ package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.TestObjects;
 import fi.bizhop.kiekkohamsteri.db.DiscRepository;
-import fi.bizhop.kiekkohamsteri.dto.DiscDto;
+import fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
-import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
-import fi.bizhop.kiekkohamsteri.model.Kiekot;
-import fi.bizhop.kiekkohamsteri.model.Members;
+import fi.bizhop.kiekkohamsteri.model.Disc;
+import fi.bizhop.kiekkohamsteri.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -30,7 +29,7 @@ public class DiscServiceTest {
     DiscRepository discRepo;
 
     @Captor
-    ArgumentCaptor<Kiekot> discCaptor;
+    ArgumentCaptor<Disc> discCaptor;
 
     @BeforeEach
     void init() {
@@ -39,7 +38,7 @@ public class DiscServiceTest {
 
     @Test
     void givenNewDisc_whenUserHasPublicListTrue_thenNewDiscIsPublic() {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
         user.setPublicList(true);
 
         setupMocksForNewDisc();
@@ -54,7 +53,7 @@ public class DiscServiceTest {
 
     @Test
     void givenNewDisc_whenUserHasPublicListFalse_thenNewDiscIsNotPublic() {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
         user.setPublicList(false);
 
         setupMocksForNewDisc();
@@ -73,12 +72,12 @@ public class DiscServiceTest {
         var id = 123L;
         disc.setId(id);
         when(discRepo.findById(id)).thenReturn(Optional.of(disc));
-        when(discRepo.save(any(Kiekot.class))).then(returnsFirstArg());
+        when(discRepo.save(any(Disc.class))).then(returnsFirstArg());
 
         getDiscService().updateImage(id, "new-image");
 
         verify(discRepo, times(1)).save(any());
-        assertEquals("new-image", disc.getKuva());
+        assertEquals("new-image", disc.getImage());
     }
 
     @Test
@@ -95,7 +94,7 @@ public class DiscServiceTest {
     @Test
     void givenUserIsNotDiscOwner_whenDeletingDisc_thenThrowException() {
         var disc = DISCS.stream()
-                .filter(d -> OTHER_EMAIL.equals(d.getMember().getEmail()))
+                .filter(d -> OTHER_EMAIL.equals(d.getOwner().getEmail()))
                 .findFirst();
 
         when(discRepo.findById(123L)).thenReturn(disc);
@@ -110,12 +109,12 @@ public class DiscServiceTest {
     }
 
     @Test
-    void givenUserIsNotDiscOwner_whenUpdatingDisc_thenThrowException() throws HttpResponseException {
+    void givenUserIsNotDiscOwner_whenUpdatingDisc_thenThrowException() {
         var disc = getTestDiscFor(OTHER_USER);
 
         when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
 
-        var dto = DiscDto.builder().build();
+        var dto = DiscInputDto.builder().build();
 
         try {
             getDiscService().updateDisc(dto, 123L, TEST_USER, null, null, null);
@@ -127,12 +126,12 @@ public class DiscServiceTest {
     }
 
     @Test
-    void givenValidDto_whenUpdatingDisc_thenUpdateDisc() throws AuthorizationException, HttpResponseException {
+    void givenValidDto_whenUpdatingDisc_thenUpdateDisc() throws AuthorizationException {
         var disc = getTestDiscFor(TEST_USER);
 
         when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
 
-        var dto = DiscDto.builder()
+        var dto = DiscInputDto.builder()
                 .muuta("text")
                 .kunto(8)
                 .kuva("image")
@@ -143,20 +142,20 @@ public class DiscServiceTest {
         verify(discRepo, times(1)).save(discCaptor.capture());
 
         var savedDisc = discCaptor.getValue();
-        assertEquals("text", savedDisc.getMuuta());
-        assertEquals(8, savedDisc.getKunto());
-        assertEquals("image",savedDisc.getKuva());
+        assertEquals("text", savedDisc.getDescription());
+        assertEquals(8, savedDisc.getCondition());
+        assertEquals("image",savedDisc.getImage());
     }
 
     @Test
-    void givenDtoLostIsTrue_whenUpdating_thenSetItbFalseAndMyynnissaFalse() throws AuthorizationException, HttpResponseException {
+    void givenDtoLostIsTrue_whenUpdating_thenSetItbFalseAndMyynnissaFalse() throws AuthorizationException {
         var disc = getTestDiscFor(TEST_USER);
         disc.setItb(true);
-        disc.setMyynnissa(true);
+        disc.setForSale(true);
 
         when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
 
-        var dto = DiscDto.builder().lost(true).build();
+        var dto = DiscInputDto.builder().lost(true).build();
 
         getDiscService().updateDisc(dto, 123L, TEST_USER, null, null, null);
 
@@ -165,14 +164,14 @@ public class DiscServiceTest {
         var savedDisc = discCaptor.getValue();
         assertEquals(true, savedDisc.getLost());
         assertEquals(false, savedDisc.getItb());
-        assertEquals(false, savedDisc.getMyynnissa());
+        assertEquals(false, savedDisc.getForSale());
     }
 
     @Test
     void givenUserIsDiscOwner_whenGetDisc_thenReturnDisc() throws AuthorizationException {
         var disc = getDiscsByUser(TEST_USER).get(0);
 
-        when(discRepo.getKiekotById(123L)).thenReturn(disc);
+        when(discRepo.getDiscById(123L)).thenReturn(disc);
 
         var response = getDiscService().getDisc(TEST_USER, 123L);
 
@@ -183,7 +182,7 @@ public class DiscServiceTest {
     void givenUserIsNotDiscOwner_whenGetDisc_thenThrowException() {
         var disc = getDiscsByUser(OTHER_USER).get(0);
 
-        when(discRepo.getKiekotById(anyLong())).thenReturn(disc);
+        when(discRepo.getDiscById(anyLong())).thenReturn(disc);
 
         try {
             getDiscService().getDisc(TEST_USER, 0L);
@@ -198,7 +197,7 @@ public class DiscServiceTest {
         disc.setPublicDisc(true);
         var projection = projectionFromDisc(disc);
 
-        when(discRepo.getKiekotById(123L)).thenReturn(projection);
+        when(discRepo.getDiscById(123L)).thenReturn(projection);
 
         var response = getDiscService().getDiscIfPublicOrOwn(TEST_USER, 123L);
 
@@ -211,7 +210,7 @@ public class DiscServiceTest {
         disc.setPublicDisc(false);
         var projection = projectionFromDisc(disc);
 
-        when(discRepo.getKiekotById(123L)).thenReturn(projection);
+        when(discRepo.getDiscById(123L)).thenReturn(projection);
 
         try {
             getDiscService().getDiscIfPublicOrOwn(TEST_USER, 123L);
@@ -223,12 +222,12 @@ public class DiscServiceTest {
     @Test
     void publicListsTest() {
         var discs = DISCS.stream()
-                .filter(Kiekot::getPublicDisc)
+                .filter(Disc::getPublicDisc)
                 .map(TestObjects::projectionFromDisc)
                 .collect(Collectors.toList());
 
         var users = List.of(TEST_USER, OTHER_USER);
-        when(discRepo.findByMemberInAndPublicDiscTrue(users)).thenReturn(discs);
+        when(discRepo.findByOwnerInAndPublicDiscTrue(users)).thenReturn(discs);
 
         var publicLists = getDiscService().getPublicLists(users);
 
@@ -251,6 +250,6 @@ public class DiscServiceTest {
     }
 
     void setupMocksForNewDisc() {
-        when(discRepo.save(any(Kiekot.class))).then(returnsFirstArg());
+        when(discRepo.save(any(Disc.class))).then(returnsFirstArg());
     }
 }

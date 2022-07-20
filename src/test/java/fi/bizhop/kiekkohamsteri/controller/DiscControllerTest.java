@@ -1,13 +1,14 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
+import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.controller.provider.UUIDProvider;
-import fi.bizhop.kiekkohamsteri.dto.DiscDto;
-import fi.bizhop.kiekkohamsteri.dto.UploadDto;
+import fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto;
+import fi.bizhop.kiekkohamsteri.dto.v1.in.UploadDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
-import fi.bizhop.kiekkohamsteri.model.Members;
-import fi.bizhop.kiekkohamsteri.model.Ostot;
+import fi.bizhop.kiekkohamsteri.model.User;
+import fi.bizhop.kiekkohamsteri.model.Buy;
 import fi.bizhop.kiekkohamsteri.service.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,16 +21,22 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
 import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpMethod.*;
@@ -50,7 +57,11 @@ public class DiscControllerTest extends SpringContextTestBase {
     @MockBean ColorService colorService;
     @MockBean UUIDProvider uuidProvider;
 
-    @Captor ArgumentCaptor<Members> userCaptor;
+    @Captor ArgumentCaptor<User> userCaptor;
+
+    @Captor ArgumentCaptor<Pageable> pageableCaptor;
+
+    BaseAdder adder = new BaseAdder("disc", CONTROLLER);
 
     @ParameterizedTest
     @ValueSource(strings = {"", "myytavat", "1", "public-lists", "lost"})
@@ -115,7 +126,7 @@ public class DiscControllerTest extends SpringContextTestBase {
     void givenUnableToAuthenticateUser_whenCallingUpdateDisc_thenRespondWithUnauthorized() {
         when(authService.getUser(any())).thenReturn(null);
 
-        var requestEntity = new HttpEntity<>(DiscDto.builder().build());
+        var requestEntity = new HttpEntity<>(DiscInputDto.builder().build());
         var response = restTemplate.exchange(createUrl("1"), PUT, requestEntity, String.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
@@ -132,7 +143,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(""), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedGetDiscs.json", response.getBody());
+        assertEqualsJson(adder.create("getDiscs.json"), response.getBody());
     }
 
     @Test
@@ -146,12 +157,12 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl("myytavat"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedGetDiscsForSale.json", response.getBody());
+        assertEqualsJson(adder.create("getDiscsForSale.json"), response.getBody());
     }
 
     @Test
     void givenImageUploadSuccess_whenCreateDisc_thenSaveDiscAndUpdateImageReference() throws IOException {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
         when(authService.getUser(any())).thenReturn(user);
         whenDefaultMoldPlasticAndColor();
 
@@ -176,12 +187,12 @@ public class DiscControllerTest extends SpringContextTestBase {
 
         assertEquals(SC_OK, response.getStatusCodeValue());
 
-        assertEqualsJson("expectedNewDisc.json", response.getBody());
+        assertEqualsJson(adder.create("newDisc.json"), response.getBody());
     }
 
     @Test
     void givenImageUploadFails_whenCreateDisc_thenDiscIsDeleted() throws IOException {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
         when(authService.getUser(any())).thenReturn(user);
         whenDefaultMoldPlasticAndColor();
 
@@ -227,7 +238,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var disc = getTestDiscFor(TEST_USER);
         var discId = 123L;
         disc.setId(discId);
-        disc.setKuva("Test-123");
+        disc.setImage("Test-123");
         var discProjection = projectionFromDisc(disc);
 
         when(discService.getDisc(TEST_USER, 123L)).thenReturn(discProjection);
@@ -254,7 +265,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var disc = getTestDiscFor(TEST_USER);
         var discId = 123L;
         disc.setId(discId);
-        disc.setKuva("Test-123");
+        disc.setImage("Test-123");
         var discProjection = projectionFromDisc(disc);
 
         when(discService.getDisc(TEST_USER, 123L)).thenReturn(discProjection);
@@ -277,7 +288,7 @@ public class DiscControllerTest extends SpringContextTestBase {
 
     @Test
     void givenNotYourDisc_whenUpdateImage_thenRespondForbidden() throws AuthorizationException, IOException {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
         when(authService.getUser(any())).thenReturn(user);
 
         when(discService.getDisc(TEST_USER, 456L)).thenThrow(new AuthorizationException());
@@ -314,7 +325,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl("123"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedMyDisc.json", response.getBody());
+        assertEqualsJson(adder.create("myDisc.json"), response.getBody());
     }
 
     @Test
@@ -329,10 +340,10 @@ public class DiscControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenValidRequest_whenUpdateDisc_thenUpdateDisc() throws IOException, AuthorizationException {
+    void givenValidRequest_whenUpdateDisc_thenUpdateDisc() throws AuthorizationException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
-        var dto = DiscDto.builder()
+        var dto = DiscInputDto.builder()
                 .moldId(0L)
                 .muoviId(0L)
                 .variId(0L)
@@ -343,14 +354,14 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl("123"), PUT, new HttpEntity<>(dto), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedMyDisc.json", response.getBody());
+        assertEqualsJson(adder.create("myDisc.json"), response.getBody());
     }
 
     @Test
     void givenNotYourDisc_whenUpdateDisc_thenRespondForbidden() throws AuthorizationException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
-        var dto = DiscDto.builder()
+        var dto = DiscInputDto.builder()
                 .moldId(1L)
                 .muoviId(1L)
                 .variId(1L)
@@ -368,7 +379,7 @@ public class DiscControllerTest extends SpringContextTestBase {
     void givenRuntimeException_whenUpdateDisc_thenRespond500() throws AuthorizationException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
-        var dto = DiscDto.builder()
+        var dto = DiscInputDto.builder()
                 .moldId(0L)
                 .muoviId(0L)
                 .variId(0L)
@@ -384,7 +395,7 @@ public class DiscControllerTest extends SpringContextTestBase {
 
     @Test
     void givenValidRequest_whenDeleteDisc_thenDeleteDiscAndDecreaseDiscCountAndSaveUser() throws AuthorizationException {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
         user.setDiscCount(1);
         when(authService.getUser(any())).thenReturn(user);
 
@@ -420,7 +431,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         var disc = getTestDiscFor(OTHER_USER);
         when(discService.getDiscDb(123L)).thenReturn(Optional.of(disc));
 
-        var buys = new Ostot(disc, disc.getMember(), TEST_USER, Ostot.Status.REQUESTED);
+        var buys = new Buy(disc, disc.getOwner(), TEST_USER, Buy.Status.REQUESTED);
         when(buyService.buyDisc(TEST_USER, disc)).thenReturn(buys);
 
         var response = restTemplate.postForEntity(createUrl("123/buy"), null, String.class);
@@ -429,7 +440,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         verify(buyService, times(1)).buyDisc(TEST_USER, disc);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedBuyDiscRequest.json", response.getBody());
+        assertEqualsJson(adder.create("buyDiscRequest.json"), response.getBody());
     }
 
     @Test
@@ -511,6 +522,26 @@ public class DiscControllerTest extends SpringContextTestBase {
 
         assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
         assertNull(response.getBody());
+    }
+
+    @Test
+    void v1CompatibilityTest() {
+        when(authService.getUser(any())).thenReturn(TEST_USER);
+
+        var params = List.of(
+                "size=1000",
+                "sort=mold.valmistaja.valmistaja,asc",
+                "sort=mold.nopeus,asc",
+                "sort=muovi.muovi,asc");
+
+        var endpoint = String.format("?%s", String.join("&", params));
+
+        restTemplate.getForEntity(createUrl(endpoint), String.class);
+
+        verify(discService, times(1)).getDiscs(eq(TEST_USER), pageableCaptor.capture());
+
+        var sorts = pageableCaptor.getValue().getSort().get().collect(Collectors.toList());
+        assertEqualsJson(adder.create("compatibilitySorts.json"), sorts);
     }
 
     //HELPER METHODS

@@ -1,7 +1,7 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.UserRepository;
-import fi.bizhop.kiekkohamsteri.model.Members;
+import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.security.GoogleAuthentication;
 import fi.bizhop.kiekkohamsteri.security.JWTAuthentication;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +35,7 @@ public class AuthServiceTest {
 
     @Test
     void givenValidJwt_whenGetUser_thenReturnUser() {
-        var testUser = new Members(TEST_EMAIL);
+        var testUser = new User(TEST_EMAIL);
         given(jwtAuth.getUserEmail(anyString())).willReturn(TEST_EMAIL);
         given(userRepo.findByEmail(anyString())).willReturn(testUser);
 
@@ -51,7 +51,7 @@ public class AuthServiceTest {
 
     @Test
     void givenValidGoogleToken_whenGetUser_thenReturnUser() {
-        var testUser = new Members(TEST_EMAIL);
+        var testUser = new User(TEST_EMAIL);
         given(googleAuth.getUserEmail(anyString())).willReturn(TEST_EMAIL);
         given(userRepo.findByEmail(anyString())).willReturn(testUser);
 
@@ -92,7 +92,7 @@ public class AuthServiceTest {
 
     @Test
     void givenValidToken_whenLogin_thenReturnUser() {
-        var testUser = new Members(TEST_EMAIL);
+        var testUser = new User(TEST_EMAIL);
         given(jwtAuth.getUserEmail(anyString())).willReturn(TEST_EMAIL);
         given(userRepo.findByEmail(anyString())).willReturn(testUser);
 
@@ -111,8 +111,8 @@ public class AuthServiceTest {
     void givenValidTokenAndUserDoesntExist_whenLogin_thenSaveAndReturnUser() {
         given(jwtAuth.getUserEmail(anyString())).willReturn(TEST_EMAIL);
         given(userRepo.findByEmail(anyString())).willReturn(null);
-        given(userRepo.save(any(Members.class))).willAnswer(i -> {
-            var user = (Members)i.getArguments()[0];
+        given(userRepo.save(any(User.class))).willAnswer(i -> {
+            var user = (User)i.getArguments()[0];
             if(user.getId() == null) user.setId(1L);
             return user;
         });

@@ -15,20 +15,20 @@ public class TestObjects {
     public static final String TEST_EMAIL = "test@example.com";
     public static final String OTHER_EMAIL = "other@example.com";
     public static final String ADMIN_EMAIL = "admin@example.com";
-    public static final Members TEST_USER = new Members(TEST_EMAIL);
-    public static final Members OTHER_USER = new Members(OTHER_EMAIL);
-    public static final Members ADMIN_USER = new Members(ADMIN_EMAIL);
-    public static final List<R_valm> MANUFACTURERS;
-    public static final List<R_mold> MOLDS;
-    public static final List<R_muovi> PLASTICS;
-    public static final List<R_vari> COLORS;
+    public static final User TEST_USER = new User(TEST_EMAIL);
+    public static final User OTHER_USER = new User(OTHER_EMAIL);
+    public static final User ADMIN_USER = new User(ADMIN_EMAIL);
+    public static final List<Manufacturer> MANUFACTURERS;
+    public static final List<Mold> MOLDS;
+    public static final List<Plastic> PLASTICS;
+    public static final List<Color> COLORS;
     public static final List<Dropdown> CONDITIONS;
     public static final List<Dropdown> MARKINGS;
-    public static final List<Kiekot> DISCS;
-    public static final List<Members> USERS;
+    public static final List<Disc> DISCS;
+    public static final List<User> USERS;
 
-    private static final Predicate<Kiekot> isNotLost = disc -> Boolean.FALSE.equals(disc.getLost());
-    private static final Predicate<Kiekot> isLost = disc -> Boolean.TRUE.equals(disc.getLost());
+    private static final Predicate<Disc> isNotLost = disc -> Boolean.FALSE.equals(disc.getLost());
+    private static final Predicate<Disc> isLost = disc -> Boolean.TRUE.equals(disc.getLost());
 
     public static class Dropdown {
         public Integer id;
@@ -80,22 +80,22 @@ public class TestObjects {
         var noMarkings = new Dropdown(0, "Ei merkintöjä");
         MARKINGS = List.of(noMarkings);
 
-        var testUserDisc = new Kiekot(TEST_USER, fd, sLine, white);
+        var testUserDisc = new Disc(TEST_USER, fd, sLine, white);
         testUserDisc.setPublicDisc(true);
-        var otherUserDisc = new Kiekot(OTHER_USER, harp, vip, yellow);
+        var otherUserDisc = new Disc(OTHER_USER, harp, vip, yellow);
         otherUserDisc.setPublicDisc(true);
-        var lostDisc = new Kiekot(TEST_USER, pd, cLine, yellow);
+        var lostDisc = new Disc(TEST_USER, pd, cLine, yellow);
         lostDisc.setPublicDisc(true);
         lostDisc.setLost(true);
-        var notPublicDisc = new Kiekot(TEST_USER, dessu, star, yellow);
+        var notPublicDisc = new Disc(TEST_USER, dessu, star, yellow);
         notPublicDisc.setPublicDisc(false);
         DISCS = List.of(testUserDisc, otherUserDisc, lostDisc, notPublicDisc);
     }
 
-    public static List<DiscProjection> getDiscsByUser(Members user) {
+    public static List<DiscProjection> getDiscsByUser(User user) {
         return DISCS.stream()
                 .filter(isNotLost)
-                .filter(disc -> disc.getMember().getEmail().equals(user.getEmail()))
+                .filter(disc -> disc.getOwner().getEmail().equals(user.getEmail()))
                 .map(TestObjects::projectionFromDisc)
                 .collect(Collectors.toList());
     }
@@ -119,9 +119,9 @@ public class TestObjects {
                 .collect(Collectors.toList());
     }
 
-    public static List<MoldDropdownProjection> getMoldsDD(R_valm manufacturer) {
+    public static List<MoldDropdownProjection> getMoldsDD(Manufacturer manufacturer) {
         return MOLDS.stream()
-                .filter(mold -> mold.getValmistaja().getId().equals(manufacturer.getId()))
+                .filter(mold -> mold.getManufacturer().getId().equals(manufacturer.getId()))
                 .map(TestObjects::dropdownProjectionFromMold)
                 .collect(Collectors.toList());
     }
@@ -132,9 +132,9 @@ public class TestObjects {
                 .collect(Collectors.toList());
     }
 
-    public static List<MoldProjection> getMolds(R_valm manufacturer) {
+    public static List<MoldProjection> getMolds(Manufacturer manufacturer) {
         return MOLDS.stream()
-                .filter(mold -> mold.getValmistaja().getId().equals(manufacturer.getId()))
+                .filter(mold -> mold.getManufacturer().getId().equals(manufacturer.getId()))
                 .map(TestObjects::projectionFromMold)
                 .collect(Collectors.toList());
     }
@@ -145,9 +145,9 @@ public class TestObjects {
                 .collect(Collectors.toList());
     }
 
-    public static List<PlasticProjection> getPlastics(R_valm manufacturer) {
+    public static List<PlasticProjection> getPlastics(Manufacturer manufacturer) {
         return PLASTICS.stream()
-                .filter(mold -> mold.getValmistaja().getId().equals(manufacturer.getId()))
+                .filter(mold -> mold.getManufacturer().getId().equals(manufacturer.getId()))
                 .map(TestObjects::projectionFromPlastic)
                 .collect(Collectors.toList());
     }
@@ -158,9 +158,9 @@ public class TestObjects {
                 .collect(Collectors.toList());
     }
 
-    public static List<PlasticDropdownProjection> getPlasticsDD(R_valm manufacturer) {
+    public static List<PlasticDropdownProjection> getPlasticsDD(Manufacturer manufacturer) {
         return PLASTICS.stream()
-                .filter(plastic -> plastic.getValmistaja().getId().equals(manufacturer.getId()))
+                .filter(plastic -> plastic.getManufacturer().getId().equals(manufacturer.getId()))
                 .map(TestObjects::dropdownProjectionFromPlastic)
                 .collect(Collectors.toList());
     }
@@ -183,43 +183,43 @@ public class TestObjects {
                 .collect(Collectors.toList());
     }
 
-    public static Kiekot getTestDiscFor(Members owner) {
-        return new Kiekot(owner, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0));
+    public static Disc getTestDiscFor(User owner) {
+        return new Disc(owner, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0));
     }
 
     // HELPER METHODS
 
-    private static R_vari createColor(Long id, String name) {
-        var color = new R_vari();
+    private static Color createColor(Long id, String name) {
+        var color = new Color();
         color.setId(id);
-        color.setVari(name);
+        color.setName(name);
         return color;
     }
 
-    private static R_muovi createPlastic(Long id, R_valm manufacturer, String name) {
-        var plastic = new R_muovi();
+    private static Plastic createPlastic(Long id, Manufacturer manufacturer, String name) {
+        var plastic = new Plastic();
         plastic.setId(id);
-        plastic.setValmistaja(manufacturer);
-        plastic.setMuovi(name);
+        plastic.setManufacturer(manufacturer);
+        plastic.setName(name);
         return plastic;
     }
 
-    private static R_valm createManufacturer(Long id, String name) {
-        var manufacturer = new R_valm();
+    private static Manufacturer createManufacturer(Long id, String name) {
+        var manufacturer = new Manufacturer();
         manufacturer.setId(id);
-        manufacturer.setValmistaja(name);
+        manufacturer.setName(name);
         return manufacturer;
     }
 
-    private static R_mold createMold(Long id, R_valm manufacturer, String disc, Double speed, Double glide, Double stability, Double fade) {
-        var mold = new R_mold();
+    private static Mold createMold(Long id, Manufacturer manufacturer, String disc, Double speed, Double glide, Double stability, Double fade) {
+        var mold = new Mold();
         mold.setId(id);
-        mold.setValmistaja(manufacturer);
-        mold.setKiekko(disc);
-        mold.setNopeus(speed);
-        mold.setLiito(glide);
-        mold.setVakaus(stability);
-        mold.setFeidi(fade);
+        mold.setManufacturer(manufacturer);
+        mold.setName(disc);
+        mold.setSpeed(speed);
+        mold.setGlide(glide);
+        mold.setStability(stability);
+        mold.setFade(fade);
         return mold;
     }
 
@@ -233,83 +233,83 @@ public class TestObjects {
         };
     }
 
-    private static ColorDropdownProjection dropdownProjectionFromColor(R_vari color) {
+    private static ColorDropdownProjection dropdownProjectionFromColor(Color color) {
         return new ColorDropdownProjection() {
             @Override public Long getId() { return color.getId(); }
-            @Override public String getVari() { return color.getVari(); }
+            @Override public String getVari() { return color.getName(); }
         };
     }
 
-    private static PlasticDropdownProjection dropdownProjectionFromPlastic(R_muovi plastic) {
+    private static PlasticDropdownProjection dropdownProjectionFromPlastic(Plastic plastic) {
         return new PlasticDropdownProjection() {
             @Override public Long getId() { return plastic.getId(); }
-            @Override public String getMuovi() { return plastic.getMuovi();  }
+            @Override public String getMuovi() { return plastic.getName();  }
         };
     }
 
-    private static MoldDropdownProjection dropdownProjectionFromMold(R_mold mold) {
+    private static MoldDropdownProjection dropdownProjectionFromMold(Mold mold) {
         return new MoldDropdownProjection() {
             @Override public Long getId() { return mold.getId(); }
-            @Override public String getKiekko() { return mold.getKiekko(); }
+            @Override public String getKiekko() { return mold.getName(); }
         };
     }
 
-    private static ManufacturerDropdownProjection dropdownProjectionFromManufacturer(R_valm manufacturer) {
+    private static ManufacturerDropdownProjection dropdownProjectionFromManufacturer(Manufacturer manufacturer) {
         return new ManufacturerDropdownProjection() {
             @Override public Long getId() { return manufacturer.getId(); }
-            @Override public String getValmistaja() { return manufacturer.getValmistaja(); }
+            @Override public String getValmistaja() { return manufacturer.getName(); }
         };
     }
 
-    public static MoldProjection projectionFromMold(R_mold mold) {
+    public static MoldProjection projectionFromMold(Mold mold) {
         return new MoldProjection() {
             @Override public Long getId() { return mold.getId(); }
-            @Override public String getValmistaja() { return mold.getValmistaja().getValmistaja(); }
-            @Override public String getKiekko() { return mold.getKiekko(); }
-            @Override public Double getNopeus() { return mold.getNopeus(); }
-            @Override public Double getLiito() { return mold.getLiito(); }
-            @Override public Double getVakaus() { return mold.getVakaus(); }
-            @Override public Double getFeidi() { return mold.getFeidi(); }
+            @Override public String getValmistaja() { return mold.getManufacturer().getName(); }
+            @Override public String getKiekko() { return mold.getName(); }
+            @Override public Double getNopeus() { return mold.getSpeed(); }
+            @Override public Double getLiito() { return mold.getGlide(); }
+            @Override public Double getVakaus() { return mold.getStability(); }
+            @Override public Double getFeidi() { return mold.getFade(); }
         };
     }
 
-    public static PlasticProjection projectionFromPlastic(R_muovi plastic) {
+    public static PlasticProjection projectionFromPlastic(Plastic plastic) {
         return new PlasticProjection() {
             @Override public Long getId() { return plastic.getId(); }
-            @Override public String getValmistaja() { return plastic.getValmistaja().getValmistaja(); }
-            @Override public String getMuovi() { return plastic.getMuovi(); }
+            @Override public String getValmistaja() { return plastic.getManufacturer().getName(); }
+            @Override public String getMuovi() { return plastic.getName(); }
         };
     }
 
-    public static DiscProjection projectionFromDisc(Kiekot disc) {
+    public static DiscProjection projectionFromDisc(Disc disc) {
         return new DiscProjection() {
             @Override public Long getId() { return disc.getId(); }
-            @Override public String getOmistaja() { return disc.getMember().getUsername(); }
-            @Override public String getOwnerEmail() { return disc.getMember().getEmail(); }
-            @Override public String getValmistaja() { return disc.getMold().getValmistaja().getValmistaja(); }
-            @Override public Long getValmId() { return disc.getMold().getValmistaja().getId(); }
-            @Override public String getMold() { return disc.getMold().getKiekko(); }
+            @Override public String getOmistaja() { return disc.getOwner().getUsername(); }
+            @Override public String getOwnerEmail() { return disc.getOwner().getEmail(); }
+            @Override public String getValmistaja() { return disc.getMold().getManufacturer().getName(); }
+            @Override public Long getValmId() { return disc.getMold().getManufacturer().getId(); }
+            @Override public String getMold() { return disc.getMold().getName(); }
             @Override public Long getMoldId() { return disc.getMold().getId(); }
-            @Override public String getMuovi() { return disc.getMuovi().getMuovi(); }
-            @Override public Long getMuoviId() { return disc.getMuovi().getId(); }
-            @Override public String getVari() { return disc.getVari().getVari(); }
-            @Override public Long getVariId() { return disc.getVari().getId(); }
-            @Override public Double getNopeus() { return disc.getMold().getNopeus(); }
-            @Override public Double getLiito() { return disc.getMold().getLiito(); }
-            @Override public Double getVakaus() { return disc.getMold().getVakaus(); }
-            @Override public Double getFeidi() { return disc.getMold().getFeidi(); }
-            @Override public String getKuva() { return disc.getKuva(); }
-            @Override public Integer getPaino() { return disc.getPaino(); }
-            @Override public Integer getKunto() { return disc.getKunto(); }
-            @Override public Boolean getHohto() { return disc.getHohto(); }
-            @Override public Boolean getSpessu() { return disc.getSpessu(); }
+            @Override public String getMuovi() { return disc.getPlastic().getName(); }
+            @Override public Long getMuoviId() { return disc.getPlastic().getId(); }
+            @Override public String getVari() { return disc.getColor().getName(); }
+            @Override public Long getVariId() { return disc.getColor().getId(); }
+            @Override public Double getNopeus() { return disc.getMold().getSpeed(); }
+            @Override public Double getLiito() { return disc.getMold().getGlide(); }
+            @Override public Double getVakaus() { return disc.getMold().getStability(); }
+            @Override public Double getFeidi() { return disc.getMold().getFade(); }
+            @Override public String getKuva() { return disc.getImage(); }
+            @Override public Integer getPaino() { return disc.getWeight(); }
+            @Override public Integer getKunto() { return disc.getCondition(); }
+            @Override public Boolean getHohto() { return disc.getGlow(); }
+            @Override public Boolean getSpessu() { return disc.getSpecial(); }
             @Override public Boolean getDyed() { return disc.getDyed(); }
             @Override public Boolean getSwirly() { return disc.getSwirly(); }
-            @Override public Integer getTussit() { return disc.getTussit(); }
-            @Override public Boolean getMyynnissa() { return disc.getMyynnissa(); }
-            @Override public Integer getHinta() { return disc.getHinta(); }
-            @Override public String getMuuta() { return disc.getMuuta(); }
-            @Override public Boolean getLoytokiekko() { return disc.getLoytokiekko(); }
+            @Override public Integer getTussit() { return disc.getMarkings(); }
+            @Override public Boolean getMyynnissa() { return disc.getForSale(); }
+            @Override public Integer getHinta() { return disc.getPrice(); }
+            @Override public String getMuuta() { return disc.getDescription(); }
+            @Override public Boolean getLoytokiekko() { return disc.getLostAndFound(); }
             @Override public Boolean getItb() { return disc.getItb(); }
             @Override public Boolean getPublicDisc() { return disc.getPublicDisc(); }
             @Override public Boolean getLost() { return disc.getLost(); }

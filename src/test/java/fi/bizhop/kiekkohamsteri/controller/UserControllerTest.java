@@ -1,8 +1,9 @@
 package fi.bizhop.kiekkohamsteri.controller;
 
+import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.dto.UserUpdateDto;
-import fi.bizhop.kiekkohamsteri.model.Members;
+import fi.bizhop.kiekkohamsteri.dto.v1.in.UserUpdateDto;
+import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.DiscService;
 import fi.bizhop.kiekkohamsteri.service.UserService;
@@ -19,8 +20,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 
+import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
-import static fi.bizhop.kiekkohamsteri.TestUtils.*;
+import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -37,6 +39,8 @@ public class UserControllerTest extends SpringContextTestBase {
     @MockBean AuthService authService;
     @MockBean UserService userService;
     @MockBean DiscService discService;
+
+    BaseAdder adder = new BaseAdder("user", CONTROLLER);
 
     @ParameterizedTest
     @ValueSource(strings = {"", "1", "leaders", "me"})
@@ -74,7 +78,7 @@ public class UserControllerTest extends SpringContextTestBase {
         verify(userService, times(1)).getUsers();
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedTestUsers.json", response.getBody());
+        assertEqualsJson(adder.create("testUsers.json"), response.getBody());
     }
 
     @Test
@@ -85,7 +89,7 @@ public class UserControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl("1"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedTestUser.json", response.getBody());
+        assertEqualsJson(adder.create("testUser.json"), response.getBody());
     }
 
     @Test
@@ -96,7 +100,7 @@ public class UserControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl("1"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedTestUser.json", response.getBody());
+        assertEqualsJson(adder.create("testUser.json"), response.getBody());
     }
 
     @Test
@@ -113,7 +117,7 @@ public class UserControllerTest extends SpringContextTestBase {
         verify(userService, times(1)).updateDetails(TEST_USER, dto, false);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedTestUser.json", response.getBody());
+        assertEqualsJson(adder.create("testUser.json"), response.getBody());
     }
 
     @Test
@@ -152,7 +156,7 @@ public class UserControllerTest extends SpringContextTestBase {
         verify(userService, times(1)).updateDetails(TEST_USER, dto, true);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson("expectedTestUser.json", response.getBody());
+        assertEqualsJson(adder.create("testUser.json"), response.getBody());
     }
 
     @Test
@@ -179,16 +183,20 @@ public class UserControllerTest extends SpringContextTestBase {
     void givenAdminUser_whenSetUserLevel_thenSetLevel() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
-        var userWithLevel2 = new Members(TEST_EMAIL);
+        var userWithLevel2 = new User(TEST_EMAIL);
         userWithLevel2.setLevel(2);
-        when(userService.setUserLevel(1L,2)).thenReturn(userWithLevel2);
+
+        var dto = UserUpdateDto.builder().level(2).build();
+
+        when(userService.getUser(1L)).thenReturn(TEST_USER);
+        when(userService.updateDetails(TEST_USER, dto, true)).thenReturn(userWithLevel2);
 
         //called endpoint is deprecated
         var response = restTemplate.exchange(createUrl("1/level/2"), PATCH, null, String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
 
-        assertEqualsJson("expectedUserLevel2.json", response.getBody());
+        assertEqualsJson(adder.create("userLevel2.json"), response.getBody());
     }
 
 

@@ -1,0 +1,50 @@
+{
+  "content": [
+    {
+      "myynnissa": true,
+      "hinta": 0,
+      "muuta": "",
+      "loytokiekko": false,
+      "itb": false,
+      "publicDisc": false,
+      "lost": false,
+      "mold": "Test mold",
+      "muovi": "Test plastic",
+      "vari": "Test color",
+      "kuva": "",
+      "paino": 175,
+      "kunto": 10,
+      "hohto": false,
+      "spessu": false,
+      "dyed": false,
+      "swirly": false,
+      "tussit": 1,
+      "valmistaja": "Test manufacturer",
+      "nopeus": 0.0,
+      "liito": 0.0,
+      "vakaus": 0.0,
+      "feidi": 0.0,
+      "valmId": 1,
+      "moldId": 1,
+      "muoviId": 1,
+      "variId": 1,
+      "ownerEmail": "test@example.com",
+      "omistaja": "User",
+      "id": 7
+    }
+  ],
+  "pageable": "INSTANCE",
+  "last": true,
+  "totalPages": 1,
+  "totalElements": 1,
+  "first": true,
+  "number": 0,
+  "sort": {
+    "sorted": false,
+    "unsorted": true,
+    "empty": true
+  },
+  "numberOfElements": 1,
+  "size": 1,
+  "empty": false
+}

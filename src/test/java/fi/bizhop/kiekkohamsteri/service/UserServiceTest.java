@@ -1,8 +1,8 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.UserRepository;
-import fi.bizhop.kiekkohamsteri.dto.UserUpdateDto;
-import fi.bizhop.kiekkohamsteri.model.Members;
+import fi.bizhop.kiekkohamsteri.dto.v1.in.UserUpdateDto;
+import fi.bizhop.kiekkohamsteri.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -10,10 +10,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Optional;
-
 import static fi.bizhop.kiekkohamsteri.TestObjects.TEST_EMAIL;
-import static fi.bizhop.kiekkohamsteri.TestObjects.TEST_USER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -22,7 +19,7 @@ public class UserServiceTest {
     UserRepository userRepository;
 
     @Captor
-    ArgumentCaptor<Members> userCaptor;
+    ArgumentCaptor<User> userCaptor;
 
     @BeforeEach
     void init() {
@@ -31,7 +28,7 @@ public class UserServiceTest {
 
     @Test
     void givenPublicListFalse_whenUpdateDetails_thenUpdateDetails() {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
 
         var dto = UserUpdateDto.builder()
                 .etunimi("TEST")
@@ -45,14 +42,14 @@ public class UserServiceTest {
         verify(userRepository, never()).makeDiscsPublic(any());
 
         var saved = userCaptor.getValue();
-        assertEquals("TEST", saved.getEtunimi());
-        assertEquals("USER", saved.getSukunimi());
+        assertEquals("TEST", saved.getFirstName());
+        assertEquals("USER", saved.getLastName());
         assertFalse(saved.getPublicList());
     }
 
     @Test
     void givenPublicListTrue_whenUpdateDetails_thenUpdateDetailsAndMakeDiscsPublic() {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
 
         var dto = UserUpdateDto.builder()
                 .etunimi("TEST")
@@ -66,14 +63,14 @@ public class UserServiceTest {
         verify(userRepository, times(1)).makeDiscsPublic(user);
 
         var saved = userCaptor.getValue();
-        assertEquals("TEST", saved.getEtunimi());
-        assertEquals("USER", saved.getSukunimi());
+        assertEquals("TEST", saved.getFirstName());
+        assertEquals("USER", saved.getLastName());
         assertTrue(saved.getPublicList());
     }
 
     @Test
     void givenAdminRequest_whenUpdateDetailsWithLevel_thenUpdateDetailsWithLevel() {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
 
         var dto = UserUpdateDto.builder().level(2).build();
 
@@ -87,7 +84,7 @@ public class UserServiceTest {
 
     @Test
     void givenNonAdminRequest_whenUpdateDetailsWithLevel_thenDontUpdateLevel() {
-        var user = new Members(TEST_EMAIL);
+        var user = new User(TEST_EMAIL);
 
         var dto = UserUpdateDto.builder().level(2).build();
 
