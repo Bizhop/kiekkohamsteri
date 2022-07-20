@@ -8,8 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+import static javax.servlet.http.HttpServletResponse.*;
 
 @RequiredArgsConstructor
 public class AdminUserFilter implements Filter {
@@ -20,16 +19,20 @@ public class AdminUserFilter implements Filter {
         var httpServletRequest = (HttpServletRequest) servletRequest;
         var httpServletResponse = (HttpServletResponse) servletResponse;
 
-        var user = authService.getUser(httpServletRequest);
-        httpServletRequest.setAttribute("user", user);
-
-        if(user == null) {
-            httpServletResponse.sendError(SC_UNAUTHORIZED);
-            return;
+        if("OPTIONS".equals(httpServletRequest.getMethod())) {
+            httpServletResponse.setStatus(SC_OK);
         }
-        else if(user.getLevel() != 2) {
-            httpServletResponse.sendError(SC_FORBIDDEN);
-            return;
+        else {
+            var user = authService.getUser(httpServletRequest);
+            httpServletRequest.setAttribute("user", user);
+
+            if (user == null) {
+                httpServletResponse.sendError(SC_UNAUTHORIZED);
+                return;
+            } else if (user.getLevel() != 2) {
+                httpServletResponse.sendError(SC_FORBIDDEN);
+                return;
+            }
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);

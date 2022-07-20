@@ -21,11 +21,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
@@ -54,6 +58,8 @@ public class DiscControllerTest extends SpringContextTestBase {
     @MockBean UUIDProvider uuidProvider;
 
     @Captor ArgumentCaptor<User> userCaptor;
+
+    @Captor ArgumentCaptor<Pageable> pageableCaptor;
 
     BaseAdder adder = new BaseAdder("disc", CONTROLLER);
 
@@ -516,6 +522,26 @@ public class DiscControllerTest extends SpringContextTestBase {
 
         assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
         assertNull(response.getBody());
+    }
+
+    @Test
+    void v1CompatibilityTest() {
+        when(authService.getUser(any())).thenReturn(TEST_USER);
+
+        var params = List.of(
+                "size=1000",
+                "sort=mold.valmistaja.valmistaja,asc",
+                "sort=mold.nopeus,asc",
+                "sort=muovi.muovi,asc");
+
+        var endpoint = String.format("?%s", String.join("&", params));
+
+        restTemplate.getForEntity(createUrl(endpoint), String.class);
+
+        verify(discService, times(1)).getDiscs(eq(TEST_USER), pageableCaptor.capture());
+
+        var sorts = pageableCaptor.getValue().getSort().get().collect(Collectors.toList());
+        assertEqualsJson(adder.create("compatibilitySorts.json"), sorts);
     }
 
     //HELPER METHODS

@@ -31,14 +31,12 @@ public class TestUtils {
     public static final String OTHER_DISC_KEY = "otherDisc";
 
     public static void assertEqualsJson(String filename, String content) {
-        System.out.println(content);
         var expected = readFile(filename);
         assertEqualsJsonInternal(expected, content);
     }
 
     public static void assertEqualsJson(String filename, Object contentObject) {
         var content = toJson(contentObject);
-        System.out.println(content);
         var expected = readFile(filename);
         assertEqualsJsonInternal(expected, content);
     }

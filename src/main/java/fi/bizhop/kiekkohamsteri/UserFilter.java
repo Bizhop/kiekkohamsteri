@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 @RequiredArgsConstructor
@@ -19,12 +20,17 @@ public class UserFilter implements Filter {
         var httpServletRequest = (HttpServletRequest) servletRequest;
         var httpServletResponse = (HttpServletResponse) servletResponse;
 
-        var user = authService.getUser(httpServletRequest);
-        httpServletRequest.setAttribute("user", user);
+        if("OPTIONS".equals(httpServletRequest.getMethod())) {
+            httpServletResponse.setStatus(SC_OK);
+        }
+        else {
+            var user = authService.getUser(httpServletRequest);
+            httpServletRequest.setAttribute("user", user);
 
-        if(user == null) {
-            httpServletResponse.sendError(SC_UNAUTHORIZED);
-            return;
+            if (user == null) {
+                httpServletResponse.sendError(SC_UNAUTHORIZED);
+                return;
+            }
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);

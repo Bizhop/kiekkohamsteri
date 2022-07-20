@@ -1,0 +1,14 @@
+[
+  {
+    "direction": "ASC",
+    "property": "mold.manufacturer.name"
+  },
+  {
+    "direction": "ASC",
+    "property": "mold.speed"
+  },
+  {
+    "direction": "ASC",
+    "property": "plastic.name"
+  }
+]

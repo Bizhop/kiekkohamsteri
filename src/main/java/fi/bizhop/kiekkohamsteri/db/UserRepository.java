@@ -20,11 +20,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
 	@Modifying(clearAutomatically = true, flushAutomatically = true)
 	@Query("update Disc k set k.publicDisc = true where k.owner = ?1")
 	void makeDiscsPublic(User user);
-
-	//TODO: move this as part of user update
-	@Modifying(clearAutomatically = true, flushAutomatically = true)
-	@Query("update User u set u.level = ?2 where u.id = ?1")
-	void updateUserLevel(Long id, Integer level);
 	
 	Integer countByCreatedAtBetween(Date beginDate, Date endDate);
 }

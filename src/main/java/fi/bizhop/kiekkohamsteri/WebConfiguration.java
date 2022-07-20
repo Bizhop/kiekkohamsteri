@@ -1,27 +1,28 @@
 package fi.bizhop.kiekkohamsteri;
 
 import fi.bizhop.kiekkohamsteri.service.AuthService;
+import liquibase.pro.packaged.O;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@EnableWebMvc
 @RequiredArgsConstructor
-public class WebConfiguration {
+public class WebConfiguration implements WebMvcConfigurer {
     final AuthService authService;
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(@NonNull CorsRegistry registry) {
-                registry.addMapping("/**").allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
-            }
-        };
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+                .allowedOrigins("*")
+                .allowedHeaders("*");
     }
 
     @Bean
@@ -47,6 +48,17 @@ public class WebConfiguration {
         bean.addUrlPatterns("/api/molds/*");
         bean.addUrlPatterns("/api/muovit/*");
         bean.setOrder(2);
+
+        return bean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<CompatibilityFilter> compatibilityFilter() {
+        var bean = new FilterRegistrationBean<CompatibilityFilter>();
+
+        bean.setFilter(new CompatibilityFilter());
+        bean.addUrlPatterns("/api/kiekot/*");
+        bean.setOrder(3);
 
         return bean;
     }

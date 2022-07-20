@@ -51,6 +51,8 @@ public class AuthService {
 
 	private String getEmail(HttpServletRequest request) {
         var token = request.getHeader(HEADER_STRING);
+		if(token == null) return null;
+
 		String userEmail = null;
         if(token.startsWith(JWTAuthentication.JWT_TOKEN_PREFIX)) {
             userEmail = jwtAuthentication.getUserEmail(token);
