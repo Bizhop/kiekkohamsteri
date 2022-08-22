@@ -7,7 +7,9 @@ App backend for disc golf catalogue
 - Docker with compose plugin
 
 # Usage
-- build: `mvn clean package`
+For quick build and run use `./buildAndRun.sh`
+### Details:
+- build: `mvn clean package` or `mvn clean package -DskipTests` without tests
 - docker build: `docker build -t kiekkohamsteri-backend .`
 - run: `docker compose up`
 
