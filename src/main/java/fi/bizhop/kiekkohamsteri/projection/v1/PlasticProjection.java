@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 public interface PlasticProjection {
 	Long getId();
 
-	@Value("#{target.getManufacturer().name()}")
+	@Value("#{target.getManufacturer().getName()}")
 	String getValmistaja();
 
 	@Value("#{target.getName()}")
