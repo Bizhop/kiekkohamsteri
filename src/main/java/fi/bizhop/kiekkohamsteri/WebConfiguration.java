@@ -58,6 +58,8 @@ public class WebConfiguration implements WebMvcConfigurer {
 
         bean.setFilter(new CompatibilityFilter());
         bean.addUrlPatterns("/api/kiekot/*");
+        bean.addUrlPatterns("/api/muovit/*");
+        bean.addUrlPatterns("/api/molds/*");
         bean.setOrder(3);
 
         return bean;

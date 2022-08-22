@@ -10,15 +10,19 @@ import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.ManufacturerService;
 import fi.bizhop.kiekkohamsteri.service.MoldService;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
@@ -39,6 +43,8 @@ public class MoldControllerTest extends SpringContextTestBase {
     @MockBean AuthService authService;
     @MockBean MoldService moldService;
     @MockBean ManufacturerService manufacturerService;
+
+    @Captor ArgumentCaptor<Pageable> pageableCaptor;
 
     BaseAdder adder = new BaseAdder("mold", CONTROLLER);
 
@@ -169,11 +175,25 @@ public class MoldControllerTest extends SpringContextTestBase {
         assertNull(response.getBody());
     }
 
+    @Test
+    void v1CompatibilityTest() {
+        when(authService.getUser(any())).thenReturn(ADMIN_USER);
+
+        restTemplate.getForEntity(createUrl("?size=1000&sort=kiekko,asc"), String.class);
+
+        verify(moldService, times(1)).getMolds(pageableCaptor.capture());
+
+        var sorts = pageableCaptor.getValue().getSort().get().collect(Collectors.toList());
+        assertEqualsJson(adder.create("compatibilitySorts.json"), sorts);
+    }
+
 
     //HELPER METHODS
 
-    private String createUrl() {
-        return String.format("http://localhost:%d/api/molds/", port);
+    private String createUrl() { return createUrl(""); }
+
+    private String createUrl(String params) {
+        return String.format("http://localhost:%d/api/molds/%s", port, params);
     }
 
     private Mold getTestMold(Manufacturer manufacturer) {
