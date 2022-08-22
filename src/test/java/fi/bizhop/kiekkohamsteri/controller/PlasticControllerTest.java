@@ -3,23 +3,26 @@ package fi.bizhop.kiekkohamsteri.controller;
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.dto.v1.in.PlasticCreateDto;
-import fi.bizhop.kiekkohamsteri.model.User;
-import fi.bizhop.kiekkohamsteri.model.Plastic;
 import fi.bizhop.kiekkohamsteri.model.Manufacturer;
+import fi.bizhop.kiekkohamsteri.model.Plastic;
+import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.ManufacturerService;
 import fi.bizhop.kiekkohamsteri.service.PlasticService;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.io.IOException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
@@ -39,6 +42,8 @@ public class PlasticControllerTest extends SpringContextTestBase {
     @MockBean AuthService authService;
     @MockBean PlasticService plasticService;
     @MockBean ManufacturerService manufacturerService;
+
+    @Captor ArgumentCaptor<Pageable> pageableCaptor;
 
     BaseAdder adder = new BaseAdder("plastic", CONTROLLER);
 
@@ -83,7 +88,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenValidRequestWithoutManufacturerId_whenGetPlastics_thenReturnAllPlastics() throws IOException {
+    void givenValidRequestWithoutManufacturerId_whenGetPlastics_thenReturnAllPlastics() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
         var page = new PageImpl<>(getPlastics());
@@ -100,7 +105,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenValidRequestWithManufacturerId_whenGetPlastics_thenReturnPlasticsByManufacturer() throws IOException {
+    void givenValidRequestWithManufacturerId_whenGetPlastics_thenReturnPlasticsByManufacturer() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
         var manufacturer = MANUFACTURERS.get(0);
@@ -135,7 +140,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenValidRequest_whenCreatePlastic_thenCreatePlastic() throws IOException {
+    void givenValidRequest_whenCreatePlastic_thenCreatePlastic() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
         var manufacturer = MANUFACTURERS.get(0);
@@ -169,11 +174,27 @@ public class PlasticControllerTest extends SpringContextTestBase {
         assertNull(response.getBody());
     }
 
+    @Test
+    void v1CompatibilityTest() {
+        when(authService.getUser(any())).thenReturn(ADMIN_USER);
+
+        restTemplate.getForEntity(createUrl("?size=1000&sort=muovi,asc"), String.class);
+
+        verify(plasticService, times(1)).getPlastics(pageableCaptor.capture());
+
+        var sorts = pageableCaptor.getValue().getSort().get().collect(Collectors.toList());
+        assertEqualsJson(adder.create("compatibilitySorts.json"), sorts);
+    }
+
 
     //HELPER METHODS
 
     private String createUrl() {
-        return String.format("http://localhost:%d/api/muovit/", port);
+        return createUrl("");
+    }
+
+    private String createUrl(String params) {
+        return String.format("http://localhost:%d/api/muovit/%s", port, params);
     }
 
     private Plastic getTestPlastic(Manufacturer manufacturer) {

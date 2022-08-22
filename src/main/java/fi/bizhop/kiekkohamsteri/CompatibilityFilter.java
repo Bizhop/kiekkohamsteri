@@ -19,6 +19,7 @@ public class CompatibilityFilter implements Filter {
             CONVERSIONS.put("mold.vakaus", "mold.stability");
             CONVERSIONS.put("mold.feidi", "mold.fade");
             CONVERSIONS.put("mold.kiekko", "mold.name");
+            CONVERSIONS.put("kiekko", "name");
 
             //disc
             CONVERSIONS.put("paino", "weight");
@@ -29,6 +30,7 @@ public class CompatibilityFilter implements Filter {
 
             //plastic
             CONVERSIONS.put("muovi.muovi", "plastic.name");
+            CONVERSIONS.put("muovi", "name");
         }
 
         public FilteredRequest(ServletRequest request) {
