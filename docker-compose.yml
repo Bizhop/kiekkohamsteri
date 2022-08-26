@@ -21,3 +21,4 @@ services:
      - CLOUDINARY_URL
      - HAMSTERI_JWT_SECRET
      - HAMSTERI_GOOGLE_CLIENT_ID
+     - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/hamsteri?user=hamsteri&password=hamsteri
