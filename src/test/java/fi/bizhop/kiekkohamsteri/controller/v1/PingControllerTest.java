@@ -1,4 +1,4 @@
-package fi.bizhop.kiekkohamsteri.controller;
+package fi.bizhop.kiekkohamsteri.controller.v1;
 
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.service.AuthService;

@@ -6,6 +6,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "members")
@@ -42,6 +44,21 @@ public class User extends TimestampBase {
 	
 	@Column(name="disc_count")
 	private Integer discCount;
+
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(
+			name = "users_roles",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "role_id"))
+	private Set<Role> roles;
+
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(
+			name = "users_groups",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "group_id")
+	)
+	private Set<Group> groups;
 	
 	public User(String userEmail) {
 		this.username = "New User";
@@ -53,6 +70,8 @@ public class User extends TimestampBase {
 		this.publicList = false;
 		this.publicDiscCount = false;
 		this.discCount = 0;
+		this.roles = new HashSet<>();
+		this.groups = new HashSet<>();
 	}
 
 	public void addDisc() {

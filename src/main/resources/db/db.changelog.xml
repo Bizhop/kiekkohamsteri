@@ -396,4 +396,75 @@
             onUpdate="CASCADE"
             onDelete="CASCADE" />
     </changeSet>
+	<changeSet id="addUserRolesTable" author="Ville">
+		<createTable tableName="roles">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="roles_pkey" />
+			</column>
+			<column name="name" type="VARCHAR(20)" />
+			<column name="group_id" type="INT" />
+		</createTable>
+		<createTable tableName="users_roles">
+			<column name="user_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="role_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<addForeignKeyConstraint
+				baseTableName="users_roles"
+				baseColumnNames="user_id"
+				constraintName="users_roles_user_id_fk"
+				referencedTableName="members"
+				referencedColumnNames="id"
+				onDelete="CASCADE"
+		/>
+		<addForeignKeyConstraint
+				baseTableName="users_roles"
+				baseColumnNames="role_id"
+				constraintName="users_roles_role_id_fk"
+				referencedTableName="roles"
+				referencedColumnNames="id"
+				onDelete="CASCADE"
+		/>
+	</changeSet>
+	<changeSet id="addUserGroupsTable" author="Ville">
+		<createTable tableName="groups">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="groups_pkey" />
+			</column>
+			<column name="name" type="VARCHAR(50)" />
+		</createTable>
+		<createTable tableName="users_groups">
+			<column name="user_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+			<column name="group_id" type="INT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<addForeignKeyConstraint
+				baseTableName="users_groups"
+				baseColumnNames="user_id"
+				constraintName="users_roles_group_id_fk"
+				referencedTableName="groups"
+				referencedColumnNames="id"
+				onDelete="CASCADE"
+		/>
+		<addForeignKeyConstraint
+				baseTableName="users_groups"
+				baseColumnNames="group_id"
+				constraintName="users_groups_user_id_fk"
+				referencedTableName="members"
+				referencedColumnNames="id"
+				onDelete="CASCADE"
+		/>
+	</changeSet>
+	<changeSet id="insertAdminRole" author="Ville">
+		<insert tableName="roles">
+			<column name="id" value="1" />
+			<column name="name" value="ADMIN" />
+		</insert>
+	</changeSet>
 </databaseChangeLog>

@@ -28,11 +28,17 @@ public class WebConfiguration implements WebMvcConfigurer {
         var bean = new FilterRegistrationBean<UserFilter>();
 
         bean.setFilter(new UserFilter(authService));
+
+        //V1
         bean.addUrlPatterns("/api/ostot/*");
         bean.addUrlPatterns("/api/kiekot/*");
         bean.addUrlPatterns("/api/user/*");
         bean.addUrlPatterns("/api/stats/*");
         bean.addUrlPatterns("/api/dropdown/*");
+
+        //V2
+        bean.addUrlPatterns("/api/v2/user/*");
+
         bean.setOrder(1);
 
         return bean;

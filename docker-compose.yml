@@ -13,7 +13,7 @@ services:
   backend:
     image: kiekkohamsteri-backend
     ports:
-     - "8181:8181"
+     - "8080:8080"
     depends_on:
      - db
     container_name: kiekkohamsteri-backend
@@ -21,4 +21,6 @@ services:
      - CLOUDINARY_URL
      - HAMSTERI_JWT_SECRET
      - HAMSTERI_GOOGLE_CLIENT_ID
-     - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/hamsteri?user=hamsteri&password=hamsteri
+     - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/hamsteri
+     - SPRING_DATASOURCE_USERNAME=hamsteri
+     - SPRING_DATASOURCE_PASSWORD=hamsteri
