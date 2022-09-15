@@ -1,0 +1,17 @@
+{
+  "username": "User",
+  "email": "test@example.com",
+  "firstName": "New",
+  "lastName": "User",
+  "pdgaNumber": 0,
+  "jwt": null,
+  "publicList": false,
+  "publicDiscCount": false,
+  "discCount": 0,
+  "groups": [
+    {
+      "id": 1,
+      "name": "group 1"
+    }
+  ]
+}

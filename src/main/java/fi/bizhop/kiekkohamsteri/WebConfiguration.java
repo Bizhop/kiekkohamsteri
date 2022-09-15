@@ -38,6 +38,7 @@ public class WebConfiguration implements WebMvcConfigurer {
 
         //V2
         bean.addUrlPatterns("/api/v2/user/*");
+        bean.addUrlPatterns("/api/v2/groups/*");
 
         bean.setOrder(1);
 
@@ -49,8 +50,11 @@ public class WebConfiguration implements WebMvcConfigurer {
         var bean = new FilterRegistrationBean<AdminUserFilter>();
 
         bean.setFilter(new AdminUserFilter(authService));
+
+        //V1
         bean.addUrlPatterns("/api/molds/*");
         bean.addUrlPatterns("/api/muovit/*");
+
         bean.setOrder(2);
 
         return bean;

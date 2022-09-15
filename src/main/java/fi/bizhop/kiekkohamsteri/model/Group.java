@@ -1,17 +1,14 @@
 package fi.bizhop.kiekkohamsteri.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
 @Table(name = "groups")
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
 @ToString
 public class Group {
@@ -20,4 +17,8 @@ public class Group {
     private Long id;
 
     private String name;
+
+    public Group(String name) {
+        this.name = name;
+    }
 }

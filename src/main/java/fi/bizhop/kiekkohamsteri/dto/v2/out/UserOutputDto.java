@@ -26,6 +26,8 @@ public class UserOutputDto {
     Set<RoleDto> roles;
     Set<GroupDto> groups;
 
+    String error;
+
     public static UserOutputDto fromDb(User input) {
         if(input == null) return null;
         return UserOutputDto.builder()

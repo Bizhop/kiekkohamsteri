@@ -13,10 +13,15 @@ import javax.persistence.*;
 @ToString
 public class Role {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
     private Long groupId;
+
+    public Role(String name, Long groupId) {
+        this.name = name;
+        this.groupId = groupId;
+    }
 }

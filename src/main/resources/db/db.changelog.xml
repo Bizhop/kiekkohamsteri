@@ -463,8 +463,48 @@
 	</changeSet>
 	<changeSet id="insertAdminRole" author="Ville">
 		<insert tableName="roles">
-			<column name="id" value="1" />
 			<column name="name" value="ADMIN" />
 		</insert>
+	</changeSet>
+	<changeSet id="createGroupRequestTable" author="Ville">
+		<createTable tableName="group_requests">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="group_request_pkey" />
+			</column>
+			<column name="group_id" type="INT">
+				<constraints
+						nullable="false"
+						foreignKeyName="group_request_group_id_fk"
+						referencedTableName="groups"
+						referencedColumnNames="id"
+				/>
+			</column>
+			<column name="source_user_id" type="INT">
+				<constraints
+						nullable="false"
+						foreignKeyName="group_request_source_user_fk"
+						referencedTableName="members"
+						referencedColumnNames="id"
+				/>
+			</column>
+			<column name="target_user_id" type="INT">
+				<constraints
+					foreignKeyName="group_request_target_user_fk"
+					referencedTableName="members"
+					referencedColumnNames="id"
+				/>
+			</column>
+			<column name="type" type="VARCHAR(20)">
+				<constraints nullable="false" />
+			</column>
+			<column name="status" type="VARCHAR(20)">
+				<constraints nullable="false" />
+			</column>
+			<column name="info" type="VARCHAR(200)" />
+			<column name="created_at" type="DATETIME" defaultValueDate="${now}"  >
+				<constraints nullable="false" />
+			</column>
+			<column name="updated_at" type="DATETIME" />
+		</createTable>
 	</changeSet>
 </databaseChangeLog>

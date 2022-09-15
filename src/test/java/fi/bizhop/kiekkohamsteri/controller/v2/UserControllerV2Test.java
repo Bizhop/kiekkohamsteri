@@ -8,6 +8,8 @@ import fi.bizhop.kiekkohamsteri.service.DiscService;
 import fi.bizhop.kiekkohamsteri.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +18,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.stream.Stream;
 
 import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
@@ -38,7 +42,7 @@ public class UserControllerV2Test extends SpringContextTestBase {
     @MockBean UserService userService;
     @MockBean DiscService discService;
 
-    BaseAdder adder = new BaseAdder("user", CONTROLLER);
+    BaseAdder adder = new BaseAdder("user/v2", CONTROLLER);
 
     @ParameterizedTest
     @ValueSource(strings = {"", "1", "leaders", "me"})
@@ -79,7 +83,8 @@ public class UserControllerV2Test extends SpringContextTestBase {
         assertEqualsJson(adder.create("testUsers.json"), response.getBody());
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("adminUsers")
     void givenAdminUser_whenGetGroupUsers_thenGetGroupUsers() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
         when(userService.getUsersByGroupId(1L)).thenReturn(GROUP_USERS);
@@ -103,23 +108,6 @@ public class UserControllerV2Test extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(""), String.class);
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
-    }
-
-    @Test
-    void givenGroupAdminUser_whenGetGroupUsers_thenGetGroupUsers() {
-        when(authService.getUser(any())).thenReturn(GROUP_ADMIN_USER);
-        when(userService.getUsersByGroupId(1L)).thenReturn(GROUP_USERS);
-
-        var response = restTemplate.getForEntity(createUrl("?groupId=1"), String.class);
-
-        //verify disc counts updated
-        verify(discService, times(1)).updateDiscCounts(GROUP_USERS);
-        verify(userService, times(1)).saveUsers(GROUP_USERS);
-
-        verify(userService, times(1)).getUsersByGroupId(1L);
-
-        assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson(adder.create("groupUsers.json"), response.getBody());
     }
 
     @Test
@@ -214,5 +202,12 @@ public class UserControllerV2Test extends SpringContextTestBase {
 
     private String createUrl(String endpoint) {
         return String.format("http://localhost:%d/api/v2/user/%s", port, endpoint);
+    }
+
+    private static Stream<Arguments> adminUsers() {
+        return Stream.of(
+                Arguments.of(ADMIN_USER),
+                Arguments.of(GROUP_ADMIN_USER)
+        );
     }
 }

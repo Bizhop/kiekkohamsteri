@@ -34,51 +34,40 @@ public class UserRepositoryTest extends SpringContextTestBase {
 
     BaseAdder adder = new BaseAdder("user", REPOSITORY);
 
+    private static Group group1 = null;
+    private static Group group2 = null;
+    private static Role adminRole = null;
+    private static Role groupAdminRole = null;
+    private static boolean setupUsers = true;
+
     @BeforeEach
     void setupTestData() {
-        userRepository.deleteAll();
-        groupRepository.deleteAll();
-        roleRepository.deleteAll();
+        if(setupUsers) {
+            group1 = groupRepository.save(new Group("group 1"));
+            group2 = groupRepository.save(new Group("group 2"));
+            adminRole = roleRepository.findById(1L).orElseThrow();
+            groupAdminRole = roleRepository.save(new Role(USER_ROLE_GROUP_ADMIN, group2.getId()));
 
-        var testUser = new User(TEST_EMAIL);
-        var otherUser = new User(OTHER_EMAIL);
+            var testUser = new User(TEST_EMAIL);
+            var otherUser = new User(OTHER_EMAIL);
 
-        var group1 = new Group();
-        group1.setId(1L);
-        group1.setName("group 1");
-        group1 = groupRepository.save(group1);
+            testUser.setUsername("test user");
+            testUser.setDiscCount(55);
+            testUser.setPublicDiscCount(true);
+            testUser.setPublicList(true);
+            testUser.setGroups(Set.of(group1));
+            testUser.setRoles(Set.of(adminRole));
 
-        var group2 = new Group();
-        group2.setId(2L);
-        group2.setName("group 2");
-        group2 = groupRepository.save(group2);
+            otherUser.setUsername("other user");
+            otherUser.setDiscCount(88);
+            otherUser.setPublicDiscCount(false);
+            otherUser.setPublicList(false);
+            otherUser.setGroups(Set.of(group2));
+            otherUser.setRoles(Set.of(groupAdminRole));
 
-        var adminRole = new Role();
-        adminRole.setId(1L);
-        adminRole.setName(USER_ROLE_ADMIN);
-        roleRepository.save(adminRole);
-
-        var groupAdminRole = new Role();
-        groupAdminRole.setId(2L);
-        groupAdminRole.setName(USER_ROLE_GROUP_ADMIN);
-        groupAdminRole.setGroupId(group2.getId());
-        roleRepository.save(groupAdminRole);
-
-        testUser.setUsername("test user");
-        testUser.setDiscCount(55);
-        testUser.setPublicDiscCount(true);
-        testUser.setPublicList(true);
-        testUser.setGroups(Set.of(group1));
-        testUser.setRoles(Set.of(adminRole));
-
-        otherUser.setUsername("other user");
-        otherUser.setDiscCount(88);
-        otherUser.setPublicDiscCount(false);
-        otherUser.setPublicList(false);
-        otherUser.setGroups(Set.of(group2));
-        otherUser.setRoles(Set.of(groupAdminRole));
-
-        userRepository.saveAll(List.of(testUser, otherUser));
+            userRepository.saveAll(List.of(testUser, otherUser));
+            setupUsers = false;
+        }
     }
 
     @Test
@@ -122,7 +111,7 @@ public class UserRepositoryTest extends SpringContextTestBase {
 
     @Test
     void findAllByGroupsTest() {
-        var group = groupRepository.findById(1L).orElseThrow();
+        var group = groupRepository.findById(group1.getId()).orElseThrow();
 
         var result = userRepository.findAllByGroups(group);
 
@@ -133,9 +122,6 @@ public class UserRepositoryTest extends SpringContextTestBase {
 
     @Test
     void findAllByRolesTest() {
-        var adminRole = roleRepository.findById(1L).orElseThrow();
-        var groupAdminRole = roleRepository.findById(2L).orElseThrow();
-
         var admins = userRepository.findAllByRoles(adminRole);
         var groupAdmins = userRepository.findAllByRoles(groupAdminRole);
 
@@ -153,5 +139,28 @@ public class UserRepositoryTest extends SpringContextTestBase {
         var groupAdminUserRole = groupAdmin.getRoles().stream().findFirst().orElseThrow();
         assertEquals(USER_ROLE_GROUP_ADMIN, groupAdminUserRole.getName());
         assertEquals(2L, groupAdminUserRole.getGroupId());
+    }
+
+    @Test
+    void testSetsAreMutable() {
+        var user = userRepository.findByEmail(TEST_EMAIL);
+
+        var initialGroups = user.getGroups().size();
+        var initialRoles = user.getGroups().size();
+
+        var group = new Group("temp");
+        user.getGroups().add(group);
+
+        var role = new Role("temp", null);
+        user.getRoles().add(role);
+
+        assertEquals(initialGroups + 1, user.getGroups().size());
+        assertEquals(initialRoles + 1, user.getRoles().size());
+
+        user.getGroups().remove(group);
+        user.getRoles().remove(role);
+
+        assertEquals(initialGroups, user.getGroups().size());
+        assertEquals(initialRoles, user.getRoles().size());
     }
 }

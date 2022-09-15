@@ -11,6 +11,9 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_ADMIN;
+import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_GROUP_ADMIN;
+
 public class TestObjects {
     public static final String TEST_UUID = "d2b62756-378f-487d-ba25-0b0ff287d1d8";
     public static final String SHOULD_THROW_EXCEPTION = "Previous call should throw Exception";
@@ -31,6 +34,7 @@ public class TestObjects {
     public static final List<Disc> DISCS;
     public static final List<User> USERS;
     public static final List<User> GROUP_USERS;
+    public static final List<Group> GROUPS;
 
     private static final Predicate<Disc> isNotLost = disc -> Boolean.FALSE.equals(disc.getLost());
     private static final Predicate<Disc> isLost = disc -> Boolean.TRUE.equals(disc.getLost());
@@ -52,12 +56,17 @@ public class TestObjects {
         GROUP_ADMIN_USER.setUsername("Group admin");
 
         ADMIN_USER.setLevel(2);
-        ADMIN_USER.setRoles(Set.of(new Role(1L, Utils.USER_ROLE_ADMIN, null)));
+        ADMIN_USER.setRoles(Set.of(new Role(1L, USER_ROLE_ADMIN, null)));
 
-        GROUP_ADMIN_USER.setRoles(Set.of(new Role(2L, Utils.USER_ROLE_GROUP_ADMIN, 1L)));
+        GROUP_ADMIN_USER.setRoles(Set.of(new Role(2L, USER_ROLE_GROUP_ADMIN, 1L)));
 
         USERS = List.of(TEST_USER, OTHER_USER, ADMIN_USER, GROUP_ADMIN_USER);
         GROUP_USERS = List.of(TEST_USER, GROUP_ADMIN_USER);
+
+        GROUPS = List.of(new Group(1L, "group 1"), new Group(2L, "group 2"));
+
+        TEST_USER.getGroups().add(GROUPS.get(0));
+        GROUP_ADMIN_USER.getGroups().add(GROUPS.get(0));
 
         var discmania = createManufacturer(0L, "Discmania");
         var innova = createManufacturer(1L, "Innova");

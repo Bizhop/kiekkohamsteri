@@ -12,8 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static fi.bizhop.kiekkohamsteri.TestObjects.OTHER_USER;
-import static fi.bizhop.kiekkohamsteri.TestObjects.TEST_USER;
+import static fi.bizhop.kiekkohamsteri.TestObjects.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -70,13 +69,8 @@ public class TestUtils {
         }
     }
 
-    public static Map<String, Object> initBaseData(UserRepository userRepository, DiscRepository discRepository, ManufacturerRepository manufacturerRepository, MoldRepository moldRepository, ColorRepository colorRepository, PlasticRepository plasticRepository) {
-        discRepository.deleteAll();
-        userRepository.deleteAll();
-        moldRepository.deleteAll();
-        colorRepository.deleteAll();
-        plasticRepository.deleteAll();
-        manufacturerRepository.deleteAll();
+    public static Map<String, Object> initBaseData(UserRepository userRepository, DiscRepository discRepository, ManufacturerRepository manufacturerRepository, MoldRepository moldRepository, ColorRepository colorRepository, PlasticRepository plasticRepository, GroupRepository groupRepository) {
+        groupRepository.save(GROUPS.get(0));
 
         var testUser = userRepository.save(TEST_USER);
         var otherUser = userRepository.save(OTHER_USER);
