@@ -29,6 +29,7 @@ public class DiscRepositoryTest extends SpringContextTestBase {
     @Autowired MoldRepository moldRepository;
     @Autowired ColorRepository colorRepository;
     @Autowired PlasticRepository plasticRepository;
+    @Autowired GroupRepository groupRepository;
 
     static Map<String, Object> testDataContainer = null;
 
@@ -38,7 +39,7 @@ public class DiscRepositoryTest extends SpringContextTestBase {
     void setupTestData() {
         //kind of dirty hack to make this run only once with autowired repos
         if(testDataContainer == null) {
-            testDataContainer = initBaseData(userRepository, discRepository, manufacturerRepository, moldRepository, colorRepository, plasticRepository);
+            testDataContainer = initBaseData(userRepository, discRepository, manufacturerRepository, moldRepository, colorRepository, plasticRepository, groupRepository);
             discRepository.deleteAll();
 
             var testUser = (User) testDataContainer.get(TEST_USER_KEY);

@@ -22,7 +22,7 @@ import javax.persistence.Table;
 @ToString
 public class Disc extends TimestampBase {
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	@ManyToOne

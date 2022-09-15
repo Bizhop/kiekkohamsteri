@@ -1,4 +1,4 @@
-package fi.bizhop.kiekkohamsteri.controller;
+package fi.bizhop.kiekkohamsteri.controller.v1;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
@@ -82,7 +82,7 @@ public class UserControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenAdminUser_whenGetDetailsForOtherUser_thenGetDetails() throws IOException {
+    void givenAdminUser_whenGetDetailsForOtherUser_thenGetDetails() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
         when(userService.getUser(1L)).thenReturn(TEST_USER);
 
@@ -93,7 +93,7 @@ public class UserControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenUser_whenGetDetailsForSelf_thenGetDetails() throws IOException {
+    void givenUser_whenGetDetailsForSelf_thenGetDetails() {
         when(authService.getUser(any())).thenReturn(TEST_USER);
         when(userService.getUser(1L)).thenReturn(TEST_USER);
 

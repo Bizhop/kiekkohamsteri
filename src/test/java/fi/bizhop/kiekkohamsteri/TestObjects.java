@@ -3,11 +3,16 @@ package fi.bizhop.kiekkohamsteri;
 import fi.bizhop.kiekkohamsteri.model.*;
 import fi.bizhop.kiekkohamsteri.projection.v1.*;
 import fi.bizhop.kiekkohamsteri.projection.v1.dropdown.*;
+import fi.bizhop.kiekkohamsteri.util.Utils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_ADMIN;
+import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_GROUP_ADMIN;
 
 public class TestObjects {
     public static final String TEST_UUID = "d2b62756-378f-487d-ba25-0b0ff287d1d8";
@@ -15,9 +20,11 @@ public class TestObjects {
     public static final String TEST_EMAIL = "test@example.com";
     public static final String OTHER_EMAIL = "other@example.com";
     public static final String ADMIN_EMAIL = "admin@example.com";
+    public static final String GROUP_ADMIN_EMAIL = "group-admin@example.com";
     public static final User TEST_USER = new User(TEST_EMAIL);
     public static final User OTHER_USER = new User(OTHER_EMAIL);
     public static final User ADMIN_USER = new User(ADMIN_EMAIL);
+    public static final User GROUP_ADMIN_USER = new User(GROUP_ADMIN_EMAIL);
     public static final List<Manufacturer> MANUFACTURERS;
     public static final List<Mold> MOLDS;
     public static final List<Plastic> PLASTICS;
@@ -26,6 +33,8 @@ public class TestObjects {
     public static final List<Dropdown> MARKINGS;
     public static final List<Disc> DISCS;
     public static final List<User> USERS;
+    public static final List<User> GROUP_USERS;
+    public static final List<Group> GROUPS;
 
     private static final Predicate<Disc> isNotLost = disc -> Boolean.FALSE.equals(disc.getLost());
     private static final Predicate<Disc> isLost = disc -> Boolean.TRUE.equals(disc.getLost());
@@ -44,8 +53,20 @@ public class TestObjects {
         TEST_USER.setUsername("User");
         OTHER_USER.setUsername("Other");
         ADMIN_USER.setUsername("Admin");
+        GROUP_ADMIN_USER.setUsername("Group admin");
+
         ADMIN_USER.setLevel(2);
-        USERS = List.of(TEST_USER, OTHER_USER, ADMIN_USER);
+        ADMIN_USER.setRoles(Set.of(new Role(1L, USER_ROLE_ADMIN, null)));
+
+        GROUP_ADMIN_USER.setRoles(Set.of(new Role(2L, USER_ROLE_GROUP_ADMIN, 1L)));
+
+        USERS = List.of(TEST_USER, OTHER_USER, ADMIN_USER, GROUP_ADMIN_USER);
+        GROUP_USERS = List.of(TEST_USER, GROUP_ADMIN_USER);
+
+        GROUPS = List.of(new Group(1L, "group 1"), new Group(2L, "group 2"));
+
+        TEST_USER.getGroups().add(GROUPS.get(0));
+        GROUP_ADMIN_USER.getGroups().add(GROUPS.get(0));
 
         var discmania = createManufacturer(0L, "Discmania");
         var innova = createManufacturer(1L, "Innova");

@@ -15,6 +15,11 @@ public class UserUpdateDto {
     boolean publicDiscCount;
     boolean publicList;
     Integer level;
+    Long addToGroupId;
+    Long removeFromGroupId;
+    String addToRole;
+    String removeFromRole;
+    Long roleGroupId;
 
     public static UserUpdateDto fromV1(fi.bizhop.kiekkohamsteri.dto.v1.in.UserUpdateDto v1) {
         if(v1 == null) return null;

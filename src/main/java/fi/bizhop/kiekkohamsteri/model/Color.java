@@ -13,7 +13,7 @@ import javax.persistence.*;
 @ToString
 public class Color extends TimestampBase {
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name="vari")

@@ -28,6 +28,7 @@ public class BuyRepositoryTest extends SpringContextTestBase {
     @Autowired MoldRepository moldRepository;
     @Autowired ColorRepository colorRepository;
     @Autowired PlasticRepository plasticRepository;
+    @Autowired GroupRepository groupRepository;
 
     @Autowired BuyRepository buyRepository;
 
@@ -39,7 +40,7 @@ public class BuyRepositoryTest extends SpringContextTestBase {
     void setupTestData() {
         //kind of dirty hack to make this run only once with autowired repos
         if(testDataContainer == null) {
-            testDataContainer = initBaseData(userRepository, discRepository, manufacturerRepository, moldRepository, colorRepository, plasticRepository);
+            testDataContainer = initBaseData(userRepository, discRepository, manufacturerRepository, moldRepository, colorRepository, plasticRepository, groupRepository);
 
             var testDisc = (Disc) testDataContainer.get(TEST_DISC_KEY);
             var testUser = (User) testDataContainer.get(TEST_USER_KEY);

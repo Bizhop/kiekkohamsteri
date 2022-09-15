@@ -1,5 +1,6 @@
 package fi.bizhop.kiekkohamsteri.util;
 
+import fi.bizhop.kiekkohamsteri.model.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanWrapper;
@@ -12,6 +13,9 @@ import java.util.*;
 
 public class Utils {
 	private static final Logger LOG = LogManager.getLogger(Utils.class);
+
+	public static final String USER_ROLE_ADMIN = "ADMIN";
+	public static final String USER_ROLE_GROUP_ADMIN = "GROUP_ADMIN";
 
 	public static List<String> getNullPropertyNames (Object source) {
 		final BeanWrapper src = new BeanWrapperImpl(source);
@@ -39,5 +43,17 @@ public class Utils {
 			LOG.warn("Invalid long: {}", valueString);
 			return defaultValue;
 		}
+	}
+
+	public static boolean userIsAdmin(User user) {
+		if(user == null || user.getRoles() == null) return false;
+		return user.getRoles().stream()
+				.anyMatch(role -> USER_ROLE_ADMIN.equals(role.getName()));
+	}
+
+	public static boolean userIsGroupAdmin(User user, Long groupId) {
+		if(user == null || user.getRoles() == null || groupId == null) return false;
+		return user.getRoles().stream()
+				.anyMatch(role -> USER_ROLE_GROUP_ADMIN.equals(role.getName()) && groupId.equals(role.getGroupId()));
 	}
 }

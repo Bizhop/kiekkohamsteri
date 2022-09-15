@@ -2,19 +2,23 @@
   {
     "username": "User",
     "email": "test@example.com",
-    "level": 1,
     "firstName": "New",
     "lastName": "User",
     "pdgaNumber": 0,
     "jwt": null,
     "publicList": false,
     "publicDiscCount": false,
-    "discCount": 0
+    "discCount": 0,
+    "groups": [
+      {
+        "id": 1,
+        "name": "group 1"
+      }
+    ]
   },
   {
     "username": "Other",
     "email": "other@example.com",
-    "level": 1,
     "firstName": "New",
     "lastName": "User",
     "pdgaNumber": 0,
@@ -26,25 +30,41 @@
   {
     "username": "Admin",
     "email": "admin@example.com",
-    "level": 2,
     "firstName": "New",
     "lastName": "User",
     "pdgaNumber": 0,
     "jwt": null,
     "publicList": false,
     "publicDiscCount": false,
-    "discCount": 0
+    "discCount": 0,
+    "roles": [
+      {
+        "name": "ADMIN",
+        "groupId": null
+      }
+    ]
   },
   {
     "username": "Group admin",
     "email": "group-admin@example.com",
-    "level": 1,
     "firstName": "New",
     "lastName": "User",
     "pdgaNumber": 0,
     "jwt": null,
     "publicList": false,
     "publicDiscCount": false,
-    "discCount": 0
+    "discCount": 0,
+    "roles": [
+      {
+        "name": "GROUP_ADMIN",
+        "groupId": 1
+      }
+    ],
+    "groups": [
+      {
+        "id": 1,
+        "name": "group 1"
+      }
+    ]
   }
 ]
