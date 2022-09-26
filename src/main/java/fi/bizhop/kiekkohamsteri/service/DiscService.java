@@ -146,6 +146,12 @@ public class DiscService {
 		}
 	}
 
+	public void makeDiscsPublic(User user) {
+		var discs = discRepo.findByOwnerAndLostFalse(user);
+		discs.forEach(disc -> disc.setPublicDisc(true));
+		discRepo.saveAll(discs);
+	}
+
 	// Pass-through methods to db
 	// Not covered (or to be covered by unit tests)
 

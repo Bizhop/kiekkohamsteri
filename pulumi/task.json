@@ -1,0 +1,71 @@
+{
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "containerDefinitions": [
+        {
+            "name": "kiekkohamsteri-container",
+            "image": "806232589401.dkr.ecr.eu-north-1.amazonaws.com/kiekkohamsteri",
+            "memoryReservation": "1024",
+            "resourceRequirements": null,
+            "essential": true,
+            "portMappings": [
+                {
+                    "containerPort": "80",
+                    "protocol": "tcp"
+                }
+            ],
+            "environment": [
+                {
+                    "name": "HAMSTERI_JWT_SECRET",
+                    "value": "Fn+4z/+a2n34ZiAo7WDgZaDfWntA5AhNKZCPBtLuKek5M+JLel9fMwkdwBIRb+pG3WgyAkxAF6oPSM1nfJ2n0+J2ApCeKsBtjqtSh7MWlBt8B8ysauoFa+dlQng/7o+YVplpYXkibB/U8QvimbUnQANxMueYMsbljSEO4912Q3boSJ2M9cW4sn85wMJC/lTqLzARd7TF/Lq3WEP+GCg9IOmIsCpLJZH1vSE7aJ4sLjxeSXJAoOFbn5bmNIcSsLHYTXUyn2Yn4PCjS0+zs2xGzjMVWvt7Nre9rbMN+q6StO8/b+TROq81dMdHVPso2tI4n1mD0tyRhdwpo6wTkLF9mh2HvxpFv3DDc1KULx4PLeyZHfbzNi8LvUnnQwe6GtscisLT7clnKxS33OrlCV0xaVlI/7AzTOCQXPT8Wa5T5W/uu1cZgZLDXNjKaQL2Rn5k9RDjyZGWPCTRkRxkapFc05BMIoCG492lGLSiw4XwMb/XPYhsUaG/4CLKQsc6qBLBgvhc91lsftlv80aOp4HGdhAaXZev8xfs3Y1AzMD+EP5fcbmvscZGcVvv1rxCi/R+vP3ZV5J5m2aKhxjwyHpTA65OhJdUrM/0hFIufSbNPn9l56FkYSWjD8+j85cCokd6NZVqLVeN5Te+dijcIl9i+F+hJpwC7W+8Bez7LzS2iVE="
+                },
+                {
+                    "name": "HAMSTERI_GOOGLE_CLIENT_ID",
+                    "value": "107543052765-lfgp4lke6h51a0l4kp258anilpeegf8v.apps.googleusercontent.com"
+                },
+                {
+                    "name": "CLOUDINARY_URL",
+                    "value": "cloudinary://163395465588864:okA9K78D5NEs3_h9qzbNJ6WzsN8@djc4j4dcs"
+                },
+                {
+                    "name": "SPRING_DATASOURCE_URL",
+                    "value": "jdbc:postgresql://kiekkohamsteri-dev-db-instance4bfd4af.czb63epdr6sq.eu-north-1.rds.amazonaws.com:5432/kiekkohamsteri?user=hamsteri&password=ZOvL4S6J8gdypwwEaxA3v3LY2DZmXqt7"
+                }
+            ],
+            "environmentFiles": [],
+            "secrets": null,
+            "mountPoints": null,
+            "volumesFrom": null,
+            "hostname": null,
+            "user": null,
+            "workingDirectory": null,
+            "extraHosts": null,
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/kiekkohamsteri-task",
+                    "awslogs-region": "eu-north-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "ulimits": null,
+            "dockerLabels": null,
+            "dependsOn": null,
+            "repositoryCredentials": {
+                "credentialsParameter": ""
+            }
+        }
+    ],
+    "volumes": [],
+    "networkMode": "awsvpc",
+    "memory": "1024",
+    "cpu": "512",
+    "executionRoleArn": "<create_new>",
+    "family": "kiekkohamsteri-task",
+    "taskRoleArn": "",
+    "runtimePlatform": {
+        "operatingSystemFamily": "LINUX"
+    },
+    "tags": []
+}

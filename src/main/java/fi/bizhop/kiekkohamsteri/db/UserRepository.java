@@ -20,9 +20,9 @@ public interface UserRepository extends CrudRepository<User, Long> {
 	List<User> findByPublicListTrue();
 
 	//TODO: move this elsewhere, disc repo?
-	@Modifying(clearAutomatically = true, flushAutomatically = true)
-	@Query("update Disc k set k.publicDisc = true where k.owner = ?1")
-	void makeDiscsPublic(User user);
+//	@Modifying(clearAutomatically = true, flushAutomatically = true)
+//	@Query("update Disc k set k.publicDisc = true where k.owner = ?1")
+//	void makeDiscsPublic(User user);
 	
 	Integer countByCreatedAtBetween(Date beginDate, Date endDate);
 

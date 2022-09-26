@@ -13,6 +13,7 @@ import fi.bizhop.kiekkohamsteri.projection.v1.DiscProjection;
 
 public interface DiscRepository extends PagingAndSortingRepository<Disc, Long> {
 	Page<DiscProjection> findByOwnerAndLostFalse(User user, Pageable pageable);
+	List<Disc> findByOwnerAndLostFalse(User user);
 	List<DiscProjection> findByOwnerInAndPublicDiscTrue(List<User> users);
 	Page<DiscProjection> findByLostTrue(Pageable pageable);
 

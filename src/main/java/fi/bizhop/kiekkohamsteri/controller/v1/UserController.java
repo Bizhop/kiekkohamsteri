@@ -62,7 +62,11 @@ public class UserController extends BaseController {
 		}
 
 		response.setStatus(SC_OK);
-		return userService.updateDetails(user, dto, adminRequest);
+		var result = userService.updateDetails(user, dto, adminRequest);
+		if(dto.isPublicList()) {
+			discService.makeDiscsPublic(user);
+		}
+		return result;
 	}
 
 	@RequestMapping(value = "/user/{id}/level/{level}", method = PATCH, produces = "application/json")
