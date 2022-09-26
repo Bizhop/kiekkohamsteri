@@ -54,7 +54,6 @@ public class UserServiceTest {
         getUserService().updateDetails(user, dto, false);
 
         verify(userRepository, times(1)).save(any(User.class));
-        verify(userRepository, never()).makeDiscsPublic(any());
 
         assertEquals("TEST", user.getFirstName());
         assertEquals("USER", user.getLastName());
@@ -74,7 +73,6 @@ public class UserServiceTest {
         getUserService().updateDetails(user, dto, false);
 
         verify(userRepository, times(1)).save(any(User.class));
-        verify(userRepository, times(1)).makeDiscsPublic(user);
 
         assertEquals("TEST", user.getFirstName());
         assertEquals("USER", user.getLastName());

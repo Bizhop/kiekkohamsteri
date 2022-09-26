@@ -84,7 +84,11 @@ public class UserControllerV2 extends BaseControllerV2 {
         }
 
         response.setStatus(SC_OK);
-        return UserOutputDto.fromDb(userService.updateDetailsV2(user, authUser, dto, adminRequest));
+        var result = userService.updateDetailsV2(user, authUser, dto, adminRequest);
+        if(dto.isPublicList()) {
+            discService.makeDiscsPublic(user);
+        }
+        return UserOutputDto.fromDb(result);
     }
 
     @RequestMapping(value = "/user/leaders", method = GET, produces = "application/json")

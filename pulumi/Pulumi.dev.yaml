@@ -1,0 +1,5 @@
+config:
+  aws:region: eu-north-1
+  kiekkohamsteri:dbPassword:
+    secure: AAABABgkqVC22k5i0ZMnA4gTGhFXvMH+chbNo7TVvbnS7KaO6lNGvH+xNKdKmwzXQTbThjO4WQkFmLOAlGkr4A==
+  kiekkohamsteri:environment: dev

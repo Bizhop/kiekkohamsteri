@@ -197,6 +197,20 @@ public class UserControllerV2Test extends SpringContextTestBase {
         assertEqualsJson(adder.create("testUser.json"), response.getBody());
     }
 
+    @Test
+    void givenPublicListTrue_whenUpdateDetails_thenMakeDiscsPublic() {
+        when(authService.getUser(any())).thenReturn(TEST_USER);
+
+        var dto = UserUpdateDto.builder().publicList(true).build();
+
+        when(userService.getUser(1L)).thenReturn(TEST_USER);
+
+        var response = restTemplate.exchange(createUrl("1"), PATCH, new HttpEntity<>(dto), String.class);
+
+        verify(discService, times(1)).makeDiscsPublic(TEST_USER);
+        assertEquals(SC_OK, response.getStatusCodeValue());
+    }
+
 
     // HELPER METHODS
 

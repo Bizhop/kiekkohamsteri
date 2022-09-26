@@ -67,10 +67,6 @@ public class UserService {
 			removeFromRole(user, removeFromRole, roleGroupId);
 		}
 		
-		if(dto.isPublicList()) {
-			userRepository.makeDiscsPublic(user);
-		}
-		
 		return userRepository.save(user);
 	}
 
