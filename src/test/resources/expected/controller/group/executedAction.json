@@ -9,10 +9,7 @@
     "firstName": "New",
     "lastName": "User",
     "pdgaNumber": 0,
-    "jwt": null,
-    "publicList": false,
-    "publicDiscCount": false,
-    "discCount": 0
+    "jwt": null
   },
   "type": "KICK",
   "status": "COMPLETED",

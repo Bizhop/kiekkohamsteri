@@ -55,7 +55,6 @@ public class TestObjects {
         ADMIN_USER.setUsername("Admin");
         GROUP_ADMIN_USER.setUsername("Group admin");
 
-        ADMIN_USER.setLevel(2);
         ADMIN_USER.setRoles(Set.of(new Role(1L, USER_ROLE_ADMIN, null)));
 
         GROUP_ADMIN_USER.setRoles(Set.of(new Role(2L, USER_ROLE_GROUP_ADMIN, 1L)));

@@ -20,9 +20,6 @@ public class UserOutputDto {
     String lastName;
     Integer pdgaNumber;
     String jwt;
-    Boolean publicList;
-    Boolean publicDiscCount;
-    Integer discCount;
     Set<RoleDto> roles;
     Set<GroupDto> groups;
 
@@ -38,9 +35,6 @@ public class UserOutputDto {
                 .lastName(input.getLastName())
                 .pdgaNumber(input.getPdgaNumber())
                 .jwt(input.getJwt())
-                .publicList(input.getPublicList())
-                .publicDiscCount(input.getPublicDiscCount())
-                .discCount(input.getDiscCount())
                 .roles(input.getRoles() == null
                         ? new HashSet<>()
                         : input.getRoles().stream().map(RoleDto::fromDb).collect(Collectors.toSet()))

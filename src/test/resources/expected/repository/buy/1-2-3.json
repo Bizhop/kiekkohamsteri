@@ -7,14 +7,10 @@
         "id": 1,
         "username": "User",
         "email": "test@example.com",
-        "level": 1,
         "firstName": "New",
         "lastName": "User",
         "pdgaNumber": 0,
-        "jwt": null,
-        "publicList": false,
-        "publicDiscCount": false,
-        "discCount": 0
+        "jwt": null
       },
       "mold": {
         "id": 1,
@@ -60,27 +56,19 @@
       "id": 1,
       "username": "User",
       "email": "test@example.com",
-      "level": 1,
       "firstName": "New",
       "lastName": "User",
       "pdgaNumber": 0,
-      "jwt": null,
-      "publicList": false,
-      "publicDiscCount": false,
-      "discCount": 0
+      "jwt": null
     },
     "buyer": {
       "id": 2,
       "username": "Other",
       "email": "other@example.com",
-      "level": 1,
       "firstName": "New",
       "lastName": "User",
       "pdgaNumber": 0,
-      "jwt": null,
-      "publicList": false,
-      "publicDiscCount": false,
-      "discCount": 0
+      "jwt": null
     },
     "status": "REQUESTED"
   },
@@ -92,14 +80,10 @@
         "id": 2,
         "username": "Other",
         "email": "other@example.com",
-        "level": 1,
         "firstName": "New",
         "lastName": "User",
         "pdgaNumber": 0,
-        "jwt": null,
-        "publicList": false,
-        "publicDiscCount": false,
-        "discCount": 0
+        "jwt": null
       },
       "mold": {
         "id": 1,
@@ -145,27 +129,19 @@
       "id": 2,
       "username": "Other",
       "email": "other@example.com",
-      "level": 1,
       "firstName": "New",
       "lastName": "User",
       "pdgaNumber": 0,
-      "jwt": null,
-      "publicList": false,
-      "publicDiscCount": false,
-      "discCount": 0
+      "jwt": null
     },
     "buyer": {
       "id": 1,
       "username": "User",
       "email": "test@example.com",
-      "level": 1,
       "firstName": "New",
       "lastName": "User",
       "pdgaNumber": 0,
-      "jwt": null,
-      "publicList": false,
-      "publicDiscCount": false,
-      "discCount": 0
+      "jwt": null
     },
     "status": "REQUESTED"
   },
@@ -177,14 +153,10 @@
         "id": 2,
         "username": "Other",
         "email": "other@example.com",
-        "level": 1,
         "firstName": "New",
         "lastName": "User",
         "pdgaNumber": 0,
-        "jwt": null,
-        "publicList": false,
-        "publicDiscCount": false,
-        "discCount": 0
+        "jwt": null
       },
       "mold": {
         "id": 1,
@@ -230,27 +202,19 @@
       "id": 2,
       "username": "Other",
       "email": "other@example.com",
-      "level": 1,
       "firstName": "New",
       "lastName": "User",
       "pdgaNumber": 0,
-      "jwt": null,
-      "publicList": false,
-      "publicDiscCount": false,
-      "discCount": 0
+      "jwt": null
     },
     "buyer": {
       "id": 1,
       "username": "User",
       "email": "test@example.com",
-      "level": 1,
       "firstName": "New",
       "lastName": "User",
       "pdgaNumber": 0,
-      "jwt": null,
-      "publicList": false,
-      "publicDiscCount": false,
-      "discCount": 0
+      "jwt": null
     },
     "status": "CONFIRMED"
   }

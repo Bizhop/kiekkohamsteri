@@ -22,7 +22,6 @@ public class User extends TimestampBase {
 	
 	private String username;
 	private String email;
-	private Integer level;
 
 	@Column(name="etunimi")
 	private String firstName;
@@ -35,15 +34,6 @@ public class User extends TimestampBase {
 
 	@Transient
 	private String jwt; //do not persist
-	
-	@Column(name="public_list", nullable = false)
-	private Boolean publicList;
-	
-	@Column(name="public_disc_count", nullable = false)
-	private Boolean publicDiscCount;
-	
-	@Column(name="disc_count")
-	private Integer discCount;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
@@ -63,23 +53,11 @@ public class User extends TimestampBase {
 	public User(String userEmail) {
 		this.username = "New User";
 		this.email = userEmail;
-		this.level = 1;
 		this.firstName = "New";
 		this.lastName = "User";
 		this.pdgaNumber = 0;
-		this.publicList = false;
-		this.publicDiscCount = false;
-		this.discCount = 0;
 		this.roles = new HashSet<>();
 		this.groups = new HashSet<>();
-	}
-
-	public void addDisc() {
-		this.discCount++;
-	}
-	
-	public void removeDisc() {
-		this.discCount--;
 	}
 
 	@Override

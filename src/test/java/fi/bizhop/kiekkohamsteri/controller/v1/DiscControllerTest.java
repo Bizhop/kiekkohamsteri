@@ -51,7 +51,6 @@ public class DiscControllerTest extends SpringContextTestBase {
     @MockBean AuthService authService;
     @MockBean UploadService uploadService;
     @MockBean BuyService buyService;
-    @MockBean UserService userService;
     @MockBean MoldService moldService;
     @MockBean PlasticService plasticService;
     @MockBean ColorService colorService;
@@ -181,7 +180,6 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.postForEntity(createUrl(""), dto, String.class);
 
         verify(discService, times(1)).newDisc(user, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0));
-        verify(userService, times(1)).saveUser(user);
         verify(uploadService, times(1)).upload(dto, image);
         verify(discService, times(1)).updateImage(discId, image);
 
@@ -211,7 +209,6 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.postForEntity(createUrl(""), dto, String.class);
 
         verify(discService, times(1)).newDisc(user, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0));
-        verify(userService, times(1)).saveUser(user);
         verify(uploadService, times(1)).upload(dto, image);
         verify(discService, times(1)).deleteDiscById(discId);
 
@@ -394,18 +391,13 @@ public class DiscControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenValidRequest_whenDeleteDisc_thenDeleteDiscAndDecreaseDiscCountAndSaveUser() throws AuthorizationException {
+    void givenValidRequest_whenDeleteDisc_thenDeleteDisc() throws AuthorizationException {
         var user = new User(TEST_EMAIL);
-        user.setDiscCount(1);
         when(authService.getUser(any())).thenReturn(user);
 
         var response = restTemplate.exchange(createUrl("123"), DELETE, null, Object.class);
 
         verify(discService, times(1)).deleteDisc(123L, user);
-        verify(userService, times(1)).saveUser(userCaptor.capture());
-
-        var savedUser = userCaptor.getValue();
-        assertEquals(0, savedUser.getDiscCount());
 
         assertEquals(SC_NO_CONTENT, response.getStatusCodeValue());
         assertNull(response.getBody());
@@ -419,7 +411,6 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl("123"), DELETE, null, Object.class);
 
         verify(discService, times(1)).deleteDisc(123L, TEST_USER);
-        verify(userService, never()).saveUser(any());
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
         assertNull(response.getBody());

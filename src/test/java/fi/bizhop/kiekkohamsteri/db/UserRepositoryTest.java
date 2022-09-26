@@ -1,6 +1,5 @@
 package fi.bizhop.kiekkohamsteri.db;
 
-import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.model.Group;
 import fi.bizhop.kiekkohamsteri.model.Role;
@@ -15,10 +14,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.REPOSITORY;
 import static fi.bizhop.kiekkohamsteri.TestObjects.OTHER_EMAIL;
 import static fi.bizhop.kiekkohamsteri.TestObjects.TEST_EMAIL;
-import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static fi.bizhop.kiekkohamsteri.TestUtils.dateWithDayOffset;
 import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_ADMIN;
 import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_GROUP_ADMIN;
@@ -31,8 +28,6 @@ public class UserRepositoryTest extends SpringContextTestBase {
     @Autowired UserRepository userRepository;
     @Autowired GroupRepository groupRepository;
     @Autowired RoleRepository roleRepository;
-
-    BaseAdder adder = new BaseAdder("user", REPOSITORY);
 
     private static Group group1 = null;
     private static Group group2 = null;
@@ -52,16 +47,10 @@ public class UserRepositoryTest extends SpringContextTestBase {
             var otherUser = new User(OTHER_EMAIL);
 
             testUser.setUsername("test user");
-            testUser.setDiscCount(55);
-            testUser.setPublicDiscCount(true);
-            testUser.setPublicList(true);
             testUser.setGroups(Set.of(group1));
             testUser.setRoles(Set.of(adminRole));
 
             otherUser.setUsername("other user");
-            otherUser.setDiscCount(88);
-            otherUser.setPublicDiscCount(false);
-            otherUser.setPublicList(false);
             otherUser.setGroups(Set.of(group2));
             otherUser.setRoles(Set.of(groupAdminRole));
 
@@ -79,20 +68,6 @@ public class UserRepositoryTest extends SpringContextTestBase {
         assertEquals(TEST_EMAIL, testUser.getEmail());
         assertEquals(OTHER_EMAIL, otherUser.getEmail());
         assertNull(none);
-    }
-
-    @Test
-    void findByPublicDiscCountTrueOrderByDiscCountDescTest() {
-        var result = userRepository.findByPublicDiscCountTrueOrderByDiscCountDesc();
-
-        assertEqualsJson(adder.create("leaders.json"), result);
-    }
-
-    @Test
-    void findByPublicListTrueTest() {
-        var result = userRepository.findByPublicListTrue();
-
-        assertEqualsJson(adder.create("publicListTrue.json"), result);
     }
 
     @Test
