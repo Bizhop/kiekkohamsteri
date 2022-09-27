@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static fi.bizhop.kiekkohamsteri.model.GroupRequest.Status.*;
 import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_GROUP_ADMIN;
@@ -85,9 +86,9 @@ public class GroupService {
         return group;
     }
 
-    public List<GroupRequest> getGroupRequests(Long groupId) throws HttpResponseException {
-        var group = groupRepository.findById(groupId).orElseThrow(() -> new HttpResponseException(SC_NOT_FOUND, "Group not found"));
-        return groupRequestRepository.findByGroup(group);
+    public List<GroupRequest> getGroupRequests(Set<Long> groupIds) {
+        var groups = groupRepository.findAllById(groupIds);
+        return groupRequestRepository.findAllByGroupInAndStatus(groups, REQUESTED);
     }
 
     // Passthrough methods to db
@@ -97,7 +98,7 @@ public class GroupService {
 
     public Optional<Group> getGroup(Long groupId) { return groupRepository.findById(groupId); }
 
-    public List<GroupRequest> getGroupRequests() { return groupRequestRepository.findAll(); }
+    public List<GroupRequest> getGroupRequests() { return groupRequestRepository.findByStatus(REQUESTED); }
 
     public Optional<GroupRequest> getGroupRequest(Long id) { return groupRequestRepository.findById(id); }
 }

@@ -512,4 +512,31 @@
 		<dropColumn tableName="members" columnName="public_disc_count" />
 		<dropColumn tableName="members" columnName="disc_count" />
 	</changeSet>
+	<changeSet id="userModelRework-part2" author="Ville">
+		<dropColumn tableName="members" columnName="level" />
+	</changeSet>
+	<changeSet id="fixUsersGroupsForeignKeys" author="Ville">
+		<dropForeignKeyConstraint baseTableName="users_groups" constraintName="users_roles_group_id_fk" />
+		<dropForeignKeyConstraint baseTableName="users_groups" constraintName="users_groups_user_id_fk" />
+		<addForeignKeyConstraint
+				baseTableName="users_groups"
+				baseColumnNames="group_id"
+				constraintName="users_roles_group_id_fk"
+				referencedTableName="groups"
+				referencedColumnNames="id"
+				onDelete="CASCADE"
+		/>
+		<addForeignKeyConstraint
+				baseTableName="users_groups"
+				baseColumnNames="user_id"
+				constraintName="users_groups_user_id_fk"
+				referencedTableName="members"
+				referencedColumnNames="id"
+				onDelete="CASCADE"
+		/>
+	</changeSet>
+	<changeSet id="groupRequestEnumsToInteger" author="Ville">
+		<modifyDataType tableName="group_requests" columnName="type" newDataType="INT" />
+		<modifyDataType tableName="group_requests" columnName="status" newDataType="INT" />
+	</changeSet>
 </databaseChangeLog>
