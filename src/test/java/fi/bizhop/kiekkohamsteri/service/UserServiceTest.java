@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import static fi.bizhop.kiekkohamsteri.TestObjects.TEST_EMAIL;
 import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_ADMIN;
+import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_GROUP_ADMIN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -108,11 +109,13 @@ public class UserServiceTest {
     @Test
     void givenNonAdminRequest_whenUserLeavesGroup_thenSuccess() {
         var user = new User(TEST_EMAIL);
-        var group1 = new Group();
-        group1.setName("group 1");
-        user.getGroups().add(group1);
+        var group = new Group("group 1");
+        user.getGroups().add(group);
+        var groupAdminRole = new Role(USER_ROLE_GROUP_ADMIN, 1L);
+        user.getRoles().add(groupAdminRole);
 
-        when(groupRepository.findById(1L)).thenReturn(Optional.of(group1));
+        when(groupRepository.findById(1L)).thenReturn(Optional.of(group));
+        when(roleRepository.findByGroupId(1L)).thenReturn(Optional.of(groupAdminRole));
 
         var removeDto = UserUpdateDto.builder()
                 .removeFromGroupId(1L)
@@ -123,6 +126,7 @@ public class UserServiceTest {
         verify(userRepository, times(1)).save(any(User.class));
 
         assertEquals(0, user.getGroups().size());
+        assertEquals(0, user.getRoles().size());
     }
 
     private UserService getUserService() {
