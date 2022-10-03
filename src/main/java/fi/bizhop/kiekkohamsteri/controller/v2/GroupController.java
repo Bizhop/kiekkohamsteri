@@ -24,8 +24,7 @@ import java.util.stream.Collectors;
 import static fi.bizhop.kiekkohamsteri.model.GroupRequest.Status.COMPLETED;
 import static fi.bizhop.kiekkohamsteri.util.Utils.*;
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -57,6 +56,30 @@ public class GroupController extends BaseControllerV2 {
         } catch (HttpResponseException e) {
             response.setStatus(e.getStatusCode());
             return null;
+        }
+    }
+
+    @RequestMapping(value = "/groups/{groupId}", method = DELETE)
+    public void deleteGroup(@RequestAttribute("user") User user,
+                            @PathVariable Long groupId,
+                            HttpServletResponse response) {
+        response.setStatus(SC_OK);
+
+        if(!userIsAdmin(user) && !userIsGroupAdmin(user, groupId)) {
+            response.setStatus(SC_FORBIDDEN);
+            return;
+        }
+
+        var groupUsers = userService.getUsersByGroupId(groupId);
+        if(groupUsers.size() > 0) {
+            response.setStatus(SC_CONFLICT);
+            return;
+        }
+
+        try {
+            groupService.deleteGroup(groupId);
+        } catch (HttpResponseException e) {
+            response.setStatus(e.getStatusCode());
         }
     }
 

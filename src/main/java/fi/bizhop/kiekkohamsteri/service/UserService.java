@@ -22,8 +22,6 @@ public class UserService {
 	final GroupRepository groupRepository;
 	final RoleRepository roleRepository;
 
-	private Role adminRole = null;
-
 	public User updateDetails(User user, UserUpdateDto dto, boolean adminRequest) {
 		if(user == null) return null;
 
@@ -33,7 +31,7 @@ public class UserService {
 		BeanUtils.copyProperties(dto, user, ignores.toArray(String[]::new));
 
 		if(adminRequest) {
-			if (USER_ROLE_ADMIN.equals(dto.getAddToRole())){
+			if(USER_ROLE_ADMIN.equals(dto.getAddToRole())){
 				addAdminRole(user);
 			}
 			if(USER_ROLE_ADMIN.equals(dto.getRemoveFromRole())) {
@@ -59,7 +57,10 @@ public class UserService {
 
 	private void removeFromGroup(User user, Long removeFromGroup) {
 		if (removeFromGroup != null) {
+			var groupAdminRole = roleRepository.findByGroupId(removeFromGroup).orElseThrow();
 			var group = groupRepository.findById(removeFromGroup).orElseThrow();
+
+			user.getRoles().remove(groupAdminRole);
 			user.getGroups().remove(group);
 		}
 	}
@@ -69,14 +70,16 @@ public class UserService {
 	}
 
 	private void removeAdminRole(User user) {
-		user.getRoles().remove(getAdminRole());
+		var adminRole = user.getRoles().stream()
+				.filter(role -> USER_ROLE_ADMIN.equals(role.getName()))
+				.findFirst()
+				.orElseThrow();
+
+		user.getRoles().remove(adminRole);
 	}
 
 	private Role getAdminRole() {
-		if(this.adminRole == null) {
-			this.adminRole = roleRepository.findById(1L).orElseThrow();
-		}
-		return this.adminRole;
+		return roleRepository.findById(1L).orElseThrow();
 	}
 
 

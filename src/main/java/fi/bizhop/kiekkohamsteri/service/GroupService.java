@@ -59,6 +59,7 @@ public class GroupService {
                 break;
             case KICK:
                 user.getGroups().remove(request.getGroup());
+                user.getRoles().remove(role);
                 break;
             case PROMOTE:
                 user.getRoles().add(role);
@@ -101,4 +102,6 @@ public class GroupService {
     public List<GroupRequest> getGroupRequests() { return groupRequestRepository.findByStatus(REQUESTED); }
 
     public Optional<GroupRequest> getGroupRequest(Long id) { return groupRequestRepository.findById(id); }
+
+    public void deleteGroup(Long groupId) throws HttpResponseException { groupRepository.deleteById(groupId); }
 }
