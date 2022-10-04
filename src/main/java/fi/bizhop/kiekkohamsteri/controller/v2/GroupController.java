@@ -33,9 +33,7 @@ public class GroupController extends BaseControllerV2 {
     final GroupService groupService;
 
     @RequestMapping(value = "/groups", method = GET, produces = "application/json")
-    public @ResponseBody List<GroupDto> getGroups(
-            @RequestAttribute("user") User user,
-            HttpServletResponse response) {
+    public @ResponseBody List<GroupDto> getGroups(HttpServletResponse response) {
         response.setStatus(SC_OK);
         return groupService.getGroups()
                 .stream()

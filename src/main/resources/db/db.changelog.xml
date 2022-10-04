@@ -539,4 +539,7 @@
 		<modifyDataType tableName="group_requests" columnName="type" newDataType="INT" />
 		<modifyDataType tableName="group_requests" columnName="status" newDataType="INT" />
 	</changeSet>
+	<changeSet id="makeGroupNameUnique" author="Ville">
+		<addUniqueConstraint tableName="groups" columnNames="name" />
+	</changeSet>
 </databaseChangeLog>

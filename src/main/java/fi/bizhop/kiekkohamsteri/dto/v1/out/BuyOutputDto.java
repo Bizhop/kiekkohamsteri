@@ -20,6 +20,7 @@ public class BuyOutputDto {
     public static BuyOutputDto fromDb(Buy input) {
         if(input == null) return null;
         return BuyOutputDto.builder()
+                .id(input.getId())
                 .kiekko(DiscOutputDto.fromDb(input.getDisc()))
                 .myyja(UserOutputDto.fromDb(input.getSeller()))
                 .ostaja(UserOutputDto.fromDb(input.getBuyer()))

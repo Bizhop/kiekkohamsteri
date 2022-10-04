@@ -11,6 +11,7 @@ import fi.bizhop.kiekkohamsteri.model.GroupRequest;
 import fi.bizhop.kiekkohamsteri.model.Role;
 import fi.bizhop.kiekkohamsteri.model.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -76,7 +77,12 @@ public class GroupService {
         if(dto == null || dto.getName() == null) throw new HttpResponseException(SC_BAD_REQUEST, "Invalid group create request");
 
         var group = new Group(dto.getName());
-        groupRepository.save(group);
+
+        try {
+            groupRepository.save(group);
+        } catch (DataIntegrityViolationException e) {
+            throw new HttpResponseException(SC_CONFLICT, "Group name already exists");
+        }
 
         var groupAdminRole = new Role(USER_ROLE_GROUP_ADMIN, group.getId());
         roleRepository.save(groupAdminRole);
