@@ -259,35 +259,5 @@ public class GroupServiceTest {
         assertEquals(group.getId(), groupAdminRole.getGroupId());
     }
 
-    @Test
-    void givenGroupNotFound_whenGetGroupRequestsByGroupId_thenException() {
-        when(groupRepository.findById(1L)).thenReturn(Optional.empty());
-
-        try {
-            getGroupService().getGroupRequests(1L);
-
-            fail();
-        } catch (HttpResponseException e) {
-            assertEquals(SC_NOT_FOUND, e.getStatusCode());
-        }
-
-        verify(groupRequestRepository, never()).findByGroup(any(Group.class));
-    }
-
-    @Test
-    void givenGroupFound_whenGetGroupRequestsByGroupId_thenReturnGroupRequests() throws HttpResponseException {
-        var group = new Group("group");
-        when(groupRepository.findById(1L)).thenReturn(Optional.of(group));
-
-        var request = new GroupRequest(group, null, null, JOIN, REQUESTED, null);
-        when(groupRequestRepository.findByGroup(group)).thenReturn(List.of(request));
-
-        var response = getGroupService().getGroupRequests(1L);
-        verify(groupRequestRepository, times(1)).findByGroup(group);
-
-        assertEquals(1, response.size());
-        assertEquals(request, response.get(0));
-    }
-
     GroupService getGroupService() { return new GroupService(groupRepository, groupRequestRepository, roleRepository); }
 }

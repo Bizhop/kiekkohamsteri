@@ -56,4 +56,10 @@ public class Utils {
 		return user.getRoles().stream()
 				.anyMatch(role -> USER_ROLE_GROUP_ADMIN.equals(role.getName()) && groupId.equals(role.getGroupId()));
 	}
+
+	public static boolean userBelongsToGroup(User user, Long groupId) {
+		if(user == null || user.getGroups() == null || groupId == null) return false;
+		return user.getGroups().stream()
+				.anyMatch(group -> groupId.equals(group.getId()));
+	}
 }

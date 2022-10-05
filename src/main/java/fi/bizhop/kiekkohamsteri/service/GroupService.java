@@ -11,10 +11,12 @@ import fi.bizhop.kiekkohamsteri.model.GroupRequest;
 import fi.bizhop.kiekkohamsteri.model.Role;
 import fi.bizhop.kiekkohamsteri.model.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static fi.bizhop.kiekkohamsteri.model.GroupRequest.Status.*;
 import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_GROUP_ADMIN;
@@ -58,6 +60,7 @@ public class GroupService {
                 break;
             case KICK:
                 user.getGroups().remove(request.getGroup());
+                user.getRoles().remove(role);
                 break;
             case PROMOTE:
                 user.getRoles().add(role);
@@ -74,7 +77,12 @@ public class GroupService {
         if(dto == null || dto.getName() == null) throw new HttpResponseException(SC_BAD_REQUEST, "Invalid group create request");
 
         var group = new Group(dto.getName());
-        groupRepository.save(group);
+
+        try {
+            groupRepository.save(group);
+        } catch (DataIntegrityViolationException e) {
+            throw new HttpResponseException(SC_CONFLICT, "Group name already exists");
+        }
 
         var groupAdminRole = new Role(USER_ROLE_GROUP_ADMIN, group.getId());
         roleRepository.save(groupAdminRole);
@@ -85,9 +93,9 @@ public class GroupService {
         return group;
     }
 
-    public List<GroupRequest> getGroupRequests(Long groupId) throws HttpResponseException {
-        var group = groupRepository.findById(groupId).orElseThrow(() -> new HttpResponseException(SC_NOT_FOUND, "Group not found"));
-        return groupRequestRepository.findByGroup(group);
+    public List<GroupRequest> getGroupRequests(Set<Long> groupIds) {
+        var groups = groupRepository.findAllById(groupIds);
+        return groupRequestRepository.findAllByGroupInAndStatus(groups, REQUESTED);
     }
 
     // Passthrough methods to db
@@ -97,7 +105,9 @@ public class GroupService {
 
     public Optional<Group> getGroup(Long groupId) { return groupRepository.findById(groupId); }
 
-    public List<GroupRequest> getGroupRequests() { return groupRequestRepository.findAll(); }
+    public List<GroupRequest> getGroupRequests() { return groupRequestRepository.findByStatus(REQUESTED); }
 
     public Optional<GroupRequest> getGroupRequest(Long id) { return groupRequestRepository.findById(id); }
+
+    public void deleteGroup(Long groupId) throws HttpResponseException { groupRepository.deleteById(groupId); }
 }

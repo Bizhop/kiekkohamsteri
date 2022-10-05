@@ -29,7 +29,6 @@ public class DiscController extends BaseController {
 	final AuthService authService;
 	final UploadService uploadService;
 	final BuyService buyService;
-	final UserService userService;
 	final MoldService moldService;
 	final PlasticService plasticService;
 	final ColorService colorService;
@@ -59,8 +58,6 @@ public class DiscController extends BaseController {
 				moldService.getDefaultMold(),
 				plasticService.getDefaultPlastic(),
 				colorService.getDefaultColor());
-		owner.addDisc();
-		userService.saveUser(owner);
 
 		var image = String.format("%s-%d", owner.getUsername(), disc.getId());
 		try {
@@ -146,8 +143,6 @@ public class DiscController extends BaseController {
 	public void deleteDisc(@PathVariable Long id, @RequestAttribute("user") User owner, HttpServletResponse response) {
 		try {
 			discService.deleteDisc(id, owner);
-			owner.removeDisc();
-			userService.saveUser(owner);
 			response.setStatus(SC_NO_CONTENT);
 		}
 		catch(AuthorizationException ae) {
@@ -169,12 +164,6 @@ public class DiscController extends BaseController {
 			response.setStatus(e.getStatusCode());
 			return null;
 		}
-	}
-
-	@RequestMapping(value = "/kiekot/public-lists", method = RequestMethod.GET)
-	public List<ListingDto> getPublicLists() {
-		var usersWithPublicLists = userService.getUsersWithPublicList();
-		return discService.getPublicLists(usersWithPublicLists);
 	}
 
 	@RequestMapping(value = "/kiekot/lost", method = RequestMethod.GET)

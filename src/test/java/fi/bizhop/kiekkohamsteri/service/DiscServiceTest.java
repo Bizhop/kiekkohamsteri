@@ -37,24 +37,8 @@ public class DiscServiceTest {
     }
 
     @Test
-    void givenNewDisc_whenUserHasPublicListTrue_thenNewDiscIsPublic() {
+    void givenAnyUser_whenNewDisc_thenNewDiscIsNotPublic() {
         var user = new User(TEST_EMAIL);
-        user.setPublicList(true);
-
-        setupMocksForNewDisc();
-
-        getDiscService().newDisc(user, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0));
-
-        verify(discRepo, times(1)).save(discCaptor.capture());
-
-        var savedDisc = discCaptor.getValue();
-        assertTrue(savedDisc.getPublicDisc());
-    }
-
-    @Test
-    void givenNewDisc_whenUserHasPublicListFalse_thenNewDiscIsNotPublic() {
-        var user = new User(TEST_EMAIL);
-        user.setPublicList(false);
 
         setupMocksForNewDisc();
 

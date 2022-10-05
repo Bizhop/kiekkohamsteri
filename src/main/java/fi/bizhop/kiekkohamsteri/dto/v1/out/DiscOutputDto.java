@@ -1,6 +1,7 @@
 package fi.bizhop.kiekkohamsteri.dto.v1.out;
 
 import fi.bizhop.kiekkohamsteri.model.Disc;
+import fi.bizhop.kiekkohamsteri.dto.v2.out.UserOutputDto;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;

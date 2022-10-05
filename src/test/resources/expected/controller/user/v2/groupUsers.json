@@ -6,9 +6,6 @@
     "lastName": "User",
     "pdgaNumber": 0,
     "jwt": null,
-    "publicList": false,
-    "publicDiscCount": false,
-    "discCount": 0,
     "groups": [
       {
         "id": 1,
@@ -23,9 +20,6 @@
     "lastName": "User",
     "pdgaNumber": 0,
     "jwt": null,
-    "publicList": false,
-    "publicDiscCount": false,
-    "discCount": 0,
     "roles": [
       {
         "name": "GROUP_ADMIN",

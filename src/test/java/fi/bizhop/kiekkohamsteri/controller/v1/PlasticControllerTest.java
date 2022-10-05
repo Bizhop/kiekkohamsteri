@@ -58,9 +58,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
 
     @Test
     void givenNonAdminUser_whenCallingGetPlastics_thenRespondForbidden() {
-        var user = new User(TEST_EMAIL);
-        user.setLevel(1);
-        when(authService.getUser(any())).thenReturn(user);
+        when(authService.getUser(any())).thenReturn(TEST_USER);
 
         var response = restTemplate.getForEntity(createUrl(), Object.class);
 
@@ -78,9 +76,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
 
     @Test
     void givenNonAdminUser_whenCreatingPlastic_thenRespondWithUnauthorized() {
-        var user = new User(TEST_EMAIL);
-        user.setLevel(1);
-        when(authService.getUser(any())).thenReturn(user);
+        when(authService.getUser(any())).thenReturn(TEST_USER);
 
         var response = restTemplate.postForEntity(createUrl(), PlasticCreateDto.builder().build(), Object.class);
 

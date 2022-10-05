@@ -8,6 +8,7 @@ import fi.bizhop.kiekkohamsteri.dto.v2.out.GroupRequestOutputDto;
 import fi.bizhop.kiekkohamsteri.dto.v2.out.UserOutputDto;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.GroupRequest;
+import fi.bizhop.kiekkohamsteri.model.Role;
 import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.service.GroupService;
 import fi.bizhop.kiekkohamsteri.service.UserService;
@@ -17,14 +18,13 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static fi.bizhop.kiekkohamsteri.model.GroupRequest.Status.COMPLETED;
-import static fi.bizhop.kiekkohamsteri.util.Utils.userIsAdmin;
-import static fi.bizhop.kiekkohamsteri.util.Utils.userIsGroupAdmin;
+import static fi.bizhop.kiekkohamsteri.util.Utils.*;
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,14 +33,7 @@ public class GroupController extends BaseControllerV2 {
     final GroupService groupService;
 
     @RequestMapping(value = "/groups", method = GET, produces = "application/json")
-    public @ResponseBody List<GroupDto> getGroups(
-            @RequestAttribute("user") User user,
-            HttpServletResponse response) {
-        if(!userIsAdmin(user)) {
-            response.setStatus(SC_FORBIDDEN);
-            return null;
-        }
-
+    public @ResponseBody List<GroupDto> getGroups(HttpServletResponse response) {
         response.setStatus(SC_OK);
         return groupService.getGroups()
                 .stream()
@@ -61,6 +54,30 @@ public class GroupController extends BaseControllerV2 {
         } catch (HttpResponseException e) {
             response.setStatus(e.getStatusCode());
             return null;
+        }
+    }
+
+    @RequestMapping(value = "/groups/{groupId}", method = DELETE)
+    public void deleteGroup(@RequestAttribute("user") User user,
+                            @PathVariable Long groupId,
+                            HttpServletResponse response) {
+        response.setStatus(SC_OK);
+
+        if(!userIsAdmin(user) && !userIsGroupAdmin(user, groupId)) {
+            response.setStatus(SC_FORBIDDEN);
+            return;
+        }
+
+        var groupUsers = userService.getUsersByGroupId(groupId);
+        if(groupUsers.size() > 0) {
+            response.setStatus(SC_CONFLICT);
+            return;
+        }
+
+        try {
+            groupService.deleteGroup(groupId);
+        } catch (HttpResponseException e) {
+            response.setStatus(e.getStatusCode());
         }
     }
 
@@ -109,23 +126,16 @@ public class GroupController extends BaseControllerV2 {
     @RequestMapping(value = "/groups/requests", method = GET, produces = "application/json")
     public @ResponseBody List<GroupRequestOutputDto> getGroupRequests(
             @RequestAttribute("user") User user,
-            @RequestParam(required = false) Long groupId,
             HttpServletResponse response) {
-        if(!userIsAdmin(user) && !userIsGroupAdmin(user, groupId)) {
-            response.setStatus(SC_FORBIDDEN);
-            return null;
-        }
-
         response.setStatus(SC_OK);
-        try {
-            return getGroupRequests(user, groupId)
-                    .stream()
-                    .map(GroupRequestOutputDto::fromDb)
-                    .collect(Collectors.toList());
-        } catch (HttpResponseException e) {
-            response.setStatus(e.getStatusCode());
-            return null;
-        }
+
+        var result = userIsAdmin(user)
+                ? getGroupRequests()
+                : getGroupRequests(extractAdministeredGroupIds(user));
+
+         return result.stream()
+                .map(GroupRequestOutputDto::fromDb)
+                .collect(Collectors.toList());
     }
 
     @RequestMapping(value = "/groups/{groupId}/requests/{requestId}", method = POST, consumes = "application/json", produces = "application/json")
@@ -158,8 +168,18 @@ public class GroupController extends BaseControllerV2 {
         }
     }
 
-    private List<GroupRequest> getGroupRequests(User user, Long groupId) throws HttpResponseException {
-        if(groupId == null && !userIsAdmin(user)) throw new HttpResponseException(SC_FORBIDDEN, "Forbidden");
-        return groupId == null ? groupService.getGroupRequests() : groupService.getGroupRequests(groupId);
+    private List<GroupRequest> getGroupRequests() {
+        return groupService.getGroupRequests();
+    }
+
+    private List<GroupRequest> getGroupRequests(Set<Long> groupIds) {
+        return groupService.getGroupRequests(groupIds);
+    }
+
+    private Set<Long> extractAdministeredGroupIds(User user) {
+        return user.getRoles().stream()
+                .filter(role -> USER_ROLE_GROUP_ADMIN.equals(role.getName()))
+                .map(Role::getGroupId)
+                .collect(Collectors.toSet());
     }
 }

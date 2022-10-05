@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static fi.bizhop.kiekkohamsteri.util.Utils.userIsAdmin;
 import static javax.servlet.http.HttpServletResponse.*;
 
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class AdminUserFilter implements Filter {
             if (user == null) {
                 httpServletResponse.sendError(SC_UNAUTHORIZED);
                 return;
-            } else if (user.getLevel() != 2) {
+            } else if (!userIsAdmin(user)) {
                 httpServletResponse.sendError(SC_FORBIDDEN);
                 return;
             }

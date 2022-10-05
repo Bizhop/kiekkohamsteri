@@ -27,6 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
@@ -37,7 +38,6 @@ import static fi.bizhop.kiekkohamsteri.model.GroupRequest.Type.JOIN;
 import static fi.bizhop.kiekkohamsteri.model.GroupRequest.Type.KICK;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -62,18 +62,6 @@ public class GroupControllerTest extends SpringContextTestBase {
         var response = restTemplate.getForEntity(createUrl(endpoint), String.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {""})
-    void givenNonAdminUser_whenCallingRestrictedGetEndpoints_thenRespondWithForbidden(String endpoint) {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-        when(userService.getUser(1L)).thenReturn(OTHER_USER);
-
-        var response = restTemplate.getForEntity(createUrl(endpoint), String.class);
-
-        assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -207,24 +195,6 @@ public class GroupControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenNonAdminUser_whenGettingRequests_thenException() {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-
-        var response = restTemplate.getForEntity(createUrl("requests"), String.class);
-
-        assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
-    }
-
-    @Test
-    void givenNonAdminUser_whenGettingGroupRequests_thenException() {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-
-        var response = restTemplate.getForEntity(createUrl("requests?groupId=1"), String.class);
-
-        assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
-    }
-
-    @Test
     void givenAdminUser_whenGettingAllRequests_thenReturnAllRequests() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
@@ -238,41 +208,29 @@ public class GroupControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenAdminUser_whenGettingGroupRequests_thenReturnGroupRequests() throws HttpResponseException {
+    void givenAdminUser_whenGettingGroupRequests_thenReturnGroupRequests() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
         var requests = List.of(request());
-        when(groupService.getGroupRequests(1L)).thenReturn(requests);
+        when(groupService.getGroupRequests()).thenReturn(requests);
 
-        var response = restTemplate.getForEntity(createUrl("requests?groupId=1"), String.class);
+        var response = restTemplate.getForEntity(createUrl("requests"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
         assertEqualsJson(adder.create("requests.json"), response.getBody());
     }
 
     @Test
-    void givenGroupAdminUser_whenGettingGroupRequests_thenReturnGroupRequests() throws HttpResponseException {
+    void givenGroupAdminUser_whenGettingGroupRequests_thenReturnGroupRequests() {
         when(authService.getUser(any())).thenReturn(GROUP_ADMIN_USER);
 
         var requests = List.of(request());
-        when(groupService.getGroupRequests(1L)).thenReturn(requests);
+        when(groupService.getGroupRequests(Set.of(1L))).thenReturn(requests);
 
-        var response = restTemplate.getForEntity(createUrl("requests?groupId=1"), String.class);
+        var response = restTemplate.getForEntity(createUrl("requests"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
         assertEqualsJson(adder.create("requests.json"), response.getBody());
-    }
-
-    @ParameterizedTest
-    @MethodSource("adminUsers")
-    void givenGroupNotFound_whenGettingGroupRequests_thenException(User admin) throws HttpResponseException {
-        when(authService.getUser(any())).thenReturn(admin);
-
-        when(groupService.getGroupRequests(1L)).thenThrow(new HttpResponseException(SC_NOT_FOUND, "Group not found"));
-
-        var response = restTemplate.getForEntity(createUrl("requests?groupId=1"), String.class);
-
-        assertEquals(SC_NOT_FOUND, response.getStatusCodeValue());
     }
 
     @ParameterizedTest

@@ -59,9 +59,7 @@ public class MoldControllerTest extends SpringContextTestBase {
 
     @Test
     void givenNonAdminUser_whenCallingGetMolds_thenRespondForbidden() {
-        var user = new User(TEST_EMAIL);
-        user.setLevel(1);
-        when(authService.getUser(any())).thenReturn(user);
+        when(authService.getUser(any())).thenReturn(TEST_USER);
 
         var response = restTemplate.getForEntity(createUrl(), Object.class);
 
@@ -79,9 +77,7 @@ public class MoldControllerTest extends SpringContextTestBase {
 
     @Test
     void givenNonAdminUser_whenCreatingMold_thenRespondWithUnauthorized() {
-        var user = new User(TEST_EMAIL);
-        user.setLevel(1);
-        when(authService.getUser(any())).thenReturn(user);
+        when(authService.getUser(any())).thenReturn(TEST_USER);
 
         var response = restTemplate.postForEntity(createUrl(), MoldCreateDto.builder().build(), Object.class);
 

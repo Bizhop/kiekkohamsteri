@@ -1,7 +1,6 @@
 package fi.bizhop.kiekkohamsteri.controller.v2;
 
 import fi.bizhop.kiekkohamsteri.dto.v2.in.UserUpdateDto;
-import fi.bizhop.kiekkohamsteri.dto.v2.out.LeaderDto;
 import fi.bizhop.kiekkohamsteri.dto.v2.out.UserOutputDto;
 import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
@@ -15,8 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static fi.bizhop.kiekkohamsteri.util.Utils.userIsAdmin;
-import static fi.bizhop.kiekkohamsteri.util.Utils.userIsGroupAdmin;
+import static fi.bizhop.kiekkohamsteri.util.Utils.*;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
@@ -39,19 +37,19 @@ public class UserControllerV2 extends BaseControllerV2 {
                 return null;
             }
             response.setStatus(SC_OK);
-            return usersWithUpdatedDiscCounts(userService.getUsers())
+            return userService.getUsers()
                     .stream()
                     .map(UserOutputDto::fromDb)
                     .collect(Collectors.toList());
         }
 
-        if(!userIsGroupAdmin(user, groupId) && !userIsAdmin(user)) {
+        if(!userBelongsToGroup(user, groupId) && !userIsAdmin(user)) {
             response.setStatus(SC_FORBIDDEN);
             return null;
         }
 
         response.setStatus(SC_OK);
-        return usersWithUpdatedDiscCounts(userService.getUsersByGroupId(groupId))
+        return userService.getUsersByGroupId(groupId)
                 .stream()
                 .map(UserOutputDto::fromDb)
                 .collect(Collectors.toList());
@@ -75,28 +73,13 @@ public class UserControllerV2 extends BaseControllerV2 {
         var user = userService.getUser(id);
 
         boolean adminRequest = userIsAdmin(authUser);
-        boolean groupAdminRequest = userIsGroupAdmin(authUser, dto.getRoleGroupId())
-                || userIsGroupAdmin(authUser, dto.getAddToGroupId())
-                || userIsGroupAdmin(authUser, dto.getRemoveFromGroupId());
-        if(!authUser.equals(user) && !adminRequest && !groupAdminRequest) {
+        if(!authUser.equals(user) && !adminRequest) {
             response.setStatus(SC_FORBIDDEN);
             return null;
         }
 
         response.setStatus(SC_OK);
-        var result = userService.updateDetailsV2(user, authUser, dto, adminRequest);
-        if(dto.isPublicList()) {
-            discService.makeDiscsPublic(user);
-        }
-        return UserOutputDto.fromDb(result);
-    }
-
-    @RequestMapping(value = "/user/leaders", method = GET, produces = "application/json")
-    public @ResponseBody List<LeaderDto> getLeaders(HttpServletResponse response) {
-        response.setStatus(SC_OK);
-        return usersWithUpdatedDiscCounts(userService.getUsers()).stream()
-                .map(LeaderDto::fromDb)
-                .collect(Collectors.toList());
+        return UserOutputDto.fromDb(userService.updateDetails(user, dto, adminRequest));
     }
 
     @RequestMapping(value = "/user/me", method = GET, produces = "application/json")
@@ -115,13 +98,5 @@ public class UserControllerV2 extends BaseControllerV2 {
 
         response.setStatus(SC_OK);
         return UserOutputDto.fromDb(user);
-    }
-
-    // HELPER METHODS
-
-    private List<User> usersWithUpdatedDiscCounts(List<User> users) {
-        discService.updateDiscCounts(users);
-        userService.saveUsers(users);
-        return users;
     }
 }

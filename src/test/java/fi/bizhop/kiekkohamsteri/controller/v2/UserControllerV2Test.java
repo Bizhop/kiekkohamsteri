@@ -45,7 +45,7 @@ public class UserControllerV2Test extends SpringContextTestBase {
     BaseAdder adder = new BaseAdder("user/v2", CONTROLLER);
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "1", "leaders", "me"})
+    @ValueSource(strings = {"", "1", "me"})
     void givenUnableToAuthenticateUser_whenCallingGetEndpoints_thenRespondWithUnauthorized(String endpoint) {
         when(authService.getUser(any())).thenReturn(null);
 
@@ -73,10 +73,6 @@ public class UserControllerV2Test extends SpringContextTestBase {
 
         var response = restTemplate.getForEntity(createUrl(""), String.class);
 
-        //verify disc counts updated
-        verify(discService, times(1)).updateDiscCounts(USERS);
-        verify(userService, times(1)).saveUsers(USERS);
-
         verify(userService, times(1)).getUsers();
 
         assertEquals(SC_OK, response.getStatusCodeValue());
@@ -90,10 +86,6 @@ public class UserControllerV2Test extends SpringContextTestBase {
         when(userService.getUsersByGroupId(1L)).thenReturn(GROUP_USERS);
 
         var response = restTemplate.getForEntity(createUrl("?groupId=1"), String.class);
-
-        //verify disc counts updated
-        verify(discService, times(1)).updateDiscCounts(GROUP_USERS);
-        verify(userService, times(1)).saveUsers(GROUP_USERS);
 
         verify(userService, times(1)).getUsersByGroupId(1L);
 
@@ -147,12 +139,12 @@ public class UserControllerV2Test extends SpringContextTestBase {
         when(userService.getUser(1L)).thenReturn(TEST_USER);
 
         var dto = UserUpdateDto.builder().build();
-        when(userService.updateDetailsV2(TEST_USER, TEST_USER, dto, false)).thenReturn(TEST_USER);
+        when(userService.updateDetails(TEST_USER, dto, false)).thenReturn(TEST_USER);
 
         var response = restTemplate.exchange(createUrl("1"), PATCH, new HttpEntity<>(dto), String.class);
 
         //non admin user should invoke non admin request
-        verify(userService, times(1)).updateDetailsV2(TEST_USER, TEST_USER, dto, false);
+        verify(userService, times(1)).updateDetails(TEST_USER, dto, false);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
         assertEqualsJson(adder.create("testUser.json"), response.getBody());
@@ -186,29 +178,15 @@ public class UserControllerV2Test extends SpringContextTestBase {
         when(userService.getUser(1L)).thenReturn(TEST_USER);
 
         var dto = UserUpdateDto.builder().build();
-        when(userService.updateDetailsV2(TEST_USER, ADMIN_USER, dto, true)).thenReturn(TEST_USER);
+        when(userService.updateDetails(TEST_USER, dto, true)).thenReturn(TEST_USER);
 
         var response = restTemplate.exchange(createUrl("1"), PATCH, new HttpEntity<>(dto), String.class);
 
         //admin user should invoke admin request
-        verify(userService, times(1)).updateDetailsV2(TEST_USER, ADMIN_USER, dto, true);
+        verify(userService, times(1)).updateDetails(TEST_USER, dto, true);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
         assertEqualsJson(adder.create("testUser.json"), response.getBody());
-    }
-
-    @Test
-    void givenPublicListTrue_whenUpdateDetails_thenMakeDiscsPublic() {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-
-        var dto = UserUpdateDto.builder().publicList(true).build();
-
-        when(userService.getUser(1L)).thenReturn(TEST_USER);
-
-        var response = restTemplate.exchange(createUrl("1"), PATCH, new HttpEntity<>(dto), String.class);
-
-        verify(discService, times(1)).makeDiscsPublic(TEST_USER);
-        assertEquals(SC_OK, response.getStatusCodeValue());
     }
 
 

@@ -30,9 +30,6 @@ public class DiscService {
 
 	public DiscProjection newDisc(User owner, Mold defaultMold, Plastic defaultPlastic, Color defaultColor) {
 		var disc = new Disc(owner, defaultMold, defaultPlastic, defaultColor);
-		if(owner.getPublicList()) {
-			disc.setPublicDisc(true);
-		}
 		disc = discRepo.save(disc);
 
 		return discRepo.getDiscById(disc.getId());
@@ -136,13 +133,6 @@ public class DiscService {
 			disc.setForSale(false);
 			disc.setItb(false);
 			discRepo.save(disc);
-		}
-	}
-
-	public void updateDiscCounts(List<User> users) {
-		for(var user : users) {
-			var count = discRepo.countByOwner(user);
-			user.setDiscCount(count);
 		}
 	}
 
