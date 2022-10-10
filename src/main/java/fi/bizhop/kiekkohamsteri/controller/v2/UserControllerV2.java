@@ -88,7 +88,7 @@ public class UserControllerV2 extends BaseControllerV2 {
         return UserOutputDto.fromDb(user);
     }
 
-    @RequestMapping(value = "/user/login", method = RequestMethod.GET)
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
     public @ResponseBody UserOutputDto login(HttpServletRequest request, HttpServletResponse response) {
         User user = authService.login(request);
         if(user == null) {
