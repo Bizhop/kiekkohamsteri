@@ -2,7 +2,6 @@ package fi.bizhop.kiekkohamsteri.controller.v1;
 
 import fi.bizhop.kiekkohamsteri.controller.provider.UUIDProvider;
 import fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto;
-import fi.bizhop.kiekkohamsteri.dto.v1.out.ListingDto;
 import fi.bizhop.kiekkohamsteri.dto.v1.in.UploadDto;
 import fi.bizhop.kiekkohamsteri.dto.v1.out.BuyOutputDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
@@ -18,7 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
 
 import static javax.servlet.http.HttpServletResponse.*;
 
@@ -33,21 +33,42 @@ public class DiscController extends BaseController {
 	final PlasticService plasticService;
 	final ColorService colorService;
 	final UUIDProvider uuidProvider;
+	final UserService userService;
 
 	@RequestMapping(value = "/kiekot", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody Page<DiscProjection> getDiscs(@RequestAttribute("user") User owner, HttpServletResponse response, Pageable pageable) {
+	public @ResponseBody Page<DiscProjection> getDiscs(
+			@RequestAttribute("user") User me,
+			@RequestParam(required = false) Long userId,
+			HttpServletResponse response,
+			Pageable pageable) {
+		if(userId != null) {
+			try {
+				var otherUser = userService.getUser(userId);
+				var groupIntersection = new HashSet<>(me.getGroups());
+				groupIntersection.retainAll(otherUser.getGroups());
+				if(groupIntersection.isEmpty()) {
+					response.setStatus(SC_FORBIDDEN);
+					return null;
+				}
+				return discService.getDiscs(otherUser, pageable);
+			} catch (NoSuchElementException e) {
+				response.setStatus(SC_BAD_REQUEST);
+				return null;
+			}
+		}
+
 		response.setStatus(SC_OK);
-		return discService.getDiscs(owner, pageable);
+		return discService.getDiscs(me, pageable);
 	}
 
 	@RequestMapping(value = "/kiekot/myytavat", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody Page<DiscProjection> getDiscsForSale(@RequestAttribute("user") User owner, HttpServletResponse response, Pageable pageable) {
+	public @ResponseBody Page<DiscProjection> getDiscsForSale(HttpServletResponse response, Pageable pageable) {
 		response.setStatus(SC_OK);
 		return discService.getDiscsForSale(pageable);
 	}
 
 	@RequestMapping(value = "/kiekot", method = RequestMethod.POST, produces = "application/json")
-	public @ResponseBody DiscProjection createDisc(@RequestBody UploadDto dto, @RequestAttribute("user") User owner, HttpServletResponse response) {
+	public @ResponseBody DiscProjection createDisc(@RequestAttribute("user") User owner, @RequestBody UploadDto dto, HttpServletResponse response) {
 		if(invalidUploadDto(dto)) {
 			response.setStatus(SC_BAD_REQUEST);
 			return null;
@@ -77,7 +98,7 @@ public class DiscController extends BaseController {
 	}
 
 	@RequestMapping(value = "/kiekot/{id}/update-image", method = RequestMethod.PATCH, produces = "application/json", consumes = "application/json")
-	public void updateImage(@PathVariable Long id, @RequestBody UploadDto dto, @RequestAttribute("user") User owner, HttpServletResponse response) {
+	public void updateImage(@RequestAttribute("user") User owner, @PathVariable Long id, @RequestBody UploadDto dto, HttpServletResponse response) {
 		if(invalidUploadDto(dto)) {
 			response.setStatus(SC_BAD_REQUEST);
 			return;
@@ -108,7 +129,7 @@ public class DiscController extends BaseController {
 	}
 
 	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody DiscProjection getDisc(@PathVariable Long id, @RequestAttribute("user") User owner, HttpServletResponse response) {
+	public @ResponseBody DiscProjection getDisc(@RequestAttribute("user") User owner, @PathVariable Long id, HttpServletResponse response) {
 		try {
 			response.setStatus(SC_OK);
 			return discService.getDiscIfPublicOrOwn(owner, id);
@@ -120,7 +141,7 @@ public class DiscController extends BaseController {
 	}
 
 	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
-	public @ResponseBody DiscProjection updateDisc(@PathVariable Long id, @RequestBody DiscInputDto dto, @RequestAttribute("user") User owner, HttpServletResponse response) {
+	public @ResponseBody DiscProjection updateDisc(@RequestAttribute("user") User owner, @PathVariable Long id, @RequestBody DiscInputDto dto, HttpServletResponse response) {
 		try {
 			var newMold = moldService.getMold(dto.getMoldId()).orElse(null);
 			var newPlastic = plasticService.getPlastic(dto.getMuoviId()).orElse(null);
@@ -140,7 +161,7 @@ public class DiscController extends BaseController {
 	}
 
 	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.DELETE)
-	public void deleteDisc(@PathVariable Long id, @RequestAttribute("user") User owner, HttpServletResponse response) {
+	public void deleteDisc(@RequestAttribute("user") User owner, @PathVariable Long id, HttpServletResponse response) {
 		try {
 			discService.deleteDisc(id, owner);
 			response.setStatus(SC_NO_CONTENT);
@@ -151,7 +172,7 @@ public class DiscController extends BaseController {
 	}
 
 	@RequestMapping(value = "/kiekot/{id}/buy", method = RequestMethod.POST, produces = "application/json")
-	public @ResponseBody BuyOutputDto buyDisc(@PathVariable Long id, @RequestAttribute("user") User user, HttpServletResponse response) {
+	public @ResponseBody BuyOutputDto buyDisc(@RequestAttribute("user") User user, @PathVariable Long id, HttpServletResponse response) {
 		try {
 			var disc = discService.getDiscDb(id).orElse(null);
 
@@ -172,7 +193,7 @@ public class DiscController extends BaseController {
 	}
 
 	@RequestMapping(value = "/kiekot/{id}/found", method = RequestMethod.PATCH)
-	public void markFound(@PathVariable Long id, @RequestAttribute("user") User user, HttpServletResponse response) {
+	public void markFound(@RequestAttribute("user") User user, @PathVariable Long id, HttpServletResponse response) {
 		try {
 			discService.handleFoundDisc(user, id);
 			response.setStatus(SC_NO_CONTENT);

@@ -15,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,6 +29,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -55,8 +57,7 @@ public class DiscControllerTest extends SpringContextTestBase {
     @MockBean PlasticService plasticService;
     @MockBean ColorService colorService;
     @MockBean UUIDProvider uuidProvider;
-
-    @Captor ArgumentCaptor<User> userCaptor;
+    @MockBean UserService userService;
 
     @Captor ArgumentCaptor<Pageable> pageableCaptor;
 
@@ -140,6 +141,41 @@ public class DiscControllerTest extends SpringContextTestBase {
         when(discService.getDiscs(eq(TEST_USER), any())).thenReturn(page);
 
         var response = restTemplate.getForEntity(createUrl(""), String.class);
+
+        assertEquals(SC_OK, response.getStatusCodeValue());
+        assertEqualsJson(adder.create("getDiscs.json"), response.getBody());
+    }
+
+    @Test
+    void givenUserNotFound_whenGetOtherUserDiscs_thenBadRequest() {
+        when(authService.getUser(any())).thenReturn(TEST_USER);
+        when(userService.getUser(1L)).thenThrow(new NoSuchElementException());
+
+        var response = restTemplate.getForEntity(createUrl("?userId=1"), String.class);
+
+        assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
+    }
+
+    @Test
+    void givenNoCommonGroup_whenGetOtherUserDiscs_thenForbidden() {
+        when(authService.getUser(any())).thenReturn(TEST_USER);
+        when(userService.getUser(1L)).thenReturn(OTHER_USER);
+
+        var response = restTemplate.getForEntity(createUrl("?userId=1"), String.class);
+
+        assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
+    }
+
+    @Test
+    void givenCommonGroup_whenGetOtherUserDiscs_thenReturnDiscs() {
+        when(authService.getUser(any())).thenReturn(GROUP_ADMIN_USER);
+        when(userService.getUser(1L)).thenReturn(TEST_USER);
+
+        var discProjections = getDiscsByUser(TEST_USER);
+        var page = new PageImpl<>(discProjections);
+        when(discService.getDiscs(eq(TEST_USER), any())).thenReturn(page);
+
+        var response = restTemplate.getForEntity(createUrl("?userId=1"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
         assertEqualsJson(adder.create("getDiscs.json"), response.getBody());
