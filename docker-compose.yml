@@ -20,7 +20,7 @@ services:
     environment:
      - CLOUDINARY_URL
      - HAMSTERI_JWT_SECRET
-     - HAMSTERI_GOOGLE_CLIENT_ID
+     - HAMSTERI_GOOGLE_AUDIENCES
      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/hamsteri
      - SPRING_DATASOURCE_USERNAME=hamsteri
      - SPRING_DATASOURCE_PASSWORD=hamsteri
