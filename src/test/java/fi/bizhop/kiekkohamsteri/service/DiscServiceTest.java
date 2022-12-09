@@ -4,6 +4,7 @@ import fi.bizhop.kiekkohamsteri.TestObjects;
 import fi.bizhop.kiekkohamsteri.db.DiscRepository;
 import fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
+import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.Disc;
 import fi.bizhop.kiekkohamsteri.model.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -176,7 +177,7 @@ public class DiscServiceTest {
     }
 
     @Test
-    void givenDiscIsPublic_whenGetOtherUsersDisc_thenReturnDisc() throws AuthorizationException {
+    void givenDiscIsPublic_whenGetOtherUsersDisc_thenReturnDisc() throws AuthorizationException, HttpResponseException {
         var disc = getTestDiscFor(OTHER_USER);
         disc.setPublicDisc(true);
         var projection = projectionFromDisc(disc);
@@ -189,7 +190,7 @@ public class DiscServiceTest {
     }
 
     @Test
-    void givenDiscIsNotPublic_whenGetOtherUsersDisc_thenThrowException() {
+    void givenDiscIsNotPublic_whenGetOtherUsersDisc_thenThrowAuthException() {
         var disc = getTestDiscFor(OTHER_USER);
         disc.setPublicDisc(false);
         var projection = projectionFromDisc(disc);
@@ -200,7 +201,21 @@ public class DiscServiceTest {
             getDiscService().getDiscIfPublicOrOwn(TEST_USER, 123L);
 
             fail(SHOULD_THROW_EXCEPTION);
+        } catch (HttpResponseException e) {
+            fail(WRONG_EXCEPTION);
         } catch (AuthorizationException ignored) {}
+
+    }
+
+    @Test
+    void givenDiscNotFound_whenGetOtherUsersDisc_thenThrowNotFoundException() {
+        when(discRepo.getDiscById(123L)).thenReturn(null);
+
+        try {
+            getDiscService().getDiscIfPublicOrOwn(TEST_USER, 123L);
+        } catch (AuthorizationException e) {
+            fail(WRONG_EXCEPTION);
+        } catch (HttpResponseException ignored) {}
     }
 
     @Test

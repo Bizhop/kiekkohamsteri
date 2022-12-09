@@ -7,15 +7,14 @@ import fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto;
 import fi.bizhop.kiekkohamsteri.dto.v1.in.UploadDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
-import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.model.Buy;
+import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.service.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,7 +26,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -351,7 +349,7 @@ public class DiscControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenYourDisc_whenGetDisc_thenGetDisc() throws AuthorizationException {
+    void givenYourDisc_whenGetDisc_thenGetDisc() throws AuthorizationException, HttpResponseException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
         when(discService.getDiscIfPublicOrOwn(TEST_USER, 123L)).thenReturn(projectionFromDisc(DISCS.get(0)));
 
@@ -362,13 +360,24 @@ public class DiscControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenNotYourDiscAndNotPublic_whenGetDisc_thenRespondForbidden() throws AuthorizationException {
+    void givenNotYourDiscAndNotPublic_whenGetDisc_thenRespondForbidden() throws AuthorizationException, HttpResponseException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
         when(discService.getDiscIfPublicOrOwn(TEST_USER, 456L)).thenThrow(new AuthorizationException());
 
         var response = restTemplate.getForEntity(createUrl("456"), String.class);
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void givenDiscNotFound_whenGetDisc_thenRespondNotFound() throws AuthorizationException, HttpResponseException {
+        when(authService.getUser(any())).thenReturn(TEST_USER);
+        when(discService.getDiscIfPublicOrOwn(TEST_USER, 789L)).thenThrow(new HttpResponseException(SC_NOT_FOUND, "Disc not found"));
+
+        var response = restTemplate.getForEntity(createUrl("789"), String.class);
+
+        assertEquals(SC_NOT_FOUND, response.getStatusCodeValue());
         assertNull(response.getBody());
     }
 

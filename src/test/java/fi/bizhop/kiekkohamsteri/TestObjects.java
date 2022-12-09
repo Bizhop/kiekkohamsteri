@@ -17,6 +17,7 @@ import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_GROUP_ADMIN;
 public class TestObjects {
     public static final String TEST_UUID = "d2b62756-378f-487d-ba25-0b0ff287d1d8";
     public static final String SHOULD_THROW_EXCEPTION = "Previous call should throw Exception";
+    public static final String WRONG_EXCEPTION = "Expected different exception";
     public static final String TEST_EMAIL = "test@example.com";
     public static final String OTHER_EMAIL = "other@example.com";
     public static final String ADMIN_EMAIL = "admin@example.com";

@@ -22,6 +22,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 public class DiscService {
@@ -98,8 +100,9 @@ public class DiscService {
 		}
 	}
 
-	public DiscProjection getDiscIfPublicOrOwn(User owner, Long id) throws AuthorizationException {
+	public DiscProjection getDiscIfPublicOrOwn(User owner, Long id) throws AuthorizationException, HttpResponseException {
 		var disc = discRepo.getDiscById(id);
+		if(disc == null) throw new HttpResponseException(SC_NOT_FOUND, "Disc not found");
 		if(owner.getEmail().equals(disc.getOwnerEmail()) ||
 				Boolean.TRUE.equals(disc.getPublicDisc())) {
 			return disc;

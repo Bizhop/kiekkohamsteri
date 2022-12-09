@@ -138,6 +138,11 @@ public class DiscController extends BaseController {
 			response.setStatus(SC_FORBIDDEN);
 			return null;
 		}
+		catch (HttpResponseException hre) {
+			LOG.error("{} trying to get disc id={}, not found", owner.getEmail(), id);
+			response.setStatus(hre.getStatusCode());
+			return null;
+		}
 	}
 
 	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")

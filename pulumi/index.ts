@@ -1,222 +1,377 @@
-import * as pulumi from "@pulumi/pulumi";
-import * as aws from "@pulumi/aws";
-import * as awsx from "@pulumi/awsx";
+import * as pulumi from "@pulumi/pulumi"
+import * as aws from "@pulumi/aws"
 
-const config = new pulumi.Config();
-const env = config.require("environment");
-const defaultResourceName = `kiekkohamsteri-${env}`;
+const config = new pulumi.Config("kiekkohamsteri")
+const awsConfig = new pulumi.Config("aws")
+const env = config.require("environment")
+const defaultResourceName = env == "prod" ? "kiekkohamsteri" : `kiekkohamsteri-${env}`
 const subnets = ["subnet-e3947c8a", "subnet-bc3b30c4", "subnet-737d4839"]
+const vpcId = config.require("vpcId")
+const zoneId = config.require("zoneId")
 
-const bucket = new aws.s3.Bucket(defaultResourceName);
-const accessLogs = new aws.s3.Bucket(defaultResourceName + "-lb-access-logs");
+//US provider is needed for frontend certificate
+const usProvider = new aws.Provider("aws-east-1", { region: "us-east-1" })
+
+const s3BucketName = defaultResourceName
+const bucket = new aws.s3.Bucket(defaultResourceName + "-s3", {
+  bucket: s3BucketName,
+  policy: JSON.stringify({
+    Version: "2012-10-17",
+    Id: defaultResourceName + "-bucketPolicy",
+    Statement: [
+      {
+        Sid: "AllowCloudFrontServicePrincipalReadOnly-" + env,
+        Effect: "Allow",
+        Principal: {
+          Service: "cloudfront.amazonaws.com",
+        },
+        Action: "s3:GetObject",
+        Resource: `arn:aws:s3:::${s3BucketName}/*`,
+      },
+    ],
+  }),
+})
 
 const dbParameterGroup = new aws.rds.ParameterGroup(defaultResourceName + "-db-params", {
-    family: "postgres13"
-});
+  family: "postgres13",
+})
 
-const vpc = new aws.ec2.Vpc("default-vpc", {
-    cidrBlock: "172.31.0.0/16",
-    enableDnsHostnames: true,
-}, {
-    protect: true,
-});
-
-
-const kiekko_sg = new aws.ec2.SecurityGroup("kiekko-sg", {
-    description: "2022-09-16T10:34:28.283Z",
-    egress: [{
-        cidrBlocks: ["0.0.0.0/0"],
-        fromPort: 0,
-        protocol: "-1",
-        toPort: 0,
-    }],
-    ingress: [{
-        cidrBlocks: ["0.0.0.0/0"],
-        fromPort: 5432,
-        protocol: "tcp",
-        toPort: 5432,
-    },{
-        cidrBlocks: ["0.0.0.0/0"],
-        fromPort: 80,
-        protocol: "tcp",
-        toPort: 80,
-    },{
-        cidrBlocks: ["0.0.0.0/0"],
-        fromPort: 443,
-        protocol: "tcp",
-        toPort: 443,
-    }],
-    name: "kiekko-4484",
-    vpcId: vpc.id,
-}, {
-    protect: true,
-});
+const kiekko_sg = new aws.ec2.SecurityGroup(defaultResourceName + "-sg", {
+  description: `Kiekkohamsteri ${env} security group`,
+  egress: [
+    {
+      cidrBlocks: ["0.0.0.0/0"],
+      fromPort: 0,
+      protocol: "-1",
+      toPort: 0,
+    },
+  ],
+  ingress: [
+    {
+      cidrBlocks: ["0.0.0.0/0"],
+      fromPort: 5432,
+      protocol: "tcp",
+      toPort: 5432,
+    },
+    {
+      cidrBlocks: ["0.0.0.0/0"],
+      fromPort: 80,
+      protocol: "tcp",
+      toPort: 80,
+    },
+    {
+      cidrBlocks: ["0.0.0.0/0"],
+      fromPort: 443,
+      protocol: "tcp",
+      toPort: 443,
+    },
+  ],
+  vpcId: vpcId,
+})
 
 const dbInstance = new aws.rds.Instance(defaultResourceName + "-db-instance", {
-    identifier: defaultResourceName + "-db",
-    allocatedStorage: 10,
-    engine: "postgres",
-    engineVersion: "13.7",
-    instanceClass: "db.t3.micro",
-    dbName: "kiekkohamsteri",
-    parameterGroupName: dbParameterGroup.name,
-    password: config.requireSecret("dbPassword"),
-    skipFinalSnapshot: true,
-    username: "hamsteri",
-    publiclyAccessible: false,
-    vpcSecurityGroupIds: [kiekko_sg.id]
-});
+  identifier: defaultResourceName + "-db",
+  allocatedStorage: 10,
+  engine: "postgres",
+  engineVersion: "13.7",
+  instanceClass: "db.t3.micro",
+  dbName: "kiekkohamsteri",
+  parameterGroupName: dbParameterGroup.name,
+  password: config.requireSecret("dbPassword"),
+  skipFinalSnapshot: true,
+  username: "hamsteri",
+  publiclyAccessible: true,
+  vpcSecurityGroupIds: [kiekko_sg.id],
+})
 
-const kiekkohamsteri_ecs_cluster = new aws.ecs.Cluster("kiekkohamsteri-ecs-cluster", {
-    name: "kiekkohamsteri",
-    settings: [{
-        name: "containerInsights",
-        value: "disabled",
-    }],
-}, {
-    protect: true,
-});
+const kiekkohamsteriEcsCluster = new aws.ecs.Cluster(defaultResourceName + "-cluster", {
+  name: defaultResourceName,
+  settings: [
+    {
+      name: "containerInsights",
+      value: "disabled",
+    },
+  ],
+})
 
-const backend_cert = new aws.acm.Certificate("backend-cert", {
-    domainName: "kiekkohamsteri-backend.valuemotive.net",
-    subjectAlternativeNames: ["kiekkohamsteri-backend.valuemotive.net"],
+const backendDomainName = defaultResourceName + "-backend.valuemotive.net"
+const backendCert = new aws.acm.Certificate(
+  defaultResourceName + "-backendCert",
+  {
+    domainName: backendDomainName,
+    subjectAlternativeNames: [backendDomainName],
     validationMethod: "DNS",
-}, {
+  },
+  {
     protect: true,
-});
+  },
+)
 
-const lb = new aws.lb.LoadBalancer(defaultResourceName + "-lb", {
+const lb = new aws.lb.LoadBalancer(
+  defaultResourceName + "-lb",
+  {
     internal: false,
     loadBalancerType: "application",
     securityGroups: [kiekko_sg.id],
     subnets: subnets,
-    enableDeletionProtection: true
-});
+    enableDeletionProtection: true,
+  },
+  {
+    dependsOn: [kiekko_sg],
+  },
+)
 
-const target_group = new aws.lb.TargetGroup(defaultResourceName + "-tg", {
-    port: 80,
-    protocol: "HTTP",
-    targetType: "ip",
-    vpcId: vpc.id,
-    healthCheck: {
-        enabled: true,
-        path: "/actuator/health"
-    }
-});
+const targetGroup = new aws.lb.TargetGroup(defaultResourceName + "-tg", {
+  port: 80,
+  protocol: "HTTP",
+  targetType: "ip",
+  vpcId: vpcId,
+  healthCheck: {
+    enabled: true,
+    path: "/actuator/health",
+  },
+})
 
-const listener = new aws.lb.Listener(defaultResourceName + "listener", {
+new aws.lb.Listener(
+  defaultResourceName + "-listener",
+  {
     loadBalancerArn: lb.arn,
     port: 443,
     protocol: "HTTPS",
     sslPolicy: "ELBSecurityPolicy-2016-08",
-    certificateArn: backend_cert.arn,
+    certificateArn: backendCert.arn,
     defaultActions: [
-        {
-            type: "forward",
-            targetGroupArn: target_group.arn,
-        },
+      {
+        type: "forward",
+        targetGroupArn: targetGroup.arn,
+      },
     ],
-});
+  },
+  {
+    dependsOn: [lb, backendCert, targetGroup],
+  },
+)
 
-const kiekkohamsteri_service = new aws.ecs.Service("kiekkohamsteri-service", {
-    cluster: kiekkohamsteri_ecs_cluster.arn,
-    deploymentCircuitBreaker: {
-        enable: false,
-        rollback: false,
+const logGroupName = `/ecs/${defaultResourceName}-task`
+new aws.cloudwatch.LogGroup(defaultResourceName + "_lg", {name: logGroupName})
+
+pulumi
+  .output({
+    cloudinaryUrl: config.requireSecret("cloudinaryUrl"),
+    jwtSecret: config.requireSecret("jwtSecret"),
+    db: {
+      endpoint: dbInstance.endpoint,
+      name: dbInstance.dbName,
+      username: dbInstance.username,
+      password: dbInstance.password,
     },
-    desiredCount: 1,
-    enableEcsManagedTags: true,
-    iamRole: "aws-service-role",
-    launchType: "FARGATE",
-    name: "kiekkohamsteri-service",
-    networkConfiguration: {
-        assignPublicIp: true,
-        securityGroups: [kiekko_sg.id],
-        subnets: subnets
-    },
-    platformVersion: "LATEST",
-    propagateTags: "NONE",
-    loadBalancers: [{
-        targetGroupArn: target_group.arn,
-        containerName: "kiekkohamsteri-container",
-        containerPort: 80,
-    }]
-}, {
-    protect: true,
-    ignoreChanges: ["taskDefinition"]
-});
+  })
+  .apply((props) => {
+    const { db } = props
+    const containerDefinitions = [
+      {
+        command: [],
+        cpu: 0,
+        entryPoint: [],
+        environment: [
+          {
+            name: "CLOUDINARY_URL",
+            value: props.cloudinaryUrl,
+          },
+          {
+            name: "HAMSTERI_GOOGLE_AUDIENCES",
+            value: config.require("googleAudiences"),
+          },
+          {
+            name: "HAMSTERI_JWT_SECRET",
+            value: props.jwtSecret,
+          },
+          {
+            name: "SERVER_PORT",
+            value: "80",
+          },
+          {
+            name: "SPRING_DATASOURCE_URL",
+            value: `jdbc:postgresql://${db.endpoint}/${db.name}?user=${db.username}&password=${db.password}`,
+          },
+        ],
+        essential: true,
+        image: "806232589401.dkr.ecr.eu-north-1.amazonaws.com/" + defaultResourceName,
+        logConfiguration: {
+          logDriver: "awslogs",
+          secretOptions: null,
+          options: {
+            "awslogs-group": logGroupName,
+            "awslogs-region": awsConfig.require("region"),
+            "awslogs-stream-prefix": "ecs",
+          },
+        },
+        memoryReservation: 1024,
+        mountPoints: [],
+        name: defaultResourceName + "-container",
+        portMappings: [
+          {
+            hostPort: 80,
+            protocol: "tcp",
+            containerPort: 80,
+          },
+        ],
+        volumesFrom: [],
+      },
+    ]
 
-const valuemotive_zone = new aws.route53.Zone("valuemotive_zone", {
-    comment: "",
-    name: "valuemotive.net",
-}, {
-    protect: true,
-});
+    const taskDefinition = new aws.ecs.TaskDefinition(
+      defaultResourceName + "-td",
+      {
+        containerDefinitions: JSON.stringify(containerDefinitions),
+        cpu: "512",
+        executionRoleArn: "arn:aws:iam::806232589401:role/ecsTaskExecutionRole",
+        family: "kiekkohamsteri-task-" + env,
+        memory: "1024",
+        networkMode: "awsvpc",
+        requiresCompatibilities: ["FARGATE"],
+        runtimePlatform: {
+          operatingSystemFamily: "LINUX",
+        },
+      },
+      {
+        dependsOn: [dbInstance],
+      },
+    )
 
-const record = new aws.route53.Record(defaultResourceName + "-br", {
+    new aws.ecs.Service(
+      defaultResourceName + "-service",
+      {
+        cluster: kiekkohamsteriEcsCluster.arn,
+        taskDefinition: taskDefinition.arn,
+        deploymentCircuitBreaker: {
+          enable: false,
+          rollback: false,
+        },
+        desiredCount: 1,
+        enableEcsManagedTags: true,
+        launchType: "FARGATE",
+        name: defaultResourceName + "-service",
+        networkConfiguration: {
+          assignPublicIp: true,
+          securityGroups: [kiekko_sg.id],
+          subnets: subnets,
+        },
+        platformVersion: "LATEST",
+        propagateTags: "NONE",
+        loadBalancers: [
+          {
+            targetGroupArn: targetGroup.arn,
+            containerName: defaultResourceName + "-container",
+            containerPort: 80,
+          },
+        ],
+      },
+      {
+        dependsOn: [kiekkohamsteriEcsCluster, taskDefinition, kiekko_sg, targetGroup],
+      },
+    )
+  })
+
+new aws.route53.Record(
+  defaultResourceName + "-br",
+  {
     type: "A",
-    zoneId: valuemotive_zone.id,
-    name: "kiekkohamsteri-backend.valuemotive.net",
-    aliases: [{
+    zoneId: zoneId,
+    name: backendDomainName,
+    aliases: [
+      {
         name: lb.dnsName,
         zoneId: lb.zoneId,
         evaluateTargetHealth: true,
-    }]
-});
+      },
+    ],
+  },
+  {
+    dependsOn: [lb],
+  },
+)
 
-const s3OriginId = "hamsteriS3Origin";
-const distribution = new aws.cloudfront.Distribution(defaultResourceName + "-fe", {
-    origins: [{
+const s3OriginId = defaultResourceName + "-S3Origin"
+const frontendDomainName = defaultResourceName + ".valuemotive.net"
+const frontendCert = new aws.acm.Certificate(
+  defaultResourceName + "-frontendCert",
+  {
+    domainName: frontendDomainName,
+    subjectAlternativeNames: [frontendDomainName],
+    validationMethod: "DNS",
+  },
+  {
+    provider: usProvider,
+    protect: true,
+  },
+)
+const oac = new aws.cloudfront.OriginAccessControl(defaultResourceName + "-oac", {
+  description: `${defaultResourceName} CloudFront-S3 access control`,
+  originAccessControlOriginType: "s3",
+  signingBehavior: "always",
+  signingProtocol: "sigv4",
+})
+const distribution = new aws.cloudfront.Distribution(
+  defaultResourceName + "-cf",
+  {
+    origins: [
+      {
         domainName: bucket.bucketRegionalDomainName,
-        originId: s3OriginId
-    }],
+        originId: s3OriginId,
+        originAccessControlId: oac.id,
+      },
+    ],
     enabled: true,
     isIpv6Enabled: false,
     defaultRootObject: "index.html",
-    aliases: [
-        "kiekkohamsteri.valuemotive.net"
-    ],
+    aliases: [frontendDomainName],
     defaultCacheBehavior: {
-        allowedMethods: [
-            "GET",
-            "HEAD",
-            "OPTIONS"
-        ],
-        cachedMethods: [
-            "GET",
-            "HEAD",
-            "OPTIONS"
-        ],
-        targetOriginId: s3OriginId,
-        forwardedValues: {
-            queryString: false,
-            cookies: {
-                forward: "none",
-            },
+      allowedMethods: ["GET", "HEAD", "OPTIONS"],
+      cachedMethods: ["GET", "HEAD"],
+      targetOriginId: s3OriginId,
+      forwardedValues: {
+        queryString: false,
+        cookies: {
+          forward: "none",
         },
-        viewerProtocolPolicy: "allow-all",
-        minTtl: 0,
-        defaultTtl: 3600,
-        maxTtl: 86400
+      },
+      viewerProtocolPolicy: "allow-all",
+      minTtl: 0,
+      defaultTtl: 3600,
+      maxTtl: 86400,
     },
     restrictions: {
-        geoRestriction: {
-            restrictionType: "none"
-        }
+      geoRestriction: {
+        restrictionType: "whitelist",
+        locations: ["FI"],
+      },
     },
     viewerCertificate: {
-        acmCertificateArn: "arn:aws:acm:us-east-1:806232589401:certificate/39b623e4-efdb-4462-ac30-fd28713026f9",
-        sslSupportMethod: "sni-only"
-    }
-});
+      acmCertificateArn: frontendCert.arn,
+      sslSupportMethod: "sni-only",
+    },
+  },
+  {
+    dependsOn: [bucket, frontendCert, oac],
+  },
+)
 
-const fe_record = new aws.route53.Record(defaultResourceName + "-fe", {
+new aws.route53.Record(
+  defaultResourceName + "-fr",
+  {
     type: "A",
-    zoneId: valuemotive_zone.id,
-    name: "kiekkohamsteri.valuemotive.net",
-    aliases: [{
+    zoneId: zoneId,
+    name: frontendDomainName,
+    aliases: [
+      {
         name: distribution.domainName,
         zoneId: distribution.hostedZoneId,
         evaluateTargetHealth: true,
-    }]
-});
+      },
+    ],
+  },
+  {
+    dependsOn: [distribution],
+  },
+)
