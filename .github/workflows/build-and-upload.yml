@@ -32,7 +32,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_CROSS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_CROSS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ${{ secrets.AWS_REGION }}
           role-to-assume: ${{ secrets.ECR_ROLE_ARN }}
           role-duration-seconds: 1800
           role-session-name: GithubAction-ECR-PushDeploy
