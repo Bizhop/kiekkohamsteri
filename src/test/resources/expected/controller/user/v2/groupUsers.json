@@ -5,7 +5,6 @@
     "firstName": "New",
     "lastName": "User",
     "pdgaNumber": 0,
-    "jwt": null,
     "groups": [
       {
         "id": 1,
@@ -19,7 +18,6 @@
     "firstName": "New",
     "lastName": "User",
     "pdgaNumber": 0,
-    "jwt": null,
     "roles": [
       {
         "name": "GROUP_ADMIN",

@@ -5,7 +5,6 @@
     "firstName": "New",
     "lastName": "User",
     "pdgaNumber": 0,
-    "jwt": null,
     "groups": [
       {
         "id": 1,
@@ -18,8 +17,7 @@
     "email": "other@example.com",
     "firstName": "New",
     "lastName": "User",
-    "pdgaNumber": 0,
-    "jwt": null
+    "pdgaNumber": 0
   },
   {
     "username": "Admin",
@@ -27,7 +25,6 @@
     "firstName": "New",
     "lastName": "User",
     "pdgaNumber": 0,
-    "jwt": null,
     "roles": [
       {
         "name": "ADMIN",
@@ -41,7 +38,6 @@
     "firstName": "New",
     "lastName": "User",
     "pdgaNumber": 0,
-    "jwt": null,
     "roles": [
       {
         "name": "GROUP_ADMIN",

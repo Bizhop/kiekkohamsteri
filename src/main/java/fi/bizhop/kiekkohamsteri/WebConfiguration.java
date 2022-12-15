@@ -39,6 +39,7 @@ public class WebConfiguration implements WebMvcConfigurer {
         //V2
         bean.addUrlPatterns("/api/v2/user/*");
         bean.addUrlPatterns("/api/v2/groups/*");
+        bean.addUrlPatterns("/api/v2/discs/*");
 
         bean.setOrder(1);
 

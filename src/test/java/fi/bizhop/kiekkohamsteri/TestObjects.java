@@ -1,10 +1,12 @@
 package fi.bizhop.kiekkohamsteri;
 
+import fi.bizhop.kiekkohamsteri.dto.v2.out.DiscOutputDto;
 import fi.bizhop.kiekkohamsteri.model.*;
 import fi.bizhop.kiekkohamsteri.projection.v1.*;
 import fi.bizhop.kiekkohamsteri.projection.v1.dropdown.*;
 import fi.bizhop.kiekkohamsteri.util.Utils;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -15,7 +17,7 @@ import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_ADMIN;
 import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_GROUP_ADMIN;
 
 public class TestObjects {
-    public static final String TEST_UUID = "d2b62756-378f-487d-ba25-0b0ff287d1d8";
+    public static final Instant TEST_TIMESTAMP = Instant.ofEpochMilli(1670917528851L);
     public static final String SHOULD_THROW_EXCEPTION = "Previous call should throw Exception";
     public static final String WRONG_EXCEPTION = "Expected different exception";
     public static final String TEST_EMAIL = "test@example.com";
@@ -121,10 +123,10 @@ public class TestObjects {
                 .collect(Collectors.toList());
     }
 
-    public static List<DiscProjection> getLostDiscs() {
+    public static List<Disc> getDiscsByUserV2(User user) {
         return DISCS.stream()
-                .filter(isLost)
-                .map(TestObjects::projectionFromDisc)
+                .filter(isNotLost)
+                .filter(disc -> disc.getOwner().getEmail().equals(user.getEmail()))
                 .collect(Collectors.toList());
     }
 
