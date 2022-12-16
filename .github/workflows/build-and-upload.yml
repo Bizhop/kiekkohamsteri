@@ -45,6 +45,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     name: Update TD on ECS service
+    env:
+      IMAGE_NAME: ${{ secrets.CONTAINER_REGISTRY_HOST }}/kiekkohamsteri-dev:latest
 
     steps:
       - name: Configure AWS credentials
@@ -65,7 +67,10 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: kiekkohamsteri-dev-container
-          image: ${{ secrets.CONTAINER_REGISTRY_HOST }}/$ECR_REPOSITORY:latest
+          image: $IMAGE_NAME
+      - name: Debug - echo task definition file
+        run: |
+          cat ${{ steps.task-def.outputs.task-definition }}
       - name: Deploy TD
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
