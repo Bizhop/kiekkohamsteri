@@ -67,7 +67,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: kiekkohamsteri-dev-container
-          image: $IMAGE_NAME
+          image: ${{ env.IMAGE_NAME }}
       - name: Debug - echo task definition file
         run: |
           cat ${{ steps.task-def.outputs.task-definition }}
