@@ -1,18 +1,18 @@
-name: Build and upload
+name: Build, upload and deploy to dev
 
 on:
   push:
     branches: [ "main" ]
 
 env:
-  REGISTRY: ghcr.io
   ECR_REPOSITORY: kiekkohamsteri-dev
-  IMAGE_NAME: ${{ github.repository }}
+  AWS_REGION: eu-north-1
+  TD_FILE: task-definition.json
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Docker build and push to Github Packages
+    name: Docker build and push to ECR
     permissions:
       id-token: write
       contents: read
@@ -32,7 +32,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_CROSS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_CROSS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: $AWS_REGION
           role-to-assume: ${{ secrets.ECR_ROLE_ARN }}
           role-duration-seconds: 1800
           role-session-name: GithubAction-ECR-PushDeploy
@@ -40,5 +40,37 @@ jobs:
         run: |
           docker build -t $ECR_REPOSITORY .
           docker tag $ECR_REPOSITORY ${{ secrets.CONTAINER_REGISTRY_HOST }}/$ECR_REPOSITORY
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.CONTAINER_REGISTRY_HOST }}
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.CONTAINER_REGISTRY_HOST }}
           docker push ${{ secrets.CONTAINER_REGISTRY_HOST }}/$ECR_REPOSITORY
+
+  deploy:
+    runs-on: ubuntu-latest
+    name: Update TD on ECS service
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_CROSS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_CROSS_SECRET_ACCESS_KEY }}
+          aws-region: $AWS_REGION
+          role-to-assume: ${{ secrets.ECS_ROLE_ARN }}
+          role-duration-seconds: 1800
+          role-session-name: GithubAction-ECS-Update-TD
+        - name: Download TD
+          run: |
+            aws ecs describe-task-definition --task-definition kiekkohamsteri-task-dev --query taskDefinition > $TD_FILE
+        - name: Update TD
+          id: task-def
+          uses: aws-actions/amazon-ecs-render-task-definition@v1
+          with:
+            task-definition: $TD_FILE
+            container-name: kiekkohamsteri-dev-container
+            image: ${{ secrets.CONTAINER_REGISTRY_HOST }}/$ECR_REPOSITORY:latest
+        - name: Deploy TD
+          uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+          with:
+            task-definition: ${{ steps.task-def.outputs.task-definition }}
+            service: kiekkohamsteri-dev-service
+            cluster: kiekkohamsteri-dev
+            wait-for-service-stability: true
