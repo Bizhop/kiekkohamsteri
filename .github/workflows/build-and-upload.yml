@@ -57,20 +57,20 @@ jobs:
           role-to-assume: ${{ secrets.ECS_ROLE_ARN }}
           role-duration-seconds: 1800
           role-session-name: GithubAction-ECS-Update-TD
-        - name: Download TD
-          run: |
-            aws ecs describe-task-definition --task-definition kiekkohamsteri-task-dev --query taskDefinition > $TD_FILE
-        - name: Update TD
-          id: task-def
-          uses: aws-actions/amazon-ecs-render-task-definition@v1
-          with:
-            task-definition: $TD_FILE
-            container-name: kiekkohamsteri-dev-container
-            image: ${{ secrets.CONTAINER_REGISTRY_HOST }}/$ECR_REPOSITORY:latest
-        - name: Deploy TD
-          uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-          with:
-            task-definition: ${{ steps.task-def.outputs.task-definition }}
-            service: kiekkohamsteri-dev-service
-            cluster: kiekkohamsteri-dev
-            wait-for-service-stability: true
+      - name: Download TD
+        run: |
+          aws ecs describe-task-definition --task-definition kiekkohamsteri-task-dev --query taskDefinition > $TD_FILE
+      - name: Update TD
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: $TD_FILE
+          container-name: kiekkohamsteri-dev-container
+          image: ${{ secrets.CONTAINER_REGISTRY_HOST }}/$ECR_REPOSITORY:latest
+      - name: Deploy TD
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: kiekkohamsteri-dev-service
+          cluster: kiekkohamsteri-dev
+          wait-for-service-stability: true
