@@ -31,7 +31,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_CROSS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_CROSS_SECRET_ACCESS_KEY }}
           aws-region: eu-north-1
-          role-to-assume: ${{ secrets.ECR_ROLE_ARN }}
+          role-to-assume: ${{ secrets.KIEKKOHAMSTERI_CICD_ROLE }}
           role-duration-seconds: 1800
           role-session-name: GithubAction-ECR-PushDeploy
       - name: Build and push docker image
@@ -53,7 +53,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_CROSS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_CROSS_SECRET_ACCESS_KEY }}
           aws-region: eu-north-1
-          role-to-assume: ${{ secrets.ECS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.KIEKKOHAMSTERI_CICD_ROLE }}
           role-duration-seconds: 1800
           role-session-name: GithubAction-ECS-Update-TD
       - name: Download TD
