@@ -32,7 +32,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_CROSS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_CROSS_SECRET_ACCESS_KEY }}
-          aws-region: $AWS_REGION
+          aws-region: "$AWS_REGION"
           role-to-assume: ${{ secrets.ECR_ROLE_ARN }}
           role-duration-seconds: 1800
           role-session-name: GithubAction-ECR-PushDeploy
@@ -44,6 +44,7 @@ jobs:
           docker push ${{ secrets.CONTAINER_REGISTRY_HOST }}/$ECR_REPOSITORY
 
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     name: Update TD on ECS service
 
@@ -53,7 +54,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_CROSS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_CROSS_SECRET_ACCESS_KEY }}
-          aws-region: $AWS_REGION
+          aws-region: "$AWS_REGION"
           role-to-assume: ${{ secrets.ECS_ROLE_ARN }}
           role-duration-seconds: 1800
           role-session-name: GithubAction-ECS-Update-TD
@@ -64,7 +65,7 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: $TD_FILE
+          task-definition: "$TD_FILE"
           container-name: kiekkohamsteri-dev-container
           image: ${{ secrets.CONTAINER_REGISTRY_HOST }}/$ECR_REPOSITORY:latest
       - name: Deploy TD
