@@ -6,8 +6,6 @@ on:
 
 env:
   ECR_REPOSITORY: kiekkohamsteri-dev
-  AWS_REGION: eu-north-1
-  TD_FILE: task-definition.json
 
 jobs:
   build:
@@ -32,7 +30,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_CROSS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_CROSS_SECRET_ACCESS_KEY }}
-          aws-region: "$AWS_REGION"
+          aws-region: eu-north-1
           role-to-assume: ${{ secrets.ECR_ROLE_ARN }}
           role-duration-seconds: 1800
           role-session-name: GithubAction-ECR-PushDeploy
@@ -54,18 +52,18 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_CROSS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_CROSS_SECRET_ACCESS_KEY }}
-          aws-region: "$AWS_REGION"
+          aws-region: eu-north-1
           role-to-assume: ${{ secrets.ECS_ROLE_ARN }}
           role-duration-seconds: 1800
           role-session-name: GithubAction-ECS-Update-TD
       - name: Download TD
         run: |
-          aws ecs describe-task-definition --task-definition kiekkohamsteri-task-dev --query taskDefinition > $TD_FILE
+          aws ecs describe-task-definition --task-definition kiekkohamsteri-task-dev --query taskDefinition > task-definition.json
       - name: Update TD
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: "$TD_FILE"
+          task-definition: task-definition.json
           container-name: kiekkohamsteri-dev-container
           image: ${{ secrets.CONTAINER_REGISTRY_HOST }}/$ECR_REPOSITORY:latest
       - name: Deploy TD
