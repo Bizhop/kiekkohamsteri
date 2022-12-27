@@ -4,7 +4,6 @@ import fi.bizhop.kiekkohamsteri.dto.v2.in.UserUpdateDto;
 import fi.bizhop.kiekkohamsteri.dto.v2.out.UserOutputDto;
 import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
-import fi.bizhop.kiekkohamsteri.service.DiscService;
 import fi.bizhop.kiekkohamsteri.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static fi.bizhop.kiekkohamsteri.util.Utils.*;
+import static fi.bizhop.kiekkohamsteri.util.Utils.userBelongsToGroup;
+import static fi.bizhop.kiekkohamsteri.util.Utils.userIsAdmin;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
@@ -24,7 +24,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 public class UserControllerV2 extends BaseControllerV2 {
     final AuthService authService;
     final UserService userService;
-    final DiscService discService;
 
     @RequestMapping(value = "/user", method = GET, produces = "application/json")
     public @ResponseBody List<UserOutputDto> getUsers(

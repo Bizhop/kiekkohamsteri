@@ -3,6 +3,5 @@
   "email": "other@example.com",
   "firstName": "New",
   "lastName": "User",
-  "pdgaNumber": 0,
-  "jwt": null
+  "pdgaNumber": 0
 }

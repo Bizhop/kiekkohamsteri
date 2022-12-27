@@ -4,7 +4,6 @@
   "firstName": "New",
   "lastName": "User",
   "pdgaNumber": 0,
-  "jwt": null,
   "groups": [
     {
       "id": 1,

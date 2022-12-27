@@ -1,24 +1,29 @@
 package fi.bizhop.kiekkohamsteri.service;
 
-import fi.bizhop.kiekkohamsteri.TestObjects;
 import fi.bizhop.kiekkohamsteri.db.DiscRepository;
 import fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.DiscSearchDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.Disc;
 import fi.bizhop.kiekkohamsteri.model.User;
+import fi.bizhop.kiekkohamsteri.search.SearchCriteria;
+import fi.bizhop.kiekkohamsteri.search.discs.DiscSpecificationBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,6 +36,9 @@ public class DiscServiceTest {
 
     @Captor
     ArgumentCaptor<Disc> discCaptor;
+
+    @Captor
+    ArgumentCaptor<Specification<Disc>> specificationCaptor;
 
     @BeforeEach
     void init() {
@@ -77,7 +85,7 @@ public class DiscServiceTest {
     }
 
     @Test
-    void givenUserIsNotDiscOwner_whenDeletingDisc_thenThrowException() {
+    void givenUserIsNotDiscOwner_whenDeletingDisc_thenThrowAuthException() {
         var disc = DISCS.stream()
                 .filter(d -> OTHER_EMAIL.equals(d.getOwner().getEmail()))
                 .findFirst();
@@ -94,7 +102,7 @@ public class DiscServiceTest {
     }
 
     @Test
-    void givenUserIsNotDiscOwner_whenUpdatingDisc_thenThrowException() {
+    void givenUserIsNotDiscOwner_whenUpdatingDisc_thenThrowAuthException() {
         var disc = getTestDiscFor(OTHER_USER);
 
         when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
@@ -133,7 +141,7 @@ public class DiscServiceTest {
     }
 
     @Test
-    void givenDtoLostIsTrue_whenUpdating_thenSetItbFalseAndMyynnissaFalse() throws AuthorizationException {
+    void givenLostIsTrue_whenUpdating_thenSetItbFalseAndForSaleFalse() throws AuthorizationException {
         var disc = getTestDiscFor(TEST_USER);
         disc.setItb(true);
         disc.setForSale(true);
@@ -164,7 +172,7 @@ public class DiscServiceTest {
     }
 
     @Test
-    void givenUserIsNotDiscOwner_whenGetDisc_thenThrowException() {
+    void givenUserIsNotDiscOwner_whenGetDisc_thenThrowAuthException() {
         var disc = getDiscsByUser(OTHER_USER).get(0);
 
         when(discRepo.getDiscById(anyLong())).thenReturn(disc);
@@ -201,10 +209,9 @@ public class DiscServiceTest {
             getDiscService().getDiscIfPublicOrOwn(TEST_USER, 123L);
 
             fail(SHOULD_THROW_EXCEPTION);
-        } catch (HttpResponseException e) {
+        } catch (HttpResponseException hre) {
             fail(WRONG_EXCEPTION);
         } catch (AuthorizationException ignored) {}
-
     }
 
     @Test
@@ -213,35 +220,20 @@ public class DiscServiceTest {
 
         try {
             getDiscService().getDiscIfPublicOrOwn(TEST_USER, 123L);
-        } catch (AuthorizationException e) {
+        } catch (AuthorizationException ae) {
             fail(WRONG_EXCEPTION);
-        } catch (HttpResponseException ignored) {}
+        } catch (HttpResponseException hre) {
+            assertEquals(SC_NOT_FOUND, hre.getStatusCode());
+        }
     }
 
     @Test
-    void publicListsTest() {
-        var discs = DISCS.stream()
-                .filter(Disc::getPublicDisc)
-                .map(TestObjects::projectionFromDisc)
-                .collect(Collectors.toList());
-
-        var users = List.of(TEST_USER, OTHER_USER);
-        when(discRepo.findByOwnerInAndPublicDiscTrue(users)).thenReturn(discs);
-
-        var publicLists = getDiscService().getPublicLists(users);
-
-        assertEquals(2, publicLists.size());
-        var testUserListing = publicLists.stream()
-                .filter(listing -> TEST_USER.getUsername().equals(listing.getUsername()))
-                .findFirst().orElse(null);
-        var otherUserListing = publicLists.stream()
-                .filter(listing -> OTHER_USER.getUsername().equals(listing.getUsername()))
-                .findFirst().orElse(null);
-
-        assertNotNull(testUserListing);
-        assertEquals(2, testUserListing.getKiekot().size());
-        assertNotNull(otherUserListing);
-        assertEquals(1, otherUserListing.getKiekot().size());
+    void givenCriteriaIsNull_whenSearch_thenThrowBadRequestException() {
+        try {
+            getDiscService().search(null, null, DiscSearchDto.builder().build());
+        } catch (HttpResponseException hre) {
+            assertEquals(SC_BAD_REQUEST, hre.getStatusCode());
+        }
     }
 
     DiscService getDiscService() {

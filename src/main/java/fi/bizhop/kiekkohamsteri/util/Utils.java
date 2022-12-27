@@ -1,6 +1,9 @@
 package fi.bizhop.kiekkohamsteri.util;
 
 import fi.bizhop.kiekkohamsteri.model.User;
+import fi.bizhop.kiekkohamsteri.search.SearchOperation;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanWrapper;
@@ -11,11 +14,32 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
+import static fi.bizhop.kiekkohamsteri.search.SearchOperation.*;
+
 public class Utils {
 	private static final Logger LOG = LogManager.getLogger(Utils.class);
 
 	public static final String USER_ROLE_ADMIN = "ADMIN";
 	public static final String USER_ROLE_GROUP_ADMIN = "GROUP_ADMIN";
+
+	public static final Set<String> COMPARABLE_NUMBER_FIELDS = Set.of("weight", "price", "condition");
+	public static final Set<String> BOOLEAN_FIELDS = Set.of("dyed", "special", "swirly", "forSale", "lostAndFound", "itb", "publicDisc", "lost");
+
+	private static final List<SupportedOperation> SUPPORTED_OPERATIONS = new ArrayList<>();
+
+	static {
+		//add comparable number fields
+		final Set<SearchOperation> operationsForComparableNumberFields = Set.of(GREATER_THAN, GREATER_THAN_EQUAL, LESS_THAN, LESS_THAN_EQUAL, EQUAL, NOT_EQUAL, IN, NOT_IN);
+		COMPARABLE_NUMBER_FIELDS.forEach(field -> SUPPORTED_OPERATIONS.add(new SupportedOperation(field, "number", operationsForComparableNumberFields)));
+
+		//add boolean fields
+		final Set<SearchOperation> operationsForBooleans = Set.of(EQUAL);
+		BOOLEAN_FIELDS.forEach(field -> SUPPORTED_OPERATIONS.add(new SupportedOperation(field, "boolean", operationsForBooleans)));
+	}
+
+	public static List<SupportedOperation> getSupportedOperations() {
+		return List.copyOf(SUPPORTED_OPERATIONS);
+	}
 
 	public static List<String> getNullPropertyNames (Object source) {
 		final BeanWrapper src = new BeanWrapperImpl(source);
@@ -61,5 +85,13 @@ public class Utils {
 		if(user == null || user.getGroups() == null || groupId == null) return false;
 		return user.getGroups().stream()
 				.anyMatch(group -> groupId.equals(group.getId()));
+	}
+
+	@AllArgsConstructor
+	@Getter
+	public static class SupportedOperation {
+		final String field;
+		final String type;
+		final Set<SearchOperation> operations;
 	}
 }

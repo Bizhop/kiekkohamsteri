@@ -1,0 +1,114 @@
+{
+  "content": [
+    {
+      "owner": {
+        "username": "User",
+        "email": "User",
+        "firstName": "New",
+        "lastName": "User",
+        "pdgaNumber": 0
+      },
+      "mold": {
+        "id": 0,
+        "manufacturer": {
+          "id": 0,
+          "name": "Discmania"
+        },
+        "name": "FD",
+        "speed": 7,
+        "glide": 6,
+        "stability": -1,
+        "fade": 1
+      },
+      "plastic": {
+        "id": 0,
+        "manufacturer": {
+          "id": 0,
+          "name": "Discmania"
+        },
+        "name": "S-Line"
+      },
+      "color": {
+        "id": 0,
+        "name": "Valkoinen"
+      },
+      "image": "",
+      "weight": 175,
+      "condition": 10,
+      "glow": false,
+      "special": false,
+      "dyed": false,
+      "swirly": false,
+      "markings": 1,
+      "forSale": false,
+      "price": 0,
+      "description": "",
+      "lostAndFound": false,
+      "itb": false,
+      "publicDisc": true,
+      "lost": false
+    },
+    {
+      "owner": {
+        "username": "User",
+        "email": "User",
+        "firstName": "New",
+        "lastName": "User",
+        "pdgaNumber": 0
+      },
+      "mold": {
+        "id": 10,
+        "manufacturer": {
+          "id": 1,
+          "name": "Innova"
+        },
+        "name": "Destroyer",
+        "speed": 12,
+        "glide": 5,
+        "stability": -1,
+        "fade": 3
+      },
+      "plastic": {
+        "id": 10,
+        "manufacturer": {
+          "id": 1,
+          "name": "Innova"
+        },
+        "name": "Star"
+      },
+      "color": {
+        "id": 1,
+        "name": "Keltainen"
+      },
+      "image": "",
+      "weight": 175,
+      "condition": 10,
+      "glow": false,
+      "special": false,
+      "dyed": false,
+      "swirly": false,
+      "markings": 1,
+      "forSale": false,
+      "price": 0,
+      "description": "",
+      "lostAndFound": false,
+      "itb": false,
+      "publicDisc": false,
+      "lost": false
+    }
+  ],
+  "pageable": "INSTANCE",
+  "last": true,
+  "totalPages": 1,
+  "totalElements": 2,
+  "size": 2,
+  "number": 0,
+  "sort": {
+    "sorted": false,
+    "unsorted": true,
+    "empty": true
+  },
+  "first": true,
+  "numberOfElements": 2,
+  "empty": false
+}

@@ -12,6 +12,6 @@ public class BaseAdder {
     }
 
     public enum Type {
-        CONTROLLER, REPOSITORY;
+        CONTROLLER, REPOSITORY, OTHER;
     }
 }

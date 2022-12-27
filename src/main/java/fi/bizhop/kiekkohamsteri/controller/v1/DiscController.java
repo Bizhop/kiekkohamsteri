@@ -1,6 +1,5 @@
 package fi.bizhop.kiekkohamsteri.controller.v1;
 
-import fi.bizhop.kiekkohamsteri.controller.provider.UUIDProvider;
 import fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto;
 import fi.bizhop.kiekkohamsteri.dto.v1.in.UploadDto;
 import fi.bizhop.kiekkohamsteri.dto.v1.out.BuyOutputDto;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Clock;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 
@@ -32,7 +32,7 @@ public class DiscController extends BaseController {
 	final MoldService moldService;
 	final PlasticService plasticService;
 	final ColorService colorService;
-	final UUIDProvider uuidProvider;
+	final Clock clock;
 	final UserService userService;
 
 	@RequestMapping(value = "/kiekot", method = RequestMethod.GET, produces = "application/json")
@@ -108,11 +108,11 @@ public class DiscController extends BaseController {
 			var disc = discService.getDisc(owner, id);
 			var image = disc.getKuva();
 			//if image name already has more than one "-", it has been updated previously
-			// then replace the uuid with new one
-			var uuid = uuidProvider.getUuid();
+			// then replace timestamp with new one
+			var timestamp = clock.instant().toEpochMilli();
 			var newImage = StringUtils.countOccurrencesOf(image, "-") > 1
-					? image.substring(0, image.lastIndexOf("-")) + "-" + uuid
-					: image + "-" + uuid;
+					? image.substring(0, image.lastIndexOf("-")) + "-" + timestamp
+					: image + "-" + timestamp;
 
 			uploadService.upload(dto, newImage);
 			discService.updateImage(disc.getId(), newImage);

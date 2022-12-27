@@ -2,7 +2,6 @@ package fi.bizhop.kiekkohamsteri.controller.v1;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.controller.provider.UUIDProvider;
 import fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto;
 import fi.bizhop.kiekkohamsteri.dto.v1.in.UploadDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
@@ -26,6 +25,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
+import java.time.Clock;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -54,7 +54,7 @@ public class DiscControllerTest extends SpringContextTestBase {
     @MockBean MoldService moldService;
     @MockBean PlasticService plasticService;
     @MockBean ColorService colorService;
-    @MockBean UUIDProvider uuidProvider;
+    @MockBean Clock clock;
     @MockBean UserService userService;
 
     @Captor ArgumentCaptor<Pageable> pageableCaptor;
@@ -62,7 +62,7 @@ public class DiscControllerTest extends SpringContextTestBase {
     BaseAdder adder = new BaseAdder("disc", CONTROLLER);
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "myytavat", "1", "public-lists", "lost"})
+    @ValueSource(strings = {"", "myytavat", "1", "lost"})
     void givenUnableToAuthenticateUser_whenCallingGetEndpoint_thenRespondWithUnauthorized(String endpoint) {
         when(authService.getUser(any())).thenReturn(null);
 
@@ -273,15 +273,15 @@ public class DiscControllerTest extends SpringContextTestBase {
         var discProjection = projectionFromDisc(disc);
 
         when(discService.getDisc(TEST_USER, 123L)).thenReturn(discProjection);
-        when(uuidProvider.getUuid()).thenReturn(TEST_UUID);
+        when(clock.instant()).thenReturn(TEST_TIMESTAMP);
 
         var dto = uploadDto().build();
-        var newImage = String.format("Test-123-%s", TEST_UUID);
+        var newImage = String.format("Test-123-%d", TEST_TIMESTAMP.toEpochMilli());
 
         var response = restTemplate.exchange(createUrl("123/update-image"), PATCH, new HttpEntity<>(dto), Object.class);
 
         verify(discService, times(1)).getDisc(TEST_USER, 123L);
-        verify(uuidProvider, times(1)).getUuid();
+        verify(clock, times(1)).instant();
         verify(uploadService, times(1)).upload(dto, newImage);
         verify(discService, times(1)).updateImage(123L, newImage);
 
@@ -300,16 +300,16 @@ public class DiscControllerTest extends SpringContextTestBase {
         var discProjection = projectionFromDisc(disc);
 
         when(discService.getDisc(TEST_USER, 123L)).thenReturn(discProjection);
-        when(uuidProvider.getUuid()).thenReturn(TEST_UUID);
+        when(clock.instant()).thenReturn(TEST_TIMESTAMP);
 
         var dto = uploadDto().build();
-        var newImage = String.format("Test-123-%s", TEST_UUID);
+        var newImage = String.format("Test-123-%d", TEST_TIMESTAMP.toEpochMilli());
         doThrow(new IOException()).when(uploadService).upload(dto, newImage);
 
         var response = restTemplate.exchange(createUrl("123/update-image"), PATCH, new HttpEntity<>(dto), Object.class);
 
         verify(discService, times(1)).getDisc(TEST_USER, 123L);
-        verify(uuidProvider, times(1)).getUuid();
+        verify(clock, times(1)).instant();
         verify(uploadService, times(1)).upload(dto, newImage);
         verify(discService, never()).updateImage(anyLong(), anyString());
 
@@ -328,7 +328,7 @@ public class DiscControllerTest extends SpringContextTestBase {
 
         var response = restTemplate.exchange(createUrl("456/update-image"), PATCH, new HttpEntity<>(dto), Object.class);
 
-        verify(uuidProvider, never()).getUuid();
+        verify(clock, never()).instant();
         verify(uploadService, never()).upload(any(), anyString());
         verify(discService, never()).updateImage(anyLong(), anyString());
 

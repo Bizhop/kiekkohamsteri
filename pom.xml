@@ -18,9 +18,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>11</java.version>
-		<testcontainers.version>1.17.3</testcontainers.version>
+		<testcontainers.version>1.17.6</testcontainers.version>
 		<jjwt.version>0.11.5</jjwt.version>
-		<cloudinary.version>1.32.2</cloudinary.version>
+		<cloudinary.version>1.33.0</cloudinary.version>
 	</properties>
 
 	<dependencies>
@@ -47,7 +47,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.4.2</version>
+			<version>42.5.1</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -63,7 +63,7 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>4.15.0</version>
+			<version>4.17.2</version>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>

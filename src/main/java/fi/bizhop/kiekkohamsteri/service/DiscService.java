@@ -2,11 +2,12 @@ package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.DiscRepository;
 import fi.bizhop.kiekkohamsteri.dto.v2.in.DiscInputDto;
-import fi.bizhop.kiekkohamsteri.dto.v1.out.ListingDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.DiscSearchDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.*;
 import fi.bizhop.kiekkohamsteri.projection.v1.DiscProjection;
+import fi.bizhop.kiekkohamsteri.search.discs.DiscSpecificationBuilder;
 import fi.bizhop.kiekkohamsteri.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -16,12 +17,11 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static fi.bizhop.kiekkohamsteri.search.SearchOperation.EQUAL;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 @Service
@@ -112,17 +112,6 @@ public class DiscService {
 		}
 	}
 
-	public List<ListingDto> getPublicLists(List<User> usersWithPublicDiscs) {
-		if(usersWithPublicDiscs == null || usersWithPublicDiscs.isEmpty()) return Collections.emptyList();
-
-		return discRepo.findByOwnerInAndPublicDiscTrue(usersWithPublicDiscs)
-				.stream()
-				.collect(Collectors.groupingBy(DiscProjection::getOwnerEmail))
-				.entrySet().stream()
-				.map(ListingDto::fromMapEntry)
-				.collect(Collectors.toList());
-	}
-
 	public void handleFoundDisc(User user, Long id) throws HttpResponseException {
 		var disc = discRepo.findById(id).orElse(null);
 		if(disc == null || !disc.getOwner().equals(user)) {
@@ -139,10 +128,16 @@ public class DiscService {
 		}
 	}
 
-	public void makeDiscsPublic(User user) {
-		var discs = discRepo.findByOwnerAndLostFalse(user);
-		discs.forEach(disc -> disc.setPublicDisc(true));
-		discRepo.saveAll(discs);
+	public Page<Disc> search(User owner, Pageable pageable, DiscSearchDto searchDto) throws HttpResponseException {
+		if(searchDto.getCriteria() == null) throw new HttpResponseException(SC_BAD_REQUEST, "Criteria must not be null");
+
+		var builder = DiscSpecificationBuilder.builder();
+
+		builder.with("owner", EQUAL, owner);
+		builder.with("lost", EQUAL, Boolean.FALSE);
+		searchDto.getCriteria().forEach(builder::with);
+
+		return discRepo.findAll(builder.build(), pageable);
 	}
 
 	// Pass-through methods to db
@@ -154,6 +149,10 @@ public class DiscService {
 
 	public Page<DiscProjection> getDiscs(User owner, Pageable pageable) {
 		return discRepo.findByOwnerAndLostFalse(owner, pageable);
+	}
+
+	public Page<Disc> getDiscsV2(User owner, Pageable pageable) {
+		return discRepo.getByOwnerAndLostFalse(owner, pageable);
 	}
 
 	public Page<DiscProjection> getDiscsForSale(Pageable pageable) {
