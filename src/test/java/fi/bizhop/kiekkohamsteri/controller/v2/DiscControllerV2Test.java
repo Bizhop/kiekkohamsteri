@@ -78,6 +78,16 @@ public class DiscControllerV2Test extends SpringContextTestBase {
         assertEqualsJson(adder.create("getDiscs.json"), response.getBody());
     }
 
+    @Test
+    void supportedOperationsTest() {
+        when(authService.getUser(any())).thenReturn(TEST_USER);
+
+        var response = restTemplate.getForEntity(createUrl("search"), String.class);
+
+        assertEquals(SC_OK, response.getStatusCodeValue());
+        assertEqualsJson(adder.create("supportedOperations.json"), response.getBody());
+    }
+
     private String createUrl(String endpoint) {
         return String.format("http://localhost:%d/api/v2/discs/%s", port, endpoint);
     }

@@ -2,6 +2,8 @@ package fi.bizhop.kiekkohamsteri.search.discs;
 
 import fi.bizhop.kiekkohamsteri.model.Disc;
 import fi.bizhop.kiekkohamsteri.search.SearchCriteria;
+import fi.bizhop.kiekkohamsteri.search.SearchOperation;
+import fi.bizhop.kiekkohamsteri.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
@@ -12,15 +14,17 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.Set;
 
+import static fi.bizhop.kiekkohamsteri.search.SearchOperation.EQUAL;
+import static fi.bizhop.kiekkohamsteri.search.SearchOperation.NOT_EQUAL;
+
 @RequiredArgsConstructor
 public class DiscSpecification implements Specification<Disc> {
     private final SearchCriteria criteria;
 
-    private static final Set<String> COMPARABLE_NUMBER_FIELDS = Set.of("weight", "price", "condition");
-
     @Override
     public Predicate toPredicate(@NonNull Root<Disc> root, @NonNull CriteriaQuery<?> cq, @NonNull CriteriaBuilder cb) {
         if(this.criteria.getValue() == null || this.criteria.getKey() == null) return null;
+        if(!isOperationSupported(this.criteria.getOperation(), this.criteria.getKey())) return null;
 
         switch (this.criteria.getOperation()) {
             case GREATER_THAN:
@@ -41,9 +45,18 @@ public class DiscSpecification implements Specification<Disc> {
         }
     }
 
+    private boolean isOperationSupported(SearchOperation operation, String key) {
+        //equals operations are always supported
+        if(operation.equals(EQUAL) || operation.equals(NOT_EQUAL)) return true;
+
+        return Utils.getSupportedOperations().stream()
+                .anyMatch(supportedOperation ->
+                        supportedOperation.getField().equals(key) && supportedOperation.getOperations().contains(operation));
+    }
+
     private Predicate handleNumberComparison(Root<Disc> root, CriteriaBuilder cb) {
         var key = this.criteria.getKey();
-        if(COMPARABLE_NUMBER_FIELDS.contains(key)) {
+        if(Utils.COMPARABLE_NUMBER_FIELDS.contains(key)) {
             switch (this.criteria.getOperation()) {
                 case GREATER_THAN:
                     return cb.greaterThan(root.get(key), getValueNumber());

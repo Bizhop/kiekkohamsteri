@@ -1,0 +1,100 @@
+[
+  {
+    "field": "price",
+    "type": "number",
+    "operations": [
+      "LESS_THAN",
+      "GREATER_THAN_EQUAL",
+      "LESS_THAN_EQUAL",
+      "NOT_EQUAL",
+      "GREATER_THAN",
+      "EQUAL",
+      "IN",
+      "NOT_IN"
+    ]
+  },
+  {
+    "field": "condition",
+    "type": "number",
+    "operations": [
+      "LESS_THAN",
+      "GREATER_THAN_EQUAL",
+      "LESS_THAN_EQUAL",
+      "NOT_EQUAL",
+      "GREATER_THAN",
+      "EQUAL",
+      "IN",
+      "NOT_IN"
+    ]
+  },
+  {
+    "field": "weight",
+    "type": "number",
+    "operations": [
+      "LESS_THAN",
+      "GREATER_THAN_EQUAL",
+      "LESS_THAN_EQUAL",
+      "NOT_EQUAL",
+      "GREATER_THAN",
+      "EQUAL",
+      "IN",
+      "NOT_IN"
+    ]
+  },
+  {
+    "field": "special",
+    "type": "boolean",
+    "operations": [
+      "EQUAL"
+    ]
+  },
+  {
+    "field": "swirly",
+    "type": "boolean",
+    "operations": [
+      "EQUAL"
+    ]
+  },
+  {
+    "field": "publicDisc",
+    "type": "boolean",
+    "operations": [
+      "EQUAL"
+    ]
+  },
+  {
+    "field": "lostAndFound",
+    "type": "boolean",
+    "operations": [
+      "EQUAL"
+    ]
+  },
+  {
+    "field": "forSale",
+    "type": "boolean",
+    "operations": [
+      "EQUAL"
+    ]
+  },
+  {
+    "field": "dyed",
+    "type": "boolean",
+    "operations": [
+      "EQUAL"
+    ]
+  },
+  {
+    "field": "lost",
+    "type": "boolean",
+    "operations": [
+      "EQUAL"
+    ]
+  },
+  {
+    "field": "itb",
+    "type": "boolean",
+    "operations": [
+      "EQUAL"
+    ]
+  }
+]
