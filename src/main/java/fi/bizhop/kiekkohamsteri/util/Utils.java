@@ -29,11 +29,11 @@ public class Utils {
 
 	static {
 		//add comparable number fields
-		final Set<SearchOperation> operationsForComparableNumberFields = Set.of(GREATER_THAN, GREATER_THAN_EQUAL, LESS_THAN, LESS_THAN_EQUAL, EQUAL, NOT_EQUAL, IN, NOT_IN);
+		final Set<SearchOperation> operationsForComparableNumberFields = new LinkedHashSet<>(List.of(GREATER_THAN, GREATER_THAN_EQUAL, LESS_THAN, LESS_THAN_EQUAL, EQUAL, NOT_EQUAL, IN, NOT_IN));
 		COMPARABLE_NUMBER_FIELDS.forEach(field -> SUPPORTED_OPERATIONS.add(new SupportedOperation(field, "number", operationsForComparableNumberFields)));
 
 		//add boolean fields
-		final Set<SearchOperation> operationsForBooleans = Set.of(EQUAL);
+		final Set<SearchOperation> operationsForBooleans = new LinkedHashSet<>(List.of(EQUAL));
 		BOOLEAN_FIELDS.forEach(field -> SUPPORTED_OPERATIONS.add(new SupportedOperation(field, "boolean", operationsForBooleans)));
 	}
 
