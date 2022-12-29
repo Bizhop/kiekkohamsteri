@@ -141,6 +141,28 @@ public class DiscServiceTest {
     }
 
     @Test
+    void givenValidDtoOnV2_whenUpdatingDisc_thenUpdateDisc() throws AuthorizationException {
+        var disc = getTestDiscFor(TEST_USER);
+
+        when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
+
+        var dto = fi.bizhop.kiekkohamsteri.dto.v2.in.DiscInputDto.builder()
+                .description("text")
+                .condition(8)
+                .image("image")
+                .build();
+
+        getDiscService().updateDisc(dto, 123L, TEST_USER, null, null, null);
+
+        verify(discRepo, times(1)).save(discCaptor.capture());
+
+        var savedDisc = discCaptor.getValue();
+        assertEquals("text", savedDisc.getDescription());
+        assertEquals(8, savedDisc.getCondition());
+        assertEquals("image",savedDisc.getImage());
+    }
+
+    @Test
     void givenLostIsTrue_whenUpdating_thenSetItbFalseAndForSaleFalse() throws AuthorizationException {
         var disc = getTestDiscFor(TEST_USER);
         disc.setItb(true);

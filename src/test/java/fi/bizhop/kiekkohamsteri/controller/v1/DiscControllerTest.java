@@ -580,6 +580,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         assertEqualsJson(adder.create("compatibilitySorts.json"), sorts);
     }
 
+
     //HELPER METHODS
 
     private String createUrl(String endpoint) {
