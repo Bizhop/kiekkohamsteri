@@ -542,4 +542,7 @@
 	<changeSet id="makeGroupNameUnique" author="Ville">
 		<addUniqueConstraint tableName="groups" columnNames="name" />
 	</changeSet>
+	<changeSet id="makeUsernameUnique" author="Ville">
+		<addUniqueConstraint tableName="members" columnNames="username" />
+	</changeSet>
 </databaseChangeLog>
