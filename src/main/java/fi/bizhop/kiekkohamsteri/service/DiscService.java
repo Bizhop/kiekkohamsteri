@@ -3,6 +3,7 @@ package fi.bizhop.kiekkohamsteri.service;
 import fi.bizhop.kiekkohamsteri.db.DiscRepository;
 import fi.bizhop.kiekkohamsteri.dto.v2.in.DiscInputDto;
 import fi.bizhop.kiekkohamsteri.dto.v2.in.DiscSearchDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.out.DiscOutputDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.*;
@@ -58,10 +59,11 @@ public class DiscService {
 	public DiscProjection updateDisc(fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto dto, Long id, User owner, Mold newMold, Plastic newPlastic, Color newColor) throws AuthorizationException {
 		var inputV2 = DiscInputDto.fromV1(dto);
 
-		return updateDisc(inputV2, id, owner, newMold, newPlastic, newColor);
+		updateDisc(inputV2, id, owner, newMold, newPlastic, newColor);
+		return discRepo.getDiscById(id);
 	}
 
-	public DiscProjection updateDisc(DiscInputDto dto, Long id, User owner, Mold newMold, Plastic newPlastic, Color newColor) throws AuthorizationException {
+	public DiscOutputDto updateDisc(DiscInputDto dto, Long id, User owner, Mold newMold, Plastic newPlastic, Color newColor) throws AuthorizationException {
 		var disc = discRepo.findById(id).orElse(null);
 
 		if(disc == null || !disc.getOwner().equals(owner)) {
@@ -86,8 +88,7 @@ public class DiscService {
 			disc.setForSale(false);
 		}
 
-		discRepo.save(disc);
-		return discRepo.getDiscById(id);
+		return DiscOutputDto.fromDb(discRepo.save(disc));
 	}
 
 	public DiscProjection getDisc(User owner, Long id) throws AuthorizationException {
