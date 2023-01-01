@@ -2,10 +2,9 @@ package fi.bizhop.kiekkohamsteri.controller.v1;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.dto.v1.in.PlasticCreateDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.PlasticCreateDto;
 import fi.bizhop.kiekkohamsteri.model.Manufacturer;
 import fi.bizhop.kiekkohamsteri.model.Plastic;
-import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.ManufacturerService;
 import fi.bizhop.kiekkohamsteri.service.PlasticService;
@@ -22,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
@@ -140,7 +138,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
         var manufacturer = MANUFACTURERS.get(0);
-        var dto = PlasticCreateDto.builder().valmId(0L).build();
+        var dto = PlasticCreateDto.builder().manufacturerId(0L).build();
         var mold = getTestPlastic(manufacturer);
         when(manufacturerService.getManufacturer(0L)).thenReturn(Optional.of(manufacturer));
         when(plasticService.createPlastic(dto, manufacturer)).thenReturn(projectionFromPlastic(mold));
@@ -158,7 +156,7 @@ public class PlasticControllerTest extends SpringContextTestBase {
     void givenManufacturerNotFound_whenCreatePlastic_thenRespondBadRequest() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
-        var dto = PlasticCreateDto.builder().valmId(0L).build();
+        var dto = PlasticCreateDto.builder().manufacturerId(0L).build();
         when(manufacturerService.getManufacturer(0L)).thenReturn(Optional.empty());
 
         var response = restTemplate.postForEntity(createUrl(), dto, String.class);
@@ -168,18 +166,6 @@ public class PlasticControllerTest extends SpringContextTestBase {
 
         assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
         assertNull(response.getBody());
-    }
-
-    @Test
-    void v1CompatibilityTest() {
-        when(authService.getUser(any())).thenReturn(ADMIN_USER);
-
-        restTemplate.getForEntity(createUrl("?size=1000&sort=muovi,asc"), String.class);
-
-        verify(plasticService, times(1)).getPlastics(pageableCaptor.capture());
-
-        var sorts = pageableCaptor.getValue().getSort().get().collect(Collectors.toList());
-        assertEqualsJson(adder.create("compatibilitySorts.json"), sorts);
     }
 
 

@@ -1,7 +1,7 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.PlasticRepository;
-import fi.bizhop.kiekkohamsteri.dto.v1.in.PlasticCreateDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.PlasticCreateDto;
 import fi.bizhop.kiekkohamsteri.model.Plastic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,8 +48,8 @@ public class PlasticServiceTest {
         var manufacturer = MANUFACTURERS.get(0);
 
         var dto = PlasticCreateDto.builder()
-                .valmId(manufacturer.getId())
-                .muovi("TEST")
+                .manufacturerId(manufacturer.getId())
+                .name("TEST")
                 .build();
 
         when(plasticRepository.save(any(Plastic.class))).then(returnsFirstArg());

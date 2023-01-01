@@ -3,13 +3,13 @@ package fi.bizhop.kiekkohamsteri.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import fi.bizhop.kiekkohamsteri.dto.v1.out.BuyOutputDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.out.BuyOutputDto;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import fi.bizhop.kiekkohamsteri.db.BuyRepository;
-import fi.bizhop.kiekkohamsteri.dto.v1.out.BuySummaryDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.out.BuySummaryDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.model.Disc;
 import fi.bizhop.kiekkohamsteri.model.User;
@@ -40,8 +40,8 @@ public class BuyService {
 		var asSeller = buyRepo.findByStatusAndSeller(REQUESTED, user);
 		var asBuyer = buyRepo.findByStatusAndBuyer(REQUESTED, user);
 		return BuySummaryDto.builder()
-				.myyjana(asSeller.stream().map(BuyOutputDto::fromDb).collect(Collectors.toList()))
-				.ostajana(asBuyer.stream().map(BuyOutputDto::fromDb).collect(Collectors.toList()))
+				.asBuyer(asSeller.stream().map(BuyOutputDto::fromDb).collect(Collectors.toList()))
+				.asSeller(asBuyer.stream().map(BuyOutputDto::fromDb).collect(Collectors.toList()))
 				.build();
 	}
 

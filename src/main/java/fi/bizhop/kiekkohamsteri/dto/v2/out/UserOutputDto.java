@@ -50,7 +50,7 @@ public class UserOutputDto {
         if(input == null) return null;
         return UserOutputDto.builder()
                 .username(input.getUsername())
-                .email(input.getUsername())
+                .email(input.getEmail())
                 .firstName(input.getFirstName())
                 .lastName(input.getLastName())
                 .pdgaNumber(input.getPdgaNumber())

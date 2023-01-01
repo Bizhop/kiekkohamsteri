@@ -65,7 +65,7 @@ public class DiscControllerV2 extends BaseControllerV2 {
             var newPlastic = plasticService.getPlastic(dto.getPlasticId()).orElse(null);
             var newColor = colorService.getColor(dto.getColorId()).orElse(null);
             response.setStatus(SC_OK);
-            return discService.updateDisc(dto, id, owner, newMold, newPlastic, newColor);
+            return DiscOutputDto.fromDb(discService.updateDisc(dto, id, owner, newMold, newPlastic, newColor));
         }
         catch(AuthorizationException ae) {
             response.setStatus(SC_FORBIDDEN);
@@ -74,6 +74,23 @@ public class DiscControllerV2 extends BaseControllerV2 {
         catch (Exception e) {
             LOG.error(e.getMessage(), e);
             response.setStatus(SC_INTERNAL_SERVER_ERROR);
+            return null;
+        }
+    }
+
+    @RequestMapping(value = "/discs/{id}", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody DiscOutputDto getDisc(@RequestAttribute("user") User owner, @PathVariable Long id, HttpServletResponse response) {
+        try {
+            response.setStatus(SC_OK);
+            return DiscOutputDto.fromDb(discService.getDiscIfPublicOrOwnV2(owner, id));
+        }
+        catch (AuthorizationException ae) {
+            response.setStatus(SC_FORBIDDEN);
+            return null;
+        }
+        catch (HttpResponseException hre) {
+            LOG.error("{} trying to get disc id={}, not found", owner.getEmail(), id);
+            response.setStatus(hre.getStatusCode());
             return null;
         }
     }

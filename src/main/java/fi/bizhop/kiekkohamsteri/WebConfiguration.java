@@ -30,7 +30,6 @@ public class WebConfiguration implements WebMvcConfigurer {
         bean.setFilter(new UserFilter(authService));
 
         //V1
-        bean.addUrlPatterns("/api/ostot/*");
         bean.addUrlPatterns("/api/kiekot/*");
         bean.addUrlPatterns("/api/user/*");
         bean.addUrlPatterns("/api/stats/*");
@@ -40,6 +39,7 @@ public class WebConfiguration implements WebMvcConfigurer {
         bean.addUrlPatterns("/api/v2/user/*");
         bean.addUrlPatterns("/api/v2/groups/*");
         bean.addUrlPatterns("/api/v2/discs/*");
+        bean.addUrlPatterns("/api/v2/buys/*");
 
         bean.setOrder(1);
 
@@ -57,19 +57,6 @@ public class WebConfiguration implements WebMvcConfigurer {
         bean.addUrlPatterns("/api/muovit/*");
 
         bean.setOrder(2);
-
-        return bean;
-    }
-
-    @Bean
-    public FilterRegistrationBean<CompatibilityFilter> compatibilityFilter() {
-        var bean = new FilterRegistrationBean<CompatibilityFilter>();
-
-        bean.setFilter(new CompatibilityFilter());
-        bean.addUrlPatterns("/api/kiekot/*");
-        bean.addUrlPatterns("/api/muovit/*");
-        bean.addUrlPatterns("/api/molds/*");
-        bean.setOrder(3);
 
         return bean;
     }

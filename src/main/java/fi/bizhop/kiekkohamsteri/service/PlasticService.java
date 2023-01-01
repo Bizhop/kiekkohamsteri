@@ -1,7 +1,7 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.PlasticRepository;
-import fi.bizhop.kiekkohamsteri.dto.v1.in.PlasticCreateDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.PlasticCreateDto;
 import fi.bizhop.kiekkohamsteri.model.Plastic;
 import fi.bizhop.kiekkohamsteri.model.Manufacturer;
 import fi.bizhop.kiekkohamsteri.projection.v1.PlasticProjection;
@@ -24,7 +24,7 @@ public class PlasticService {
 	public PlasticProjection createPlastic(PlasticCreateDto dto, Manufacturer manufacturer) {
 		var plastic = new Plastic();
 		plastic.setManufacturer(manufacturer);
-		plastic.setName(dto.getMuovi());
+		plastic.setName(dto.getName());
 		
 		var saved = plasticRepository.save(plastic);
 		return plasticRepository.getPlasticById(saved.getId());

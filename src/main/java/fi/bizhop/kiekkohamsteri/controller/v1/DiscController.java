@@ -1,8 +1,7 @@
 package fi.bizhop.kiekkohamsteri.controller.v1;
 
-import fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto;
-import fi.bizhop.kiekkohamsteri.dto.v1.in.UploadDto;
-import fi.bizhop.kiekkohamsteri.dto.v1.out.BuyOutputDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.UploadDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.out.BuyOutputDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.User;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Clock;
-import java.util.HashSet;
-import java.util.NoSuchElementException;
 
 import static javax.servlet.http.HttpServletResponse.*;
 
@@ -34,32 +31,6 @@ public class DiscController extends BaseController {
 	final ColorService colorService;
 	final Clock clock;
 	final UserService userService;
-
-	@RequestMapping(value = "/kiekot", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody Page<DiscProjection> getDiscs(
-			@RequestAttribute("user") User me,
-			@RequestParam(required = false) Long userId,
-			HttpServletResponse response,
-			Pageable pageable) {
-		if(userId != null) {
-			try {
-				var otherUser = userService.getUser(userId);
-				var groupIntersection = new HashSet<>(me.getGroups());
-				groupIntersection.retainAll(otherUser.getGroups());
-				if(groupIntersection.isEmpty()) {
-					response.setStatus(SC_FORBIDDEN);
-					return null;
-				}
-				return discService.getDiscs(otherUser, pageable);
-			} catch (NoSuchElementException e) {
-				response.setStatus(SC_BAD_REQUEST);
-				return null;
-			}
-		}
-
-		response.setStatus(SC_OK);
-		return discService.getDiscs(me, pageable);
-	}
 
 	@RequestMapping(value = "/kiekot/myytavat", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody Page<DiscProjection> getDiscsForSale(HttpServletResponse response, Pageable pageable) {
@@ -125,43 +96,6 @@ public class DiscController extends BaseController {
 		catch (IOException e) {
 			LOG.error("Cloudinary error uploading image", e);
 			response.setStatus(SC_INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody DiscProjection getDisc(@RequestAttribute("user") User owner, @PathVariable Long id, HttpServletResponse response) {
-		try {
-			response.setStatus(SC_OK);
-			return discService.getDiscIfPublicOrOwn(owner, id);
-		}
-		catch (AuthorizationException ae) {
-			response.setStatus(SC_FORBIDDEN);
-			return null;
-		}
-		catch (HttpResponseException hre) {
-			LOG.error("{} trying to get disc id={}, not found", owner.getEmail(), id);
-			response.setStatus(hre.getStatusCode());
-			return null;
-		}
-	}
-
-	@RequestMapping(value = "/kiekot/{id}", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
-	public @ResponseBody DiscProjection updateDisc(@RequestAttribute("user") User owner, @PathVariable Long id, @RequestBody DiscInputDto dto, HttpServletResponse response) {
-		try {
-			var newMold = moldService.getMold(dto.getMoldId()).orElse(null);
-			var newPlastic = plasticService.getPlastic(dto.getMuoviId()).orElse(null);
-			var newColor = colorService.getColor(dto.getVariId()).orElse(null);
-			response.setStatus(SC_OK);
-			return discService.updateDisc(dto, id, owner, newMold, newPlastic, newColor);
-		}
-		catch(AuthorizationException ae) {
-			response.setStatus(SC_FORBIDDEN);
-			return null;
-		}
-		catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			response.setStatus(SC_INTERNAL_SERVER_ERROR);
-			return null;
 		}
 	}
 

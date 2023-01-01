@@ -55,15 +55,7 @@ public class DiscService {
 		discRepo.deleteById(id);
 	}
 
-	//V1 compatibility
-	public DiscProjection updateDisc(fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto dto, Long id, User owner, Mold newMold, Plastic newPlastic, Color newColor) throws AuthorizationException {
-		var inputV2 = DiscInputDto.fromV1(dto);
-
-		updateDisc(inputV2, id, owner, newMold, newPlastic, newColor);
-		return discRepo.getDiscById(id);
-	}
-
-	public DiscOutputDto updateDisc(DiscInputDto dto, Long id, User owner, Mold newMold, Plastic newPlastic, Color newColor) throws AuthorizationException {
+	public Disc updateDisc(DiscInputDto dto, Long id, User owner, Mold newMold, Plastic newPlastic, Color newColor) throws AuthorizationException {
 		var disc = discRepo.findById(id).orElse(null);
 
 		if(disc == null || !disc.getOwner().equals(owner)) {
@@ -88,7 +80,7 @@ public class DiscService {
 			disc.setForSale(false);
 		}
 
-		return DiscOutputDto.fromDb(discRepo.save(disc));
+		return discRepo.save(disc);
 	}
 
 	public DiscProjection getDisc(User owner, Long id) throws AuthorizationException {
@@ -111,6 +103,18 @@ public class DiscService {
 		else {
 			throw new AuthorizationException();
 		}
+	}
+
+	public Disc getDiscIfPublicOrOwnV2(User owner, Long id) throws AuthorizationException, HttpResponseException {
+		var discOpt = discRepo.findById(id);
+		if(discOpt.isEmpty()) throw new HttpResponseException(SC_NOT_FOUND, "Disc not found");
+		return discOpt.map(disc -> {
+			if(owner.equals(disc.getOwner()) ||
+					Boolean.TRUE.equals(disc.getPublicDisc())) {
+				return disc;
+			}
+			return null;
+		}).orElseThrow(AuthorizationException::new);
 	}
 
 	public void handleFoundDisc(User user, Long id) throws HttpResponseException {

@@ -1,6 +1,6 @@
 package fi.bizhop.kiekkohamsteri.controller.v1;
 
-import fi.bizhop.kiekkohamsteri.dto.v1.in.PlasticCreateDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.PlasticCreateDto;
 import fi.bizhop.kiekkohamsteri.projection.v1.PlasticProjection;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.ManufacturerService;
@@ -38,10 +38,10 @@ public class PlasticController extends BaseController {
     PlasticProjection createMuovi(@RequestBody PlasticCreateDto dto, HttpServletResponse response) {
 		response.setStatus(HttpServletResponse.SC_OK);
 
-		return manufacturerService.getManufacturer(dto.getValmId())
+		return manufacturerService.getManufacturer(dto.getManufacturerId())
 				.map(m -> plasticService.createPlastic(dto, m))
 				.orElseGet(() -> {
-					LOG.warn("Manufacturer not found, id={}", dto.getValmId());
+					LOG.warn("Manufacturer not found, id={}", dto.getManufacturerId());
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					return null;
 				});

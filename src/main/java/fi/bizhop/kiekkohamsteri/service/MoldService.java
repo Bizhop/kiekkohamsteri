@@ -23,19 +23,6 @@ public class MoldService {
 
 	private Mold DEFAULT_MOLD;
 
-	public MoldProjection createMold(fi.bizhop.kiekkohamsteri.dto.v1.in.MoldCreateDto dto, Manufacturer manufacturer) {
-		var dtoV2 = MoldCreateDto.builder()
-				.manufacturerId(dto.getValmId())
-				.name(dto.getKiekko())
-				.speed(dto.getNopeus())
-				.glide(dto.getLiito())
-				.stability(dto.getVakaus())
-				.fade(dto.getFeidi())
-				.build();
-
-		return createMold(dtoV2, manufacturer);
-	}
-
 	public MoldProjection createMold(MoldCreateDto dto, Manufacturer manufacturer) {
 		var mold = new Mold();
 		mold.setManufacturer(manufacturer);
