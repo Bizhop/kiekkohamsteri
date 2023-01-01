@@ -1,111 +1,111 @@
 [
   {
-    "kiekko": {
-      "member": {
+    "disc": {
+      "owner": {
         "username": "User",
         "email": "test@example.com"
       },
       "mold": {
         "id": 0,
-        "valmistaja": {
+        "manufacturer": {
           "id": 0,
-          "valmistaja": "Discmania"
+          "name": "Discmania"
         },
-        "kiekko": "FD",
-        "nopeus": 7.0,
-        "liito": 6.0,
-        "vakaus": -1.0,
-        "feidi": 1.0
+        "name": "FD",
+        "speed": 7,
+        "glide": 6,
+        "stability": -1,
+        "fade": 1
       },
-      "muovi": {
+      "plastic": {
         "id": 0,
-        "valmistaja": {
+        "manufacturer": {
           "id": 0,
-          "valmistaja": "Discmania"
+          "name": "Discmania"
         },
-        "muovi": "S-Line"
+        "name": "S-Line"
       },
-      "vari": {
+      "color": {
         "id": 0,
-        "vari": "Valkoinen"
+        "name": "Valkoinen"
       },
-      "kuva": "",
-      "paino": 175,
-      "kunto": 10,
-      "hohto": false,
-      "spessu": false,
+      "image": "",
+      "weight": 175,
+      "condition": 10,
+      "glow": false,
+      "special": false,
       "dyed": false,
       "swirly": false,
-      "tussit": 1,
-      "myynnissa": false,
-      "hinta": 0,
-      "muuta": "",
-      "loytokiekko": false,
+      "markings": 1,
+      "forSale": false,
+      "price": 0,
+      "description": "",
+      "lostAndFound": false,
       "itb": false,
       "publicDisc": false,
       "lost": false
     },
-    "myyja": {
+    "seller": {
       "username": "User",
       "email": "test@example.com"
     },
-    "ostaja": {
+    "buyer": {
       "username": "Other",
       "email": "other@example.com"
     },
     "status": "REQUESTED"
   },
   {
-    "kiekko": {
-      "member": {
+    "disc": {
+      "owner": {
         "username": "Other",
         "email": "other@example.com"
       },
       "mold": {
         "id": 0,
-        "valmistaja": {
+        "manufacturer": {
           "id": 0,
-          "valmistaja": "Discmania"
+          "name": "Discmania"
         },
-        "kiekko": "FD",
-        "nopeus": 7.0,
-        "liito": 6.0,
-        "vakaus": -1.0,
-        "feidi": 1.0
+        "name": "FD",
+        "speed": 7,
+        "glide": 6,
+        "stability": -1,
+        "fade": 1
       },
-      "muovi": {
+      "plastic": {
         "id": 0,
-        "valmistaja": {
+        "manufacturer": {
           "id": 0,
-          "valmistaja": "Discmania"
+          "name": "Discmania"
         },
-        "muovi": "S-Line"
+        "name": "S-Line"
       },
-      "vari": {
+      "color": {
         "id": 0,
-        "vari": "Valkoinen"
+        "name": "Valkoinen"
       },
-      "kuva": "",
-      "paino": 175,
-      "kunto": 10,
-      "hohto": false,
-      "spessu": false,
+      "image": "",
+      "weight": 175,
+      "condition": 10,
+      "glow": false,
+      "special": false,
       "dyed": false,
       "swirly": false,
-      "tussit": 1,
-      "myynnissa": false,
-      "hinta": 0,
-      "muuta": "",
-      "loytokiekko": false,
+      "markings": 1,
+      "forSale": false,
+      "price": 0,
+      "description": "",
+      "lostAndFound": false,
       "itb": false,
       "publicDisc": false,
       "lost": false
     },
-    "myyja": {
+    "seller": {
       "username": "Other",
       "email": "other@example.com"
     },
-    "ostaja": {
+    "buyer": {
       "username": "User",
       "email": "test@example.com"
     },

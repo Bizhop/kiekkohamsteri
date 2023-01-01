@@ -1,9 +1,9 @@
-package fi.bizhop.kiekkohamsteri.controller.v1;
+package fi.bizhop.kiekkohamsteri.controller.v2;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.dto.v1.out.BuyOutputDto;
-import fi.bizhop.kiekkohamsteri.dto.v1.out.BuySummaryDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.out.BuyOutputDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.out.BuySummaryDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.model.Disc;
 import fi.bizhop.kiekkohamsteri.model.Buy;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-public class BuyControllerTest extends SpringContextTestBase {
+public class BuyControllerV2Test extends SpringContextTestBase {
     @LocalServerPort int port;
     @Autowired TestRestTemplate restTemplate;
     @MockBean BuyService buyService;
@@ -49,7 +49,7 @@ public class BuyControllerTest extends SpringContextTestBase {
     BaseAdder adder = new BaseAdder("buy", CONTROLLER);
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "omat"})
+    @ValueSource(strings = {"", "own"})
     void givenUnableToAuthenticateUser_whenCallingGetEndpoint_thenRespondWithUnauthorized(String endpoint) {
         when(authService.getUser(any())).thenReturn(null);
 
@@ -77,6 +77,7 @@ public class BuyControllerTest extends SpringContextTestBase {
         when(buyService.getListing(null)).thenReturn(List.of(buy1, buy2));
 
         var response = restTemplate.getForEntity(createUrl(""), String.class);
+        System.out.println(response.getBody());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
         assertEqualsJson(adder.create("buyListing.json"), response.getBody());
@@ -90,12 +91,12 @@ public class BuyControllerTest extends SpringContextTestBase {
         var buy1 = BuyOutputDto.fromDb(new Buy(getTestDiscFor(OTHER_USER), OTHER_USER, TEST_USER, REQUESTED));
         var buy2 = BuyOutputDto.fromDb(new Buy(getTestDiscFor(OTHER_USER), OTHER_USER, TEST_USER, REQUESTED));
         var buys = BuySummaryDto.builder()
-                .myyjana(List.of(sell))
-                .ostajana(List.of(buy1, buy2))
+                .asSeller(List.of(sell))
+                .asBuyer(List.of(buy1, buy2))
                 .build();
         when(buyService.getSummary(TEST_USER)).thenReturn(buys);
 
-        var response = restTemplate.getForEntity(createUrl("omat"), String.class);
+        var response = restTemplate.getForEntity(createUrl("own"), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
         assertEqualsJson(adder.create("buySummary.json"), response.getBody());
@@ -150,6 +151,6 @@ public class BuyControllerTest extends SpringContextTestBase {
     }
 
     private String createUrl(String endpoint) {
-        return String.format("http://localhost:%d/api/ostot/%s", port, endpoint);
+        return String.format("http://localhost:%d/api/v2/buys/%s", port, endpoint);
     }
 }

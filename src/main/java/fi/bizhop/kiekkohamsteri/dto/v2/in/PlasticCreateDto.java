@@ -1,4 +1,4 @@
-package fi.bizhop.kiekkohamsteri.dto.v1.in;
+package fi.bizhop.kiekkohamsteri.dto.v2.in;
 
 import lombok.Builder;
 import lombok.Value;
@@ -8,6 +8,6 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class PlasticCreateDto {
-	Long valmId;
-	String muovi;
+	Long manufacturerId;
+	String name;
 }

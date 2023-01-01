@@ -2,10 +2,9 @@ package fi.bizhop.kiekkohamsteri.controller.v1;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.dto.v1.in.MoldCreateDto;
-import fi.bizhop.kiekkohamsteri.model.User;
-import fi.bizhop.kiekkohamsteri.model.Mold;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.MoldCreateDto;
 import fi.bizhop.kiekkohamsteri.model.Manufacturer;
+import fi.bizhop.kiekkohamsteri.model.Mold;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.ManufacturerService;
 import fi.bizhop.kiekkohamsteri.service.MoldService;
@@ -22,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
@@ -141,7 +139,7 @@ public class MoldControllerTest extends SpringContextTestBase {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
         var manufacturer = MANUFACTURERS.get(0);
-        var dto = MoldCreateDto.builder().valmId(0L).build();
+        var dto = MoldCreateDto.builder().manufacturerId(0L).build();
         var mold = getTestMold(manufacturer);
         when(manufacturerService.getManufacturer(0L)).thenReturn(Optional.of(manufacturer));
         when(moldService.createMold(dto, manufacturer)).thenReturn(projectionFromMold(mold));
@@ -159,7 +157,7 @@ public class MoldControllerTest extends SpringContextTestBase {
     void givenManufacturerNotFound_whenCreateMold_thenRespondBadRequest() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
 
-        var dto = MoldCreateDto.builder().valmId(0L).build();
+        var dto = MoldCreateDto.builder().manufacturerId(0L).build();
         when(manufacturerService.getManufacturer(0L)).thenReturn(Optional.empty());
 
         var response = restTemplate.postForEntity(createUrl(), dto, String.class);
@@ -169,18 +167,6 @@ public class MoldControllerTest extends SpringContextTestBase {
 
         assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
         assertNull(response.getBody());
-    }
-
-    @Test
-    void v1CompatibilityTest() {
-        when(authService.getUser(any())).thenReturn(ADMIN_USER);
-
-        restTemplate.getForEntity(createUrl("?size=1000&sort=kiekko,asc"), String.class);
-
-        verify(moldService, times(1)).getMolds(pageableCaptor.capture());
-
-        var sorts = pageableCaptor.getValue().getSort().get().collect(Collectors.toList());
-        assertEqualsJson(adder.create("compatibilitySorts.json"), sorts);
     }
 
 

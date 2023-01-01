@@ -2,13 +2,13 @@ package fi.bizhop.kiekkohamsteri.controller.v1;
 
 import javax.servlet.http.HttpServletResponse;
 
+import fi.bizhop.kiekkohamsteri.dto.v2.in.MoldCreateDto;
 import fi.bizhop.kiekkohamsteri.service.ManufacturerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
-import fi.bizhop.kiekkohamsteri.dto.v1.in.MoldCreateDto;
 import fi.bizhop.kiekkohamsteri.projection.v1.MoldProjection;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.MoldService;
@@ -38,10 +38,10 @@ public class MoldController extends BaseController {
 	public @ResponseBody MoldProjection createMold(@RequestBody MoldCreateDto dto, HttpServletResponse response) {
 		response.setStatus(HttpServletResponse.SC_OK);
 
-		return manufacturerService.getManufacturer(dto.getValmId())
+		return manufacturerService.getManufacturer(dto.getManufacturerId())
 				.map(m -> moldService.createMold(dto, m))
 				.orElseGet(() -> {
-					LOG.warn("Manufacturer not found, id={}", dto.getValmId());
+					LOG.warn("Manufacturer not found, id={}", dto.getManufacturerId());
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					return null;
 				});

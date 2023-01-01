@@ -1,24 +1,20 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.DiscRepository;
-import fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.DiscInputDto;
 import fi.bizhop.kiekkohamsteri.dto.v2.in.DiscSearchDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.Disc;
 import fi.bizhop.kiekkohamsteri.model.User;
-import fi.bizhop.kiekkohamsteri.search.SearchCriteria;
-import fi.bizhop.kiekkohamsteri.search.discs.DiscSpecificationBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.List;
 import java.util.Optional;
 
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
@@ -125,9 +121,9 @@ public class DiscServiceTest {
         when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
 
         var dto = DiscInputDto.builder()
-                .muuta("text")
-                .kunto(8)
-                .kuva("image")
+                .description("text")
+                .condition(8)
+                .image("image")
                 .build();
 
         getDiscService().updateDisc(dto, 123L, TEST_USER, null, null, null);

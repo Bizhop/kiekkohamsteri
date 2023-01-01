@@ -1,7 +1,7 @@
 package fi.bizhop.kiekkohamsteri.service;
 
 import fi.bizhop.kiekkohamsteri.db.MoldRepository;
-import fi.bizhop.kiekkohamsteri.dto.v1.in.MoldCreateDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.MoldCreateDto;
 import fi.bizhop.kiekkohamsteri.model.Mold;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,8 +48,8 @@ public class MoldServiceTest {
         var manufacturer = MANUFACTURERS.get(0);
 
         var dto = MoldCreateDto.builder()
-                .valmId(manufacturer.getId())
-                .kiekko("TEST")
+                .manufacturerId(manufacturer.getId())
+                .name("TEST")
                 .build();
 
         when(moldRepo.save(any(Mold.class))).then(returnsFirstArg());

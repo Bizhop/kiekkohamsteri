@@ -2,8 +2,8 @@ package fi.bizhop.kiekkohamsteri.controller.v1;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.dto.v1.in.DiscInputDto;
-import fi.bizhop.kiekkohamsteri.dto.v1.in.UploadDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.DiscInputDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.in.UploadDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.Buy;
@@ -26,10 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.time.Clock;
-import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static fi.bizhop.kiekkohamsteri.BaseAdder.Type.CONTROLLER;
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
@@ -128,55 +125,6 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl("1"), PUT, requestEntity, String.class);
 
         assertEquals(SC_UNAUTHORIZED, response.getStatusCodeValue());
-    }
-
-    @Test
-    void getDiscsTest() {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-
-        var discProjections = getDiscsByUser(TEST_USER);
-        var page = new PageImpl<>(discProjections);
-        when(discService.getDiscs(eq(TEST_USER), any())).thenReturn(page);
-
-        var response = restTemplate.getForEntity(createUrl(""), String.class);
-
-        assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson(adder.create("getDiscs.json"), response.getBody());
-    }
-
-    @Test
-    void givenUserNotFound_whenGetOtherUserDiscs_thenBadRequest() {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-        when(userService.getUser(1L)).thenThrow(new NoSuchElementException());
-
-        var response = restTemplate.getForEntity(createUrl("?userId=1"), String.class);
-
-        assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
-    }
-
-    @Test
-    void givenNoCommonGroup_whenGetOtherUserDiscs_thenForbidden() {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-        when(userService.getUser(1L)).thenReturn(OTHER_USER);
-
-        var response = restTemplate.getForEntity(createUrl("?userId=1"), String.class);
-
-        assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
-    }
-
-    @Test
-    void givenCommonGroup_whenGetOtherUserDiscs_thenReturnDiscs() {
-        when(authService.getUser(any())).thenReturn(GROUP_ADMIN_USER);
-        when(userService.getUser(1L)).thenReturn(TEST_USER);
-
-        var discProjections = getDiscsByUser(TEST_USER);
-        var page = new PageImpl<>(discProjections);
-        when(discService.getDiscs(eq(TEST_USER), any())).thenReturn(page);
-
-        var response = restTemplate.getForEntity(createUrl("?userId=1"), String.class);
-
-        assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson(adder.create("getDiscs.json"), response.getBody());
     }
 
     @Test
@@ -349,93 +297,6 @@ public class DiscControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenYourDisc_whenGetDisc_thenGetDisc() throws AuthorizationException, HttpResponseException {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-        when(discService.getDiscIfPublicOrOwn(TEST_USER, 123L)).thenReturn(projectionFromDisc(DISCS.get(0)));
-
-        var response = restTemplate.getForEntity(createUrl("123"), String.class);
-
-        assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson(adder.create("myDisc.json"), response.getBody());
-    }
-
-    @Test
-    void givenNotYourDiscAndNotPublic_whenGetDisc_thenRespondForbidden() throws AuthorizationException, HttpResponseException {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-        when(discService.getDiscIfPublicOrOwn(TEST_USER, 456L)).thenThrow(new AuthorizationException());
-
-        var response = restTemplate.getForEntity(createUrl("456"), String.class);
-
-        assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
-        assertNull(response.getBody());
-    }
-
-    @Test
-    void givenDiscNotFound_whenGetDisc_thenRespondNotFound() throws AuthorizationException, HttpResponseException {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-        when(discService.getDiscIfPublicOrOwn(TEST_USER, 789L)).thenThrow(new HttpResponseException(SC_NOT_FOUND, "Disc not found"));
-
-        var response = restTemplate.getForEntity(createUrl("789"), String.class);
-
-        assertEquals(SC_NOT_FOUND, response.getStatusCodeValue());
-        assertNull(response.getBody());
-    }
-
-    @Test
-    void givenValidRequest_whenUpdateDisc_thenUpdateDisc() throws AuthorizationException {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-
-        var dto = DiscInputDto.builder()
-                .moldId(0L)
-                .muoviId(0L)
-                .variId(0L)
-                .build();
-        whenMoldPlasticAndColor(0, 0, 0);
-        when(discService.updateDisc(dto, 123L, TEST_USER, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0))).thenReturn(projectionFromDisc(DISCS.get(0)));
-
-        var response = restTemplate.exchange(createUrl("123"), PUT, new HttpEntity<>(dto), String.class);
-
-        assertEquals(SC_OK, response.getStatusCodeValue());
-        assertEqualsJson(adder.create("myDisc.json"), response.getBody());
-    }
-
-    @Test
-    void givenNotYourDisc_whenUpdateDisc_thenRespondForbidden() throws AuthorizationException {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-
-        var dto = DiscInputDto.builder()
-                .moldId(1L)
-                .muoviId(1L)
-                .variId(1L)
-                .build();
-        whenMoldPlasticAndColor(1, 1, 1);
-        when(discService.updateDisc(dto, 456L, TEST_USER, MOLDS.get(1), PLASTICS.get(1), COLORS.get(1))).thenThrow(new AuthorizationException());
-
-        var response = restTemplate.exchange(createUrl("456"), PUT, new HttpEntity<>(dto), String.class);
-
-        assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
-        assertNull(response.getBody());
-    }
-
-    @Test
-    void givenRuntimeException_whenUpdateDisc_thenRespond500() throws AuthorizationException {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-
-        var dto = DiscInputDto.builder()
-                .moldId(0L)
-                .muoviId(0L)
-                .variId(0L)
-                .build();
-        whenMoldPlasticAndColor(0, 0, 0);
-        when(discService.updateDisc(dto, 123L, TEST_USER, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0))).thenThrow(new RuntimeException());
-
-        var response = restTemplate.exchange(createUrl("123"), PUT, new HttpEntity<>(dto), String.class);
-
-        assertEquals(SC_INTERNAL_SERVER_ERROR, response.getStatusCodeValue());
-        assertNull(response.getBody());
-    }
-
-    @Test
     void givenValidRequest_whenDeleteDisc_thenDeleteDisc() throws AuthorizationException {
         var user = new User(TEST_EMAIL);
         when(authService.getUser(any())).thenReturn(user);
@@ -471,6 +332,7 @@ public class DiscControllerTest extends SpringContextTestBase {
         when(buyService.buyDisc(TEST_USER, disc)).thenReturn(buys);
 
         var response = restTemplate.postForEntity(createUrl("123/buy"), null, String.class);
+        System.out.println(response.getBody());
 
         verify(discService, times(1)).getDiscDb(123L);
         verify(buyService, times(1)).buyDisc(TEST_USER, disc);
@@ -558,26 +420,6 @@ public class DiscControllerTest extends SpringContextTestBase {
 
         assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
         assertNull(response.getBody());
-    }
-
-    @Test
-    void v1CompatibilityTest() {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-
-        var params = List.of(
-                "size=1000",
-                "sort=mold.valmistaja.valmistaja,asc",
-                "sort=mold.nopeus,asc",
-                "sort=muovi.muovi,asc");
-
-        var endpoint = String.format("?%s", String.join("&", params));
-
-        restTemplate.getForEntity(createUrl(endpoint), String.class);
-
-        verify(discService, times(1)).getDiscs(eq(TEST_USER), pageableCaptor.capture());
-
-        var sorts = pageableCaptor.getValue().getSort().get().collect(Collectors.toList());
-        assertEqualsJson(adder.create("compatibilitySorts.json"), sorts);
     }
 
 

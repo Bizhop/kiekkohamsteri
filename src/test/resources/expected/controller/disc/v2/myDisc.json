@@ -1,10 +1,7 @@
 {
   "owner": {
     "username": "User",
-    "email": "User",
-    "firstName": "New",
-    "lastName": "User",
-    "pdgaNumber": 0
+    "email": "test@example.com"
   },
   "mold": {
     "id": 0,

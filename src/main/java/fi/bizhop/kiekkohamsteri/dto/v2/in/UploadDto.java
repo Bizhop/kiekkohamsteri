@@ -1,4 +1,4 @@
-package fi.bizhop.kiekkohamsteri.dto.v1.in;
+package fi.bizhop.kiekkohamsteri.dto.v2.in;
 
 import lombok.Builder;
 import lombok.Value;

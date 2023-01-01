@@ -4,7 +4,6 @@ import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.dto.v2.in.DiscInputDto;
 import fi.bizhop.kiekkohamsteri.dto.v2.in.DiscSearchDto;
-import fi.bizhop.kiekkohamsteri.dto.v2.out.DiscOutputDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.service.*;
@@ -30,7 +29,6 @@ import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.PUT;
 
@@ -140,10 +138,8 @@ public class DiscControllerV2Test extends SpringContextTestBase {
                 .colorId(0L)
                 .build();
 
-        var outputDto = DiscOutputDto.fromDb(DISCS.get(0));
-
         whenMoldPlasticAndColor(0, 0, 0);
-        when(discService.updateDisc(inputDto, 123L, TEST_USER, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0))).thenReturn(outputDto);
+        when(discService.updateDisc(inputDto, 123L, TEST_USER, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0))).thenReturn(DISCS.get(0));
 
         var response = restTemplate.exchange(createUrl("123"), PUT, new HttpEntity<>(inputDto), String.class);
 
@@ -184,6 +180,39 @@ public class DiscControllerV2Test extends SpringContextTestBase {
         var response = restTemplate.exchange(createUrl("123"), PUT, new HttpEntity<>(inputDto), String.class);
 
         assertEquals(SC_INTERNAL_SERVER_ERROR, response.getStatusCodeValue());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void givenYourDisc_whenGetDisc_thenGetDisc() throws AuthorizationException, HttpResponseException {
+        when(authService.getUser(any())).thenReturn(TEST_USER);
+        when(discService.getDiscIfPublicOrOwnV2(TEST_USER, 123L)).thenReturn(DISCS.get(0));
+
+        var response = restTemplate.getForEntity(createUrl("123"), String.class);
+
+        assertEquals(SC_OK, response.getStatusCodeValue());
+        assertEqualsJson(adder.create("myDisc.json"), response.getBody());
+    }
+
+    @Test
+    void givenNotYourDiscAndNotPublic_whenGetDisc_thenRespondForbidden() throws AuthorizationException, HttpResponseException {
+        when(authService.getUser(any())).thenReturn(TEST_USER);
+        when(discService.getDiscIfPublicOrOwnV2(TEST_USER, 456L)).thenThrow(new AuthorizationException());
+
+        var response = restTemplate.getForEntity(createUrl("456"), String.class);
+
+        assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void givenDiscNotFound_whenGetDisc_thenRespondNotFound() throws AuthorizationException, HttpResponseException {
+        when(authService.getUser(any())).thenReturn(TEST_USER);
+        when(discService.getDiscIfPublicOrOwnV2(TEST_USER, 789L)).thenThrow(new HttpResponseException(SC_NOT_FOUND, "Disc not found"));
+
+        var response = restTemplate.getForEntity(createUrl("789"), String.class);
+
+        assertEquals(SC_NOT_FOUND, response.getStatusCodeValue());
         assertNull(response.getBody());
     }
 
