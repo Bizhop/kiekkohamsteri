@@ -1,0 +1,66 @@
+{
+  "content": [
+    {
+      "owner": {
+        "username": "Other",
+        "email": "other@example.com",
+        "firstName": "New",
+        "lastName": "User",
+        "pdgaNumber": 0
+      },
+      "mold": {
+        "id": 20,
+        "manufacturer": {
+          "id": 2,
+          "name": "Westside"
+        },
+        "name": "Harp",
+        "speed": 4,
+        "glide": 3,
+        "stability": 0,
+        "fade": 3
+      },
+      "plastic": {
+        "id": 20,
+        "manufacturer": {
+          "id": 2,
+          "name": "Westside"
+        },
+        "name": "VIP"
+      },
+      "color": {
+        "id": 1,
+        "name": "Keltainen"
+      },
+      "image": "",
+      "weight": 175,
+      "condition": 10,
+      "glow": false,
+      "special": false,
+      "dyed": false,
+      "swirly": false,
+      "markings": 1,
+      "forSale": false,
+      "price": 0,
+      "description": "",
+      "lostAndFound": false,
+      "itb": false,
+      "publicDisc": true,
+      "lost": false
+    }
+  ],
+  "pageable": "INSTANCE",
+  "last": true,
+  "totalPages": 1,
+  "totalElements": 1,
+  "size": 1,
+  "number": 0,
+  "sort": {
+    "sorted": false,
+    "unsorted": true,
+    "empty": true
+  },
+  "first": true,
+  "numberOfElements": 1,
+  "empty": false
+}

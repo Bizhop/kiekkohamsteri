@@ -3,7 +3,6 @@ package fi.bizhop.kiekkohamsteri.service;
 import fi.bizhop.kiekkohamsteri.db.DiscRepository;
 import fi.bizhop.kiekkohamsteri.dto.v2.in.DiscInputDto;
 import fi.bizhop.kiekkohamsteri.dto.v2.in.DiscSearchDto;
-import fi.bizhop.kiekkohamsteri.dto.v2.out.DiscOutputDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.*;
@@ -23,7 +22,6 @@ import java.util.stream.Stream;
 
 import static fi.bizhop.kiekkohamsteri.search.SearchOperation.EQUAL;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -31,18 +29,9 @@ public class DiscService {
 
 	private final DiscRepository discRepo;
 
-	public DiscProjection newDisc(User owner, Mold defaultMold, Plastic defaultPlastic, Color defaultColor) {
+	public Disc newDisc(User owner, Mold defaultMold, Plastic defaultPlastic, Color defaultColor) {
 		var disc = new Disc(owner, defaultMold, defaultPlastic, defaultColor);
-		disc = discRepo.save(disc);
-
-		return discRepo.getDiscById(disc.getId());
-	}
-
-	public DiscProjection updateImage(Long id, String image) {
-		var disc = discRepo.findById(id).orElseThrow();
-		disc.setImage(image);
-		disc = discRepo.save(disc);
-		return discRepo.getDiscById(disc.getId());
+		return discRepo.save(disc);
 	}
 
 	public void deleteDisc(Long id, User owner) throws AuthorizationException {
@@ -83,38 +72,22 @@ public class DiscService {
 		return discRepo.save(disc);
 	}
 
-	public DiscProjection getDisc(User owner, Long id) throws AuthorizationException {
-		var disc = discRepo.getDiscById(id);
-		if(owner.getEmail().equals(disc.getOwnerEmail())) {
+	public Disc getDisc(User owner, Long id) throws AuthorizationException {
+		var disc = discRepo.findById(id).orElseThrow();
+		if(owner.equals(disc.getOwner()))
 			return disc;
-		}
-		else {
+		else
 			throw new AuthorizationException();
-		}
-	}
-
-	public DiscProjection getDiscIfPublicOrOwn(User owner, Long id) throws AuthorizationException, HttpResponseException {
-		var disc = discRepo.getDiscById(id);
-		if(disc == null) throw new HttpResponseException(SC_NOT_FOUND, "Disc not found");
-		if(owner.getEmail().equals(disc.getOwnerEmail()) ||
-				Boolean.TRUE.equals(disc.getPublicDisc())) {
-			return disc;
-		}
-		else {
-			throw new AuthorizationException();
-		}
 	}
 
 	public Disc getDiscIfPublicOrOwnV2(User owner, Long id) throws AuthorizationException, HttpResponseException {
-		var discOpt = discRepo.findById(id);
-		if(discOpt.isEmpty()) throw new HttpResponseException(SC_NOT_FOUND, "Disc not found");
-		return discOpt.map(disc -> {
-			if(owner.equals(disc.getOwner()) ||
-					Boolean.TRUE.equals(disc.getPublicDisc())) {
-				return disc;
-			}
-			return null;
-		}).orElseThrow(AuthorizationException::new);
+		var disc = discRepo.findById(id).orElseThrow();
+		if(owner.equals(disc.getOwner()) ||	Boolean.TRUE.equals(disc.getPublicDisc())) {
+			return disc;
+		}
+		else {
+			throw new AuthorizationException();
+		}
 	}
 
 	public void handleFoundDisc(User user, Long id) throws HttpResponseException {
@@ -148,20 +121,22 @@ public class DiscService {
 	// Pass-through methods to db
 	// Not covered (or to be covered by unit tests)
 
+	@Deprecated
 	public Page<DiscProjection> getLost(Pageable pageable) {
 		return discRepo.findByLostTrue(pageable);
-	}
-
-	public Page<DiscProjection> getDiscs(User owner, Pageable pageable) {
-		return discRepo.findByOwnerAndLostFalse(owner, pageable);
 	}
 
 	public Page<Disc> getDiscsV2(User owner, Pageable pageable) {
 		return discRepo.getByOwnerAndLostFalse(owner, pageable);
 	}
 
+	@Deprecated
 	public Page<DiscProjection> getDiscsForSale(Pageable pageable) {
 		return discRepo.findByForSaleTrue(pageable);
+	}
+
+	public Page<Disc> getDiscsForSaleV2(Pageable pageable) {
+		return discRepo.getByForSaleTrue(pageable);
 	}
 
 	//Forced method without owner check. Use with care.
@@ -173,7 +148,7 @@ public class DiscService {
 		return discRepo.findById(id);
 	}
 
-	public void saveDisc(Disc disc) {
-		discRepo.save(disc);
+	public Disc saveDisc(Disc disc) {
+		return discRepo.save(disc);
 	}
 }

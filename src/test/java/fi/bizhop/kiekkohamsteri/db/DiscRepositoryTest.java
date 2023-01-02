@@ -2,6 +2,7 @@ package fi.bizhop.kiekkohamsteri.db;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
+import fi.bizhop.kiekkohamsteri.TestUtils;
 import fi.bizhop.kiekkohamsteri.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,11 +70,11 @@ public class DiscRepositoryTest extends SpringContextTestBase {
     }
 
     @Test
-    void findByOwnerAndLostFalseTest() {
+    void getByOwnerAndLostFalseTest() {
         var user = (User) testDataContainer.get(TEST_USER_KEY);
-        var result = discRepository.findByOwnerAndLostFalse(user, Pageable.unpaged());
+        var result = discRepository.getByOwnerAndLostFalse(user, Pageable.unpaged());
 
-        assertEqualsJson(adder.create("byMemberAndLostFalse.json"), result);
+        assertEqualsJson(adder.create("byOwnerAndLostFalse.json"), result);
     }
 
     @Test

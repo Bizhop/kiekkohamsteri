@@ -49,7 +49,7 @@ public class TestUtils {
         }
     }
 
-    private static String toJson(Object object) {
+    public static String toJson(Object object) {
         try {
             return MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {

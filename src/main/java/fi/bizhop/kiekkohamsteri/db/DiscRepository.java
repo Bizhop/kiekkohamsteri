@@ -13,14 +13,18 @@ import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.projection.v1.DiscProjection;
 
 public interface DiscRepository extends PagingAndSortingRepository<Disc, Long>, JpaSpecificationExecutor<Disc> {
-	Page<DiscProjection> findByOwnerAndLostFalse(User user, Pageable pageable);
 	Page<Disc> getByOwnerAndLostFalse(User user, Pageable pageable);
+	@Deprecated
 	List<DiscProjection> findByOwnerInAndPublicDiscTrue(List<User> users);
+	@Deprecated
 	Page<DiscProjection> findByLostTrue(Pageable pageable);
 
+	@Deprecated
 	DiscProjection getDiscById(Long id);
 
+	@Deprecated
 	Page<DiscProjection> findByForSaleTrue(Pageable pageable);
+	Page<Disc> getByForSaleTrue(Pageable pageable);
 	
 	Integer countByCreatedAtBetween(Date begin, Date end);
 	Integer countByOwner(User user);
