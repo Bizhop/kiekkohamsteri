@@ -33,6 +33,7 @@ import static fi.bizhop.kiekkohamsteri.TestUtils.assertEqualsJson;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpMethod.PATCH;
@@ -269,7 +270,7 @@ public class DiscControllerV2Test extends SpringContextTestBase {
         var image = String.format("%s-%d", user.getUsername(), discId);
 
         when(discService.newDisc(user, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0))).thenReturn(disc);
-        when(discService.saveDisc(any(Disc.class))).thenAnswer(i -> i.getArgument(0));
+        when(discService.saveDisc(any(Disc.class))).then(returnsFirstArg());
 
         var dto = uploadDto().build();
 
