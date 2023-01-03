@@ -11,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Plastic extends TimestampBase {
+public class Plastic extends TimestampBase implements Dropdown {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
@@ -22,4 +22,9 @@ public class Plastic extends TimestampBase {
 
 	@Column(name="muovi")
 	private String name;
+
+	@Override
+	public Long getValue() {
+		return this.id;
+	}
 }

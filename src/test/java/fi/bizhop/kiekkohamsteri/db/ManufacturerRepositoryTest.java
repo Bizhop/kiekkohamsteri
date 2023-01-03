@@ -37,8 +37,8 @@ public class ManufacturerRepositoryTest extends SpringContextTestBase {
     }
 
     @Test
-    void findAllProjectedByTest() {
-        var all = manufacturerRepository.findAllProjectedBy();
+    void findAllTest() {
+        var all = manufacturerRepository.findAll();
 
         assertEqualsJson(adder.create("all.json"), all);
     }

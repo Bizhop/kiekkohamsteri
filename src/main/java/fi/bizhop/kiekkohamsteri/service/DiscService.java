@@ -6,7 +6,6 @@ import fi.bizhop.kiekkohamsteri.dto.v2.in.DiscSearchDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.*;
-import fi.bizhop.kiekkohamsteri.projection.v1.DiscProjection;
 import fi.bizhop.kiekkohamsteri.search.discs.DiscSpecificationBuilder;
 import fi.bizhop.kiekkohamsteri.util.Utils;
 import lombok.RequiredArgsConstructor;
@@ -121,18 +120,12 @@ public class DiscService {
 	// Pass-through methods to db
 	// Not covered (or to be covered by unit tests)
 
-	@Deprecated
-	public Page<DiscProjection> getLost(Pageable pageable) {
-		return discRepo.findByLostTrue(pageable);
+	public Page<Disc> getLostV2(Pageable pageable) {
+		return discRepo.getByLostTrue(pageable);
 	}
 
 	public Page<Disc> getDiscsV2(User owner, Pageable pageable) {
 		return discRepo.getByOwnerAndLostFalse(owner, pageable);
-	}
-
-	@Deprecated
-	public Page<DiscProjection> getDiscsForSale(Pageable pageable) {
-		return discRepo.findByForSaleTrue(pageable);
 	}
 
 	public Page<Disc> getDiscsForSaleV2(Pageable pageable) {
@@ -144,8 +137,8 @@ public class DiscService {
 		discRepo.deleteById(id);
 	}
 
-	public Optional<Disc> getDiscDb(Long id) {
-		return discRepo.findById(id);
+	public Disc getDisc(Long id) {
+		return discRepo.findById(id).orElse(null);
 	}
 
 	public Disc saveDisc(Disc disc) {

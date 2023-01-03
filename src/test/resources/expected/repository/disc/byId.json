@@ -1,32 +1,62 @@
 {
-  "tussit": 1,
-  "myynnissa": false,
-  "hinta": 0,
-  "muuta": "",
-  "loytokiekko": false,
-  "itb": false,
-  "publicDisc": false,
-  "lost": false,
-  "mold": "Test mold",
-  "muovi": "Test plastic",
-  "vari": "Test color",
-  "kuva": "",
-  "paino": 175,
-  "kunto": 10,
-  "hohto": false,
-  "spessu": false,
+   "id": 3,
+  "owner": {
+     "id": 1,
+    "username": "User",
+    "email": "test@example.com",
+    "firstName": "New",
+    "lastName": "User",
+    "pdgaNumber": 0,
+    "roles": [],
+    "groups": [
+      {
+        "id": 1,
+        "name": "group 1"
+      }
+    ]
+  },
+  "mold": {
+     "id": 1,
+    "manufacturer": {
+       "id": 1,
+      "name": "Test manufacturer",
+      "value": 1
+    },
+    "name": "Test mold",
+    "speed": 0,
+    "glide": 0,
+    "stability": 0,
+    "fade": 0,
+    "value": 1
+  },
+  "plastic": {
+     "id": 1,
+    "manufacturer": {
+       "id": 1,
+      "name": "Test manufacturer",
+      "value": 1
+    },
+    "name": "Test plastic",
+    "value": 1
+  },
+  "color": {
+     "id": 1,
+    "name": "Test color",
+    "value": 1
+  },
+  "image": "",
+  "weight": 175,
+  "condition": 10,
+  "glow": false,
+  "special": false,
   "dyed": false,
   "swirly": false,
-  "valmistaja": "Test manufacturer",
-  "nopeus": 0.0,
-  "liito": 0.0,
-  "vakaus": 0.0,
-  "feidi": 0.0,
-  "valmId": 1,
-  "moldId": 1,
-  "muoviId": 1,
-  "variId": 1,
-  "ownerEmail": "test@example.com",
-  "omistaja": "User",
-  "id": 3
+  "markings": 1,
+  "forSale": false,
+  "price": 0,
+  "description": "",
+  "lostAndFound": false,
+  "itb": false,
+  "publicDisc": false,
+  "lost": false
 }

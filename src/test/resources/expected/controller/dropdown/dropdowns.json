@@ -1,98 +1,98 @@
 {
+  "manufacturers": [
+    {
+      "value": 0,
+      "name": "Discmania"
+    },
+    {
+      "value": 1,
+      "name": "Innova"
+    },
+    {
+      "value": 2,
+      "name": "Westside"
+    }
+  ],
   "molds": [
     {
-      "kiekko": "FD",
-      "id": 0
+      "value": 0,
+      "name": "FD"
     },
     {
-      "kiekko": "PD",
-      "id": 1
+      "value": 1,
+      "name": "PD"
     },
     {
-      "kiekko": "Destroyer",
-      "id": 10
+      "value": 10,
+      "name": "Destroyer"
     },
     {
-      "kiekko": "Roc",
-      "id": 11
+      "value": 11,
+      "name": "Roc"
     },
     {
-      "kiekko": "Harp",
-      "id": 20
+      "value": 20,
+      "name": "Harp"
     },
     {
-      "kiekko": "Hatchet",
-      "id": 21
+      "value": 21,
+      "name": "Hatchet"
     }
   ],
-  "valms": [
+  "plastics": [
     {
-      "valmistaja": "Discmania",
-      "id": 0
+      "value": 0,
+      "name": "S-Line"
     },
     {
-      "valmistaja": "Innova",
-      "id": 1
+      "value": 1,
+      "name": "C-Line"
     },
     {
-      "valmistaja": "Westside",
-      "id": 2
+      "value": 10,
+      "name": "Star"
+    },
+    {
+      "value": 11,
+      "name": "Champion"
+    },
+    {
+      "value": 20,
+      "name": "VIP"
     }
   ],
-  "muovit": [
+  "colors": [
     {
-      "muovi": "S-Line",
-      "id": 0
+      "value": 0,
+      "name": "Valkoinen"
     },
     {
-      "muovi": "C-Line",
-      "id": 1
-    },
-    {
-      "muovi": "Star",
-      "id": 10
-    },
-    {
-      "muovi": "Champion",
-      "id": 11
-    },
-    {
-      "muovi": "VIP",
-      "id": 20
+      "value": 1,
+      "name": "Keltainen"
     }
   ],
-  "varit": [
+  "conditions": [
     {
-      "vari": "Valkoinen",
-      "id": 0
+      "value": 10,
+      "name": "10/10"
     },
     {
-      "vari": "Keltainen",
-      "id": 1
+      "value": 8,
+      "name": "8/10"
+    },
+    {
+      "value": 5,
+      "name": "5/10"
+    },
+    {
+      "value": 4,
+      "name": "4/10"
     }
   ],
-  "kunto": [
+  "markings": [
     {
-      "nimi": "10/10",
-      "id": 10
-    },
-    {
-      "nimi": "8/10",
-      "id": 8
-    },
-    {
-      "nimi": "5/10",
-      "id": 5
-    },
-    {
-      "nimi": "4/10",
-      "id": 4
-    }
-  ],
-  "tussit": [
-    {
-      "nimi": "Ei merkintöjä",
-      "id": 0
+      "value": 0,
+      "name": "Ei merkintöjä"
     }
   ]
 }

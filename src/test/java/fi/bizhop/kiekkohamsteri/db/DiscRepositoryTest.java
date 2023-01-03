@@ -2,7 +2,6 @@ package fi.bizhop.kiekkohamsteri.db;
 
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
-import fi.bizhop.kiekkohamsteri.TestUtils;
 import fi.bizhop.kiekkohamsteri.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -78,17 +76,8 @@ public class DiscRepositoryTest extends SpringContextTestBase {
     }
 
     @Test
-    void findByOwnerInAndPublicDiscTrueTest() {
-        var user = (User) testDataContainer.get(TEST_USER_KEY);
-        var other = (User) testDataContainer.get(OTHER_USER_KEY);
-        var result = discRepository.findByOwnerInAndPublicDiscTrue(List.of(user, other));
-
-        assertEqualsJson(adder.create("byMemberInAndPublicDiscTrue.json"), result);
-    }
-
-    @Test
     void findByLostTrueTest() {
-        var result = discRepository.findByLostTrue(Pageable.unpaged());
+        var result = discRepository.getByLostTrue(Pageable.unpaged());
 
         assertEqualsJson(adder.create("byLostTrue.json"), result);
     }
@@ -96,16 +85,16 @@ public class DiscRepositoryTest extends SpringContextTestBase {
     @Test
     void getDiscByIdTest() {
         var disc = discRepository.findAll().iterator().next();
-        var result = discRepository.getDiscById(disc.getId());
+        var result = discRepository.findById(disc.getId()).orElseThrow();
 
         assertEqualsJson(adder.create("byId.json"), result);
     }
 
     @Test
     void findByForSaleTrueTest() {
-        var result = discRepository.findByForSaleTrue(Pageable.unpaged());
+        var result = discRepository.getByForSaleTrue(Pageable.unpaged());
 
-        assertEqualsJson(adder.create("byMyynnissaTrue.json"), result);
+        assertEqualsJson(adder.create("byForSaleTrue.json"), result);
     }
 
     @Test

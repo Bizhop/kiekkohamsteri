@@ -11,11 +11,16 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Color extends TimestampBase {
+public class Color extends TimestampBase implements Dropdown {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name="vari")
 	private String name;
+
+	@Override
+	public Long getValue() {
+		return this.id;
+	}
 }

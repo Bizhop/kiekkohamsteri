@@ -2,6 +2,7 @@ package fi.bizhop.kiekkohamsteri.controller.v1;
 
 import javax.servlet.http.HttpServletResponse;
 
+import fi.bizhop.kiekkohamsteri.controller.BaseController;
 import fi.bizhop.kiekkohamsteri.dto.v1.RoundDto;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.Logger;

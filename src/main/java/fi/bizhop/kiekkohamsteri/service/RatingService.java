@@ -166,7 +166,7 @@ public class RatingService {
             Document doc = Jsoup.connect(link).get();
             return getHoles(doc);
         } catch (Exception e) {
-            System.out.println(e);
+            LOG.warn(String.format("Error getting holes from link: %s", link), e);
         }
         return 18;
     }
@@ -179,14 +179,14 @@ public class RatingService {
             String[] splitted2 = holesText.split(" ");
             return Integer.parseInt(splitted2[0]);
         } catch (Exception e) {
-            System.out.println(e);
+            LOG.warn("Error parsing document", e);
         }
         return 18;
     }
 
     private static int calculateNextRating(List<RoundDto> rounds, boolean calculateDoubles, boolean byRoundsOnly) {
         Collections.sort(rounds);
-        int includedRoundsSize = Math.toIntExact(rounds.stream().filter(r -> r.isIncluded()).count());
+        int includedRoundsSize = Math.toIntExact(rounds.stream().filter(RoundDto::isIncluded).count());
         LOG.debug(String.format("Included rounds: %d", includedRoundsSize));
         if(calculateDoubles) {
             int doubleRounds = includedRoundsSize >= 8 ? (int) Math.ceil(includedRoundsSize * 0.25) : 0;
@@ -213,7 +213,7 @@ public class RatingService {
     }
 
     private static String getEventNumber(String link) {
-        String event = link.substring(link.lastIndexOf('/') + 1, link.length());
+        String event = link.substring(link.lastIndexOf('/') + 1);
         return event.contains("#") ? event.substring(0, event.lastIndexOf('#')) : event;
     }
 }

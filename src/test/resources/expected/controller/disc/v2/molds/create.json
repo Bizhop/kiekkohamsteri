@@ -1,0 +1,11 @@
+{
+  "name": "New Mold",
+  "manufacturer": {
+    "name": "Discmania"
+  },
+  "speed": 1.0,
+  "glide": 2.0,
+  "stability": 3.0,
+  "fade": 4.0,
+  "id": 66
+}

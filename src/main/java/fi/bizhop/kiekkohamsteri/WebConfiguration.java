@@ -29,13 +29,8 @@ public class WebConfiguration implements WebMvcConfigurer {
 
         bean.setFilter(new UserFilter(authService));
 
-        //V1
-        bean.addUrlPatterns("/api/kiekot/*");
-        bean.addUrlPatterns("/api/user/*");
-        bean.addUrlPatterns("/api/stats/*");
-        bean.addUrlPatterns("/api/dropdown/*");
-
-        //V2
+        bean.addUrlPatterns("/api/v2/stats/*");
+        bean.addUrlPatterns("/api/v2/dropdowns/*");
         bean.addUrlPatterns("/api/v2/user/*");
         bean.addUrlPatterns("/api/v2/groups/*");
         bean.addUrlPatterns("/api/v2/discs/*");
@@ -53,8 +48,8 @@ public class WebConfiguration implements WebMvcConfigurer {
         bean.setFilter(new AdminUserFilter(authService));
 
         //V1
-        bean.addUrlPatterns("/api/molds/*");
-        bean.addUrlPatterns("/api/muovit/*");
+        bean.addUrlPatterns("/api/v2/discs/molds/*");
+        bean.addUrlPatterns("/api/v2/discs/plastics/*");
 
         bean.setOrder(2);
 

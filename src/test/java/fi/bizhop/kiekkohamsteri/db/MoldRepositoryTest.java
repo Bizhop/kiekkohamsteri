@@ -58,13 +58,6 @@ public class MoldRepositoryTest extends SpringContextTestBase {
     }
 
     @Test
-    void findAllProjectedByTest() {
-        var result = moldRepository.findAllProjectedBy(Pageable.unpaged());
-
-        assertEqualsJson(adder.create("all.json"), result);
-    }
-
-    @Test
     void findByManufacturerTest() {
         var innovaResult = moldRepository.findByManufacturer(findManufacturer("Innova"), Pageable.unpaged());
         var discmaniaResult = moldRepository.findByManufacturer(findManufacturer("Discmania"), Pageable.unpaged());
