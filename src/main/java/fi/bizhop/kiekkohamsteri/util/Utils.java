@@ -23,7 +23,7 @@ public class Utils {
 	public static final String USER_ROLE_GROUP_ADMIN = "GROUP_ADMIN";
 
 	public static final Set<String> COMPARABLE_NUMBER_FIELDS = Set.of("weight", "price", "condition");
-	public static final Set<String> BOOLEAN_FIELDS = Set.of("dyed", "special", "swirly", "forSale", "lostAndFound", "itb", "publicDisc", "lost");
+	public static final Set<String> BOOLEAN_FIELDS = Set.of("dyed", "special", "swirly", "forSale", "lostAndFound", "itb", "publicDisc");
 
 	private static final List<SupportedOperation> SUPPORTED_OPERATIONS = new ArrayList<>();
 
