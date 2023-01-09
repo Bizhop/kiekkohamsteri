@@ -1,5 +1,6 @@
 package fi.bizhop.kiekkohamsteri.controller.v2;
 
+import fi.bizhop.kiekkohamsteri.controller.BaseControllerV2;
 import fi.bizhop.kiekkohamsteri.dto.v2.in.CompleteGroupRequestDto;
 import fi.bizhop.kiekkohamsteri.dto.v2.in.GroupCreateDto;
 import fi.bizhop.kiekkohamsteri.dto.v2.in.GroupRequestDto;

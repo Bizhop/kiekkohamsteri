@@ -1,0 +1,80 @@
+{
+  "content": [
+    {
+      "id": 7,
+      "owner": {
+        "id": 1,
+        "username": "User",
+        "email": "test@example.com",
+        "firstName": "New",
+        "lastName": "User",
+        "pdgaNumber": 0,
+        "roles": [],
+        "groups": [
+          {
+            "id": 1,
+            "name": "group 1"
+          }
+        ]
+      },
+      "mold": {
+        "id": 1,
+        "manufacturer": {
+          "id": 1,
+          "name": "Test manufacturer",
+          "value": 1
+        },
+        "name": "Test mold",
+        "speed": 0,
+        "glide": 0,
+        "stability": 0,
+        "fade": 0,
+        "value": 1
+      },
+      "plastic": {
+        "id": 1,
+        "manufacturer": {
+          "id": 1,
+          "name": "Test manufacturer",
+          "value": 1
+        },
+        "name": "Test plastic",
+        "value": 1
+      },
+      "color": {
+        "id": 1,
+        "name": "Test color",
+        "value": 1
+      },
+      "image": "",
+      "weight": 175,
+      "condition": 10,
+      "glow": false,
+      "special": false,
+      "dyed": false,
+      "swirly": false,
+      "markings": 1,
+      "forSale": true,
+      "price": 0,
+      "description": "",
+      "lostAndFound": false,
+      "itb": false,
+      "publicDisc": false,
+      "lost": false
+    }
+  ],
+  "pageable": "INSTANCE",
+  "last": true,
+  "totalPages": 1,
+  "totalElements": 1,
+  "size": 1,
+  "number": 0,
+  "sort": {
+    "sorted": false,
+    "unsorted": true,
+    "empty": true
+  },
+  "first": true,
+  "numberOfElements": 1,
+  "empty": false
+}

@@ -1,9 +1,6 @@
 package fi.bizhop.kiekkohamsteri.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -12,8 +9,9 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
-public class DropdownValues {
+public class DropdownValues implements Dropdown {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
@@ -25,5 +23,5 @@ public class DropdownValues {
 	private String name;
 
 	@Column(name="arvo")
-	private Integer value;
+	private Long value;
 }

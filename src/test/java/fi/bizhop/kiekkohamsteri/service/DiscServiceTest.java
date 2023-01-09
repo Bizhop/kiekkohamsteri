@@ -13,13 +13,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.jpa.domain.Specification;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,9 +31,6 @@ public class DiscServiceTest {
 
     @Captor
     ArgumentCaptor<Disc> discCaptor;
-
-    @Captor
-    ArgumentCaptor<Specification<Disc>> specificationCaptor;
 
     @BeforeEach
     void init() {
@@ -53,20 +49,6 @@ public class DiscServiceTest {
 
         var savedDisc = discCaptor.getValue();
         assertFalse(savedDisc.getPublicDisc());
-    }
-
-    @Test
-    void updateImageTest() {
-        var disc = getTestDiscFor(TEST_USER);
-        var id = 123L;
-        disc.setId(id);
-        when(discRepo.findById(id)).thenReturn(Optional.of(disc));
-        when(discRepo.save(any(Disc.class))).then(returnsFirstArg());
-
-        getDiscService().updateImage(id, "new-image");
-
-        verify(discRepo, times(1)).save(any());
-        assertEquals("new-image", disc.getImage());
     }
 
     @Test
@@ -180,9 +162,9 @@ public class DiscServiceTest {
 
     @Test
     void givenUserIsDiscOwner_whenGetDisc_thenReturnDisc() throws AuthorizationException {
-        var disc = getDiscsByUser(TEST_USER).get(0);
+        var disc = getDiscsByUserV2(TEST_USER).get(0);
 
-        when(discRepo.getDiscById(123L)).thenReturn(disc);
+        when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
 
         var response = getDiscService().getDisc(TEST_USER, 123L);
 
@@ -191,9 +173,9 @@ public class DiscServiceTest {
 
     @Test
     void givenUserIsNotDiscOwner_whenGetDisc_thenThrowAuthException() {
-        var disc = getDiscsByUser(OTHER_USER).get(0);
+        var disc = getDiscsByUserV2(OTHER_USER).get(0);
 
-        when(discRepo.getDiscById(anyLong())).thenReturn(disc);
+        when(discRepo.findById(anyLong())).thenReturn(Optional.of(disc));
 
         try {
             getDiscService().getDisc(TEST_USER, 0L);
@@ -206,25 +188,23 @@ public class DiscServiceTest {
     void givenDiscIsPublic_whenGetOtherUsersDisc_thenReturnDisc() throws AuthorizationException, HttpResponseException {
         var disc = getTestDiscFor(OTHER_USER);
         disc.setPublicDisc(true);
-        var projection = projectionFromDisc(disc);
 
-        when(discRepo.getDiscById(123L)).thenReturn(projection);
+        when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
 
-        var response = getDiscService().getDiscIfPublicOrOwn(TEST_USER, 123L);
+        var response = getDiscService().getDiscIfPublicOrOwnV2(TEST_USER, 123L);
 
-        assertEquals(projection, response);
+        assertEquals(disc, response);
     }
 
     @Test
     void givenDiscIsNotPublic_whenGetOtherUsersDisc_thenThrowAuthException() {
         var disc = getTestDiscFor(OTHER_USER);
         disc.setPublicDisc(false);
-        var projection = projectionFromDisc(disc);
 
-        when(discRepo.getDiscById(123L)).thenReturn(projection);
+        when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
 
         try {
-            getDiscService().getDiscIfPublicOrOwn(TEST_USER, 123L);
+            getDiscService().getDiscIfPublicOrOwnV2(TEST_USER, 123L);
 
             fail(SHOULD_THROW_EXCEPTION);
         } catch (HttpResponseException hre) {
@@ -234,15 +214,15 @@ public class DiscServiceTest {
 
     @Test
     void givenDiscNotFound_whenGetOtherUsersDisc_thenThrowNotFoundException() {
-        when(discRepo.getDiscById(123L)).thenReturn(null);
+        when(discRepo.findById(123L)).thenReturn(Optional.empty());
 
         try {
-            getDiscService().getDiscIfPublicOrOwn(TEST_USER, 123L);
-        } catch (AuthorizationException ae) {
+            getDiscService().getDiscIfPublicOrOwnV2(TEST_USER, 123L);
+
+            fail(SHOULD_THROW_EXCEPTION);
+        } catch (AuthorizationException | HttpResponseException e) {
             fail(WRONG_EXCEPTION);
-        } catch (HttpResponseException hre) {
-            assertEquals(SC_NOT_FOUND, hre.getStatusCode());
-        }
+        } catch (NoSuchElementException ignored) {}
     }
 
     @Test

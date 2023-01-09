@@ -1,14 +1,42 @@
 [
   {
-    "kiekko": "PD"
+    "manufacturer": {
+      "name": "Discmania"
+    },
+    "name": "PD",
+    "speed": 10.0,
+    "glide": 4.0,
+    "stability": 0.0,
+    "fade": 3.0
   },
   {
-    "kiekko": "FD"
+    "manufacturer": {
+      "name": "Discmania"
+    },
+    "name": "FD",
+    "speed": 7.0,
+    "glide": 6.0,
+    "stability": -1.0,
+    "fade": 1.0
   },
   {
-    "kiekko": "Destroyer"
+    "manufacturer": {
+      "name": "Innova"
+    },
+    "name": "Destroyer",
+    "speed": 12.0,
+    "glide": 5.0,
+    "stability": -1.0,
+    "fade": 3.0
   },
   {
-    "kiekko": "Roc"
+    "manufacturer": {
+      "name": "Innova"
+    },
+    "name": "Roc",
+    "speed": 4.0,
+    "glide": 4.0,
+    "stability": 0.0,
+    "fade": 3.0
   }
 ]

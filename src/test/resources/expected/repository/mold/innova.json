@@ -1,20 +1,24 @@
 {
   "content": [
     {
-      "valmistaja": "Innova",
-      "kiekko": "Destroyer",
-      "nopeus": 12.0,
-      "liito": 5.0,
-      "vakaus": -1.0,
-      "feidi": 3.0
+      "manufacturer": {
+        "name": "Innova"
+      },
+      "name": "Destroyer",
+      "speed": 12.0,
+      "glide": 5.0,
+      "stability": -1.0,
+      "fade": 3.0
     },
     {
-      "valmistaja": "Innova",
-      "kiekko": "Roc",
-      "nopeus": 4.0,
-      "liito": 4.0,
-      "vakaus": 0.0,
-      "feidi": 3.0
+      "manufacturer": {
+        "name": "Innova"
+      },
+      "name": "Roc",
+      "speed": 4.0,
+      "glide": 4.0,
+      "stability": 0.0,
+      "fade": 3.0
     }
   ],
   "pageable": "INSTANCE",

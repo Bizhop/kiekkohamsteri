@@ -37,9 +37,9 @@ public class PlasticRepositoryTest extends SpringContextTestBase {
     }
 
     @Test
-    void findAllByOrderByMuoviAscTest() {
+    void findAllByOrderByNameAscTest() {
         var result = plasticRepository.findAllByOrderByNameAsc();
 
-        assertEqualsJson(adder.create("allDD.json"), result);
+        assertEqualsJson(adder.create("all.json"), result);
     }
 }

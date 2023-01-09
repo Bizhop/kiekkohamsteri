@@ -35,44 +35,44 @@ class DropdownsServiceTest {
 
     @Test
     void getDropdownsTest() {
-        when(moldRepo.findAllByOrderByNameAsc()).thenReturn(getMoldsDD());
-        when(manufacturerRepo.findAllProjectedBy()).thenReturn(getManufacturersDD());
-        when(plasticRepo.findAllByOrderByNameAsc()).thenReturn(getPlasticsDD());
-        when(colorRepo.findAllProjectedBy()).thenReturn(getColorsDD());
-        when(ddRepo.findByMenuOrderByValueAsc("kunto")).thenReturn(getConditionsDD());
-        when(ddRepo.findByMenuOrderByValueAsc("tussit")).thenReturn(getMarkingsDD());
+        when(moldRepo.findAllByOrderByNameAsc()).thenReturn(MOLDS);
+        when(manufacturerRepo.findAll()).thenReturn(MANUFACTURERS);
+        when(plasticRepo.findAllByOrderByNameAsc()).thenReturn(PLASTICS);
+        when(colorRepo.findAll()).thenReturn(COLORS);
+        when(ddRepo.findByMenuOrderByValueAsc("kunto")).thenReturn(CONDITIONS);
+        when(ddRepo.findByMenuOrderByValueAsc("tussit")).thenReturn(MARKINGS);
 
         var dto = getDropdownsService().getDropdowns(null);
 
         assertEquals(6, dto.getMolds().size());
-        assertEquals(5, dto.getMuovit().size());
-        assertEquals(4, dto.getKunto().size());
-        assertEquals(3, dto.getValms().size());
-        assertEquals(2, dto.getVarit().size());
-        assertEquals(1, dto.getTussit().size());
+        assertEquals(5, dto.getPlastics().size());
+        assertEquals(4, dto.getConditions().size());
+        assertEquals(3, dto.getManufacturers().size());
+        assertEquals(2, dto.getColors().size());
+        assertEquals(1, dto.getMarkings().size());
     }
 
     @Test
     void getDropdownsByManufacturerTest() {
         var manufacturer = MANUFACTURERS.get(0);
 
-        when(manufacturerRepo.findAllProjectedBy()).thenReturn(getManufacturersDD());
+        when(manufacturerRepo.findAll()).thenReturn(MANUFACTURERS);
         when(manufacturerRepo.findById(manufacturer.getId())).thenReturn(Optional.of(MANUFACTURERS.get(0)));
-        when(colorRepo.findAllProjectedBy()).thenReturn(getColorsDD());
-        when(ddRepo.findByMenuOrderByValueAsc("kunto")).thenReturn(getConditionsDD());
-        when(ddRepo.findByMenuOrderByValueAsc("tussit")).thenReturn(getMarkingsDD());
+        when(colorRepo.findAll()).thenReturn(COLORS);
+        when(ddRepo.findByMenuOrderByValueAsc("kunto")).thenReturn(CONDITIONS);
+        when(ddRepo.findByMenuOrderByValueAsc("tussit")).thenReturn(MARKINGS);
 
-        when(moldRepo.findByManufacturerOrderByNameAsc(manufacturer)).thenReturn(getMoldsDD(manufacturer));
-        when(plasticRepo.findByManufacturerOrderByNameAsc(manufacturer)).thenReturn(getPlasticsDD(manufacturer));
+        when(moldRepo.findByManufacturerOrderByNameAsc(manufacturer)).thenReturn(getMolds(manufacturer));
+        when(plasticRepo.findByManufacturerOrderByNameAsc(manufacturer)).thenReturn(getPlastics(manufacturer));
 
         var dto = getDropdownsService().getDropdowns(manufacturer.getId());
 
         assertEquals(2, dto.getMolds().size());
-        assertEquals(2, dto.getMuovit().size());
-        assertEquals(4, dto.getKunto().size());
-        assertEquals(3, dto.getValms().size());
-        assertEquals(2, dto.getVarit().size());
-        assertEquals(1, dto.getTussit().size());
+        assertEquals(2, dto.getPlastics().size());
+        assertEquals(4, dto.getConditions().size());
+        assertEquals(3, dto.getManufacturers().size());
+        assertEquals(2, dto.getColors().size());
+        assertEquals(1, dto.getMarkings().size());
     }
 
     DropdownsService getDropdownsService() {

@@ -1,0 +1,40 @@
+{
+  "content": [
+    {
+      "name": "FD",
+      "manufacturer": {
+        "name": "Discmania"
+      },
+      "speed": 7.0,
+      "glide": 6.0,
+      "stability": -1.0,
+      "fade": 1.0,
+      "id": 0
+    },
+    {
+      "name": "PD",
+      "manufacturer": {
+        "name": "Discmania"
+      },
+      "speed": 10.0,
+      "glide": 4.0,
+      "stability": 0.0,
+      "fade": 3.0,
+      "id": 1
+    }
+  ],
+  "pageable": "INSTANCE",
+  "last": true,
+  "totalPages": 1,
+  "totalElements": 2,
+  "first": true,
+  "number": 0,
+  "sort": {
+    "sorted": false,
+    "unsorted": true,
+    "empty": true
+  },
+  "numberOfElements": 2,
+  "size": 2,
+  "empty": false
+}

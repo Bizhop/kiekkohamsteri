@@ -1,13 +1,10 @@
 package fi.bizhop.kiekkohamsteri;
 
-import fi.bizhop.kiekkohamsteri.dto.v2.out.DiscOutputDto;
+import fi.bizhop.kiekkohamsteri.dto.v2.out.DropdownOutputDto;
 import fi.bizhop.kiekkohamsteri.model.*;
-import fi.bizhop.kiekkohamsteri.projection.v1.*;
-import fi.bizhop.kiekkohamsteri.projection.v1.dropdown.*;
-import fi.bizhop.kiekkohamsteri.util.Utils;
+import lombok.Getter;
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -32,8 +29,8 @@ public class TestObjects {
     public static final List<Mold> MOLDS;
     public static final List<Plastic> PLASTICS;
     public static final List<Color> COLORS;
-    public static final List<Dropdown> CONDITIONS;
-    public static final List<Dropdown> MARKINGS;
+    public static final List<DropdownValues> CONDITIONS;
+    public static final List<DropdownValues> MARKINGS;
     public static final List<Disc> DISCS;
     public static final List<User> USERS;
     public static final List<User> GROUP_USERS;
@@ -41,16 +38,6 @@ public class TestObjects {
 
     private static final Predicate<Disc> isNotLost = disc -> Boolean.FALSE.equals(disc.getLost());
     private static final Predicate<Disc> isLost = disc -> Boolean.TRUE.equals(disc.getLost());
-
-    public static class Dropdown {
-        public Integer id;
-        public String name;
-
-        public Dropdown(Integer id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-    }
 
     static {
         TEST_USER.setUsername("User");
@@ -94,13 +81,13 @@ public class TestObjects {
         var yellow = createColor(1L, "Keltainen");
         COLORS = List.of(white, yellow);
 
-        var mint = new Dropdown(10, "10/10");
-        var ok = new Dropdown(8, "8/10");
-        var roller = new Dropdown(5, "5/10");
-        var dogFood = new Dropdown(4, "4/10");
+        var mint = new DropdownValues(null, "kunto", "10/10", 10L);
+        var ok = new DropdownValues(null, "kunto","8/10", 8L);
+        var roller = new DropdownValues(null, "kunto", "5/10", 5L);
+        var dogFood = new DropdownValues(null, "kunto", "4/10", 4L);
         CONDITIONS = List.of(mint, ok, roller, dogFood);
 
-        var noMarkings = new Dropdown(0, "Ei merkintöjä");
+        var noMarkings = new DropdownValues(null, "tussit", "Ei merkintöjä", 0L);
         MARKINGS = List.of(noMarkings);
 
         var testUserDisc = new Disc(TEST_USER, fd, sLine, white);
@@ -115,14 +102,6 @@ public class TestObjects {
         DISCS = List.of(testUserDisc, otherUserDisc, lostDisc, notPublicDisc);
     }
 
-    public static List<DiscProjection> getDiscsByUser(User user) {
-        return DISCS.stream()
-                .filter(isNotLost)
-                .filter(disc -> disc.getOwner().getEmail().equals(user.getEmail()))
-                .map(TestObjects::projectionFromDisc)
-                .collect(Collectors.toList());
-    }
-
     public static List<Disc> getDiscsByUserV2(User user) {
         return DISCS.stream()
                 .filter(isNotLost)
@@ -130,79 +109,65 @@ public class TestObjects {
                 .collect(Collectors.toList());
     }
 
-    public static List<ManufacturerDropdownProjection> getManufacturersDD() {
+    public static List<DropdownOutputDto> getManufacturersDD() {
         return MANUFACTURERS.stream()
-                .map(TestObjects::dropdownProjectionFromManufacturer)
+                .map(DropdownOutputDto::fromDropdownInterface)
                 .collect(Collectors.toList());
     }
 
-    public static List<MoldDropdownProjection> getMoldsDD() {
+    public static List<DropdownOutputDto> getMoldsDD() {
         return MOLDS.stream()
-                .map(TestObjects::dropdownProjectionFromMold)
+                .map(DropdownOutputDto::fromDropdownInterface)
                 .collect(Collectors.toList());
     }
 
-    public static List<MoldDropdownProjection> getMoldsDD(Manufacturer manufacturer) {
-        return MOLDS.stream()
-                .filter(mold -> mold.getManufacturer().getId().equals(manufacturer.getId()))
-                .map(TestObjects::dropdownProjectionFromMold)
-                .collect(Collectors.toList());
-    }
-
-    public static List<MoldProjection> getMolds() {
-        return MOLDS.stream()
-                .map(TestObjects::projectionFromMold)
-                .collect(Collectors.toList());
-    }
-
-    public static List<MoldProjection> getMolds(Manufacturer manufacturer) {
+    public static List<DropdownOutputDto> getMoldsDD(Manufacturer manufacturer) {
         return MOLDS.stream()
                 .filter(mold -> mold.getManufacturer().getId().equals(manufacturer.getId()))
-                .map(TestObjects::projectionFromMold)
+                .map(DropdownOutputDto::fromDropdownInterface)
                 .collect(Collectors.toList());
     }
 
-    public static List<PlasticProjection> getPlastics() {
-        return PLASTICS.stream()
-                .map(TestObjects::projectionFromPlastic)
+    public static List<Mold> getMolds(Manufacturer manufacturer) {
+        return MOLDS.stream()
+                .filter(mold -> mold.getManufacturer().getId().equals(manufacturer.getId()))
                 .collect(Collectors.toList());
     }
 
-    public static List<PlasticProjection> getPlastics(Manufacturer manufacturer) {
+    public static List<Plastic> getPlastics(Manufacturer manufacturer) {
         return PLASTICS.stream()
                 .filter(mold -> mold.getManufacturer().getId().equals(manufacturer.getId()))
-                .map(TestObjects::projectionFromPlastic)
                 .collect(Collectors.toList());
     }
 
-    public static List<PlasticDropdownProjection> getPlasticsDD() {
+    public static List<DropdownOutputDto> getPlasticsDD() {
         return PLASTICS.stream()
-                .map(TestObjects::dropdownProjectionFromPlastic)
+                .map(DropdownOutputDto::fromDropdownInterface)
                 .collect(Collectors.toList());
     }
 
-    public static List<PlasticDropdownProjection> getPlasticsDD(Manufacturer manufacturer) {
+    public static List<DropdownOutputDto> getPlasticsDD(Manufacturer manufacturer) {
         return PLASTICS.stream()
                 .filter(plastic -> plastic.getManufacturer().getId().equals(manufacturer.getId()))
-                .map(TestObjects::dropdownProjectionFromPlastic)
+                .map(DropdownOutputDto::fromDropdownInterface)
                 .collect(Collectors.toList());
     }
 
-    public static List<ColorDropdownProjection> getColorsDD() {
+    public static List<DropdownOutputDto> getColorsDD() {
         return COLORS.stream()
-                .map(TestObjects::dropdownProjectionFromColor)
+                .map(DropdownOutputDto::fromDropdownInterface)
                 .collect(Collectors.toList());
     }
 
-    public static List<DropdownProjection> getConditionsDD() {
+    public static List<DropdownOutputDto> getConditionsDD() {
         return CONDITIONS.stream()
-                .map(TestObjects::dropdownProjection)
+                .map(DropdownOutputDto::fromDropdownInterface)
                 .collect(Collectors.toList());
     }
 
-    public static List<DropdownProjection> getMarkingsDD() {
+    public static List<DropdownOutputDto> getMarkingsDD() {
         return MARKINGS.stream()
-                .map(TestObjects::dropdownProjection)
+                .map(DropdownOutputDto::fromDropdownInterface)
                 .collect(Collectors.toList());
     }
 
@@ -244,100 +209,5 @@ public class TestObjects {
         mold.setStability(stability);
         mold.setFade(fade);
         return mold;
-    }
-
-
-    // PROJECTIONS
-
-    private static DropdownProjection dropdownProjection(Dropdown dropdown) {
-        return new DropdownProjection() {
-            @Override public Integer getId() { return dropdown.id; }
-            @Override public String getNimi() { return dropdown.name; }
-        };
-    }
-
-    private static ColorDropdownProjection dropdownProjectionFromColor(Color color) {
-        return new ColorDropdownProjection() {
-            @Override public Long getId() { return color.getId(); }
-            @Override public String getVari() { return color.getName(); }
-        };
-    }
-
-    private static PlasticDropdownProjection dropdownProjectionFromPlastic(Plastic plastic) {
-        return new PlasticDropdownProjection() {
-            @Override public Long getId() { return plastic.getId(); }
-            @Override public String getMuovi() { return plastic.getName();  }
-        };
-    }
-
-    private static MoldDropdownProjection dropdownProjectionFromMold(Mold mold) {
-        return new MoldDropdownProjection() {
-            @Override public Long getId() { return mold.getId(); }
-            @Override public String getKiekko() { return mold.getName(); }
-        };
-    }
-
-    private static ManufacturerDropdownProjection dropdownProjectionFromManufacturer(Manufacturer manufacturer) {
-        return new ManufacturerDropdownProjection() {
-            @Override public Long getId() { return manufacturer.getId(); }
-            @Override public String getValmistaja() { return manufacturer.getName(); }
-        };
-    }
-
-    public static MoldProjection projectionFromMold(Mold mold) {
-        return new MoldProjection() {
-            @Override public Long getId() { return mold.getId(); }
-            @Override public String getValmistaja() { return mold.getManufacturer().getName(); }
-            @Override public String getKiekko() { return mold.getName(); }
-            @Override public Double getNopeus() { return mold.getSpeed(); }
-            @Override public Double getLiito() { return mold.getGlide(); }
-            @Override public Double getVakaus() { return mold.getStability(); }
-            @Override public Double getFeidi() { return mold.getFade(); }
-        };
-    }
-
-    public static PlasticProjection projectionFromPlastic(Plastic plastic) {
-        return new PlasticProjection() {
-            @Override public Long getId() { return plastic.getId(); }
-            @Override public String getValmistaja() { return plastic.getManufacturer().getName(); }
-            @Override public String getMuovi() { return plastic.getName(); }
-        };
-    }
-
-    public static DiscProjection projectionFromDisc(Disc disc) {
-        return new DiscProjection() {
-            @Override public Long getId() { return disc.getId(); }
-            @Override public String getOmistaja() { return disc.getOwner().getUsername(); }
-            @Override public String getOwnerEmail() { return disc.getOwner().getEmail(); }
-            @Override public String getValmistaja() { return disc.getMold().getManufacturer().getName(); }
-            @Override public Long getValmId() { return disc.getMold().getManufacturer().getId(); }
-            @Override public String getMold() { return disc.getMold().getName(); }
-            @Override public Long getMoldId() { return disc.getMold().getId(); }
-            @Override public String getMuovi() { return disc.getPlastic().getName(); }
-            @Override public Long getMuoviId() { return disc.getPlastic().getId(); }
-            @Override public String getVari() { return disc.getColor().getName(); }
-            @Override public Long getVariId() { return disc.getColor().getId(); }
-            @Override public Double getNopeus() { return disc.getMold().getSpeed(); }
-            @Override public Double getLiito() { return disc.getMold().getGlide(); }
-            @Override public Double getVakaus() { return disc.getMold().getStability(); }
-            @Override public Double getFeidi() { return disc.getMold().getFade(); }
-            @Override public String getKuva() { return disc.getImage(); }
-            @Override public Integer getPaino() { return disc.getWeight(); }
-            @Override public Integer getKunto() { return disc.getCondition(); }
-            @Override public Boolean getHohto() { return disc.getGlow(); }
-            @Override public Boolean getSpessu() { return disc.getSpecial(); }
-            @Override public Boolean getDyed() { return disc.getDyed(); }
-            @Override public Boolean getSwirly() { return disc.getSwirly(); }
-            @Override public Integer getTussit() { return disc.getMarkings(); }
-            @Override public Boolean getMyynnissa() { return disc.getForSale(); }
-            @Override public Integer getHinta() { return disc.getPrice(); }
-            @Override public String getMuuta() { return disc.getDescription(); }
-            @Override public Boolean getLoytokiekko() { return disc.getLostAndFound(); }
-            @Override public Boolean getItb() { return disc.getItb(); }
-            @Override public Boolean getPublicDisc() { return disc.getPublicDisc(); }
-            @Override public Boolean getLost() { return disc.getLost(); }
-            @Override public Date getCreatedAt() { return disc.getCreatedAt(); }
-            @Override public Date getUpdatedAt() { return disc.getUpdatedAt(); }
-        };
     }
 }

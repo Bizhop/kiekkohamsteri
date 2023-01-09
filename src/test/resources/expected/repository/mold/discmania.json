@@ -1,20 +1,24 @@
 {
   "content": [
     {
-      "valmistaja": "Discmania",
-      "kiekko": "PD",
-      "nopeus": 10.0,
-      "liito": 4.0,
-      "vakaus": 0.0,
-      "feidi": 3.0
+      "manufacturer": {
+        "name": "Discmania"
+      },
+      "name": "PD",
+      "speed": 10.0,
+      "glide": 4.0,
+      "stability": 0.0,
+      "fade": 3.0
     },
     {
-      "valmistaja": "Discmania",
-      "kiekko": "FD",
-      "nopeus": 7.0,
-      "liito": 6.0,
-      "vakaus": -1.0,
-      "feidi": 1.0
+      "manufacturer": {
+        "name": "Discmania"
+      },
+      "name": "FD",
+      "speed": 7.0,
+      "glide": 6.0,
+      "stability": -1.0,
+      "fade": 1.0
     }
   ],
   "pageable": "INSTANCE",

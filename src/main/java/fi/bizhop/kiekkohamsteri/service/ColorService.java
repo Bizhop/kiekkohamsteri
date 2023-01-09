@@ -27,7 +27,7 @@ public class ColorService {
     // Passthrough methods to db
     // Not covered (or to be covered by unit tests)
 
-    public Optional<Color> getColor(Long id) {
-        return colorRepo.findById(id);
+    public Color getColor(Long id) {
+        return colorRepo.findById(id).orElse(null);
     }
 }

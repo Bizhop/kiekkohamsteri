@@ -11,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Mold extends TimestampBase {
+public class Mold extends TimestampBase implements Dropdown {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
@@ -34,4 +34,9 @@ public class Mold extends TimestampBase {
 
 	@Column(name="feidi")
 	private Double fade;
+
+	@Override
+	public Long getValue() {
+		return this.id;
+	}
 }

@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -69,25 +68,16 @@ public class DiscRepositoryTest extends SpringContextTestBase {
     }
 
     @Test
-    void findByOwnerAndLostFalseTest() {
+    void getByOwnerAndLostFalseTest() {
         var user = (User) testDataContainer.get(TEST_USER_KEY);
-        var result = discRepository.findByOwnerAndLostFalse(user, Pageable.unpaged());
+        var result = discRepository.getByOwnerAndLostFalse(user, Pageable.unpaged());
 
-        assertEqualsJson(adder.create("byMemberAndLostFalse.json"), result);
-    }
-
-    @Test
-    void findByOwnerInAndPublicDiscTrueTest() {
-        var user = (User) testDataContainer.get(TEST_USER_KEY);
-        var other = (User) testDataContainer.get(OTHER_USER_KEY);
-        var result = discRepository.findByOwnerInAndPublicDiscTrue(List.of(user, other));
-
-        assertEqualsJson(adder.create("byMemberInAndPublicDiscTrue.json"), result);
+        assertEqualsJson(adder.create("byOwnerAndLostFalse.json"), result);
     }
 
     @Test
     void findByLostTrueTest() {
-        var result = discRepository.findByLostTrue(Pageable.unpaged());
+        var result = discRepository.getByLostTrue(Pageable.unpaged());
 
         assertEqualsJson(adder.create("byLostTrue.json"), result);
     }
@@ -95,16 +85,16 @@ public class DiscRepositoryTest extends SpringContextTestBase {
     @Test
     void getDiscByIdTest() {
         var disc = discRepository.findAll().iterator().next();
-        var result = discRepository.getDiscById(disc.getId());
+        var result = discRepository.findById(disc.getId()).orElseThrow();
 
         assertEqualsJson(adder.create("byId.json"), result);
     }
 
     @Test
     void findByForSaleTrueTest() {
-        var result = discRepository.findByForSaleTrue(Pageable.unpaged());
+        var result = discRepository.getByForSaleTrue(Pageable.unpaged());
 
-        assertEqualsJson(adder.create("byMyynnissaTrue.json"), result);
+        assertEqualsJson(adder.create("byForSaleTrue.json"), result);
     }
 
     @Test

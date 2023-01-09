@@ -1,0 +1,46 @@
+{
+  "id": 123,
+  "owner": {
+    "username": "New User",
+    "email": "test@example.com"
+  },
+  "mold": {
+    "id": 0,
+    "manufacturer": {
+      "id": 0,
+      "name": "Discmania"
+    },
+    "name": "FD",
+    "speed": 7,
+    "glide": 6,
+    "stability": -1,
+    "fade": 1
+  },
+  "plastic": {
+    "id": 0,
+    "manufacturer": {
+      "id": 0,
+      "name": "Discmania"
+    },
+    "name": "S-Line"
+  },
+  "color": {
+    "id": 0,
+    "name": "Valkoinen"
+  },
+  "image": "New User-123",
+  "weight": 175,
+  "condition": 10,
+  "glow": false,
+  "special": false,
+  "dyed": false,
+  "swirly": false,
+  "markings": 1,
+  "forSale": false,
+  "price": 0,
+  "description": "",
+  "lostAndFound": false,
+  "itb": false,
+  "publicDisc": false,
+  "lost": false
+}

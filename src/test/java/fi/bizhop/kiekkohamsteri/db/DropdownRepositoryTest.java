@@ -26,19 +26,19 @@ public class DropdownRepositoryTest extends SpringContextTestBase {
         var condition = new DropdownValues();
         condition.setMenu("kunto");
         condition.setName("10/10");
-        condition.setValue(10);
+        condition.setValue(10L);
         dropdownRepository.save(condition);
 
         var markings1 = new DropdownValues();
         markings1.setMenu("tussit");
         markings1.setName("rimmissä");
-        markings1.setValue(1);
+        markings1.setValue(1L);
         dropdownRepository.save(markings1);
 
         var markings2 = new DropdownValues();
         markings2.setMenu("tussit");
         markings2.setName("pohjassa");
-        markings2.setValue(2);
+        markings2.setValue(2L);
         dropdownRepository.save(markings2);
     }
 
