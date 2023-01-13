@@ -84,13 +84,6 @@
     ]
   },
   {
-    "field": "lost",
-    "type": "boolean",
-    "operations": [
-      "EQUAL"
-    ]
-  },
-  {
     "field": "itb",
     "type": "boolean",
     "operations": [

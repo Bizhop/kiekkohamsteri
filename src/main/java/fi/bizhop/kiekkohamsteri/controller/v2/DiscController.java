@@ -12,6 +12,7 @@ import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.service.*;
 import fi.bizhop.kiekkohamsteri.util.Utils;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
@@ -49,7 +50,7 @@ public class DiscController extends BaseControllerV2 {
             @RequestAttribute("user") User me,
             @RequestParam(required = false) Long userId,
             HttpServletResponse response,
-            Pageable pageable) {
+            @ParameterObject Pageable pageable) {
         if(userId != null) {
             try {
                 var otherUser = userService.getUser(userId);
@@ -71,13 +72,13 @@ public class DiscController extends BaseControllerV2 {
     }
 
     @RequestMapping(value = "/discs/for-sale", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody Page<DiscOutputDto> getDiscsForSale(HttpServletResponse response, Pageable pageable) {
+    public @ResponseBody Page<DiscOutputDto> getDiscsForSale(HttpServletResponse response, @ParameterObject Pageable pageable) {
         response.setStatus(SC_OK);
         return discService.getDiscsForSaleV2(pageable).map(DiscOutputDto::fromDb);
     }
 
     @RequestMapping(value = "/discs/lost", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody Page<DiscOutputDto> getLost(HttpServletResponse response, Pageable pageable) {
+    public @ResponseBody Page<DiscOutputDto> getLost(HttpServletResponse response, @ParameterObject Pageable pageable) {
         response.setStatus(SC_OK);
         return discService.getLostV2(pageable).map(DiscOutputDto::fromDb);
     }
@@ -243,7 +244,7 @@ public class DiscController extends BaseControllerV2 {
             @RequestAttribute("user") User me,
             @RequestBody DiscSearchDto searchDto,
             HttpServletResponse response,
-            Pageable pageable) {
+            @ParameterObject Pageable pageable) {
         try {
             response.setStatus(SC_OK);
             return discService.search(me, pageable, searchDto).map(DiscOutputDto::fromDb);
@@ -257,7 +258,7 @@ public class DiscController extends BaseControllerV2 {
     //MOLDS
 
     @RequestMapping(value="/discs/molds", method=RequestMethod.GET, produces="application/json")
-    public @ResponseBody Page<MoldOutputDto> getMolds(@RequestParam(required=false) Long manufacturerId, Pageable pageable, HttpServletResponse response) {
+    public @ResponseBody Page<MoldOutputDto> getMolds(@RequestParam(required=false) Long manufacturerId, @ParameterObject Pageable pageable, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_OK);
         if(manufacturerId == null) return moldService.getMolds(pageable).map(MoldOutputDto::fromDb);
 
@@ -288,7 +289,7 @@ public class DiscController extends BaseControllerV2 {
     //PLASTICS
 
     @RequestMapping(value="/discs/plastics", method=RequestMethod.GET, produces="application/json")
-    public @ResponseBody Page<PlasticOutputDto> getPlastics(@RequestParam(required=false) Long manufacturerId, Pageable pageable, HttpServletResponse response) {
+    public @ResponseBody Page<PlasticOutputDto> getPlastics(@RequestParam(required=false) Long manufacturerId, @ParameterObject Pageable pageable, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_OK);
         if(manufacturerId == null) return plasticService.getPlastics(pageable).map(PlasticOutputDto::fromDb);
 
