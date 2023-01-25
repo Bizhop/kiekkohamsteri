@@ -94,8 +94,17 @@ public class GroupService {
     }
 
     public List<GroupRequest> getGroupRequests(Set<Long> groupIds) {
-        var groups = groupRepository.findAllById(groupIds);
+        var groups = groupRepository.findAllByIdIn(groupIds);
         return groupRequestRepository.findAllByGroupInAndStatus(groups, REQUESTED);
+    }
+
+    public void deleteGroup(Long groupId) throws HttpResponseException {
+        var group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new HttpResponseException(404, "Group not found"));
+        var requests = groupRequestRepository.findAllByGroup(group);
+        groupRequestRepository.deleteAll(requests);
+
+        groupRepository.delete(group);
     }
 
     // Passthrough methods to db
@@ -108,6 +117,4 @@ public class GroupService {
     public List<GroupRequest> getGroupRequests() { return groupRequestRepository.findByStatus(REQUESTED); }
 
     public Optional<GroupRequest> getGroupRequest(Long id) { return groupRequestRepository.findById(id); }
-
-    public void deleteGroup(Long groupId) throws HttpResponseException { groupRepository.deleteById(groupId); }
 }

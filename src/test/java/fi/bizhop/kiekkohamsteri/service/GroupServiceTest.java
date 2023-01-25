@@ -23,8 +23,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 import java.util.Optional;
 
-import static fi.bizhop.kiekkohamsteri.TestObjects.OTHER_EMAIL;
-import static fi.bizhop.kiekkohamsteri.TestObjects.TEST_EMAIL;
+import static fi.bizhop.kiekkohamsteri.TestObjects.*;
 import static fi.bizhop.kiekkohamsteri.model.GroupRequest.Status.*;
 import static fi.bizhop.kiekkohamsteri.model.GroupRequest.Type.*;
 import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_GROUP_ADMIN;
@@ -257,6 +256,23 @@ public class GroupServiceTest {
         var groupAdminRole = user.getRoles().stream().findFirst().orElseThrow();
         assertEquals(USER_ROLE_GROUP_ADMIN, groupAdminRole.getName());
         assertEquals(group.getId(), groupAdminRole.getGroupId());
+    }
+
+    @Test
+    void givenGroupRequestsExist_whenDeleteGroup_thenDeleteRequestsAndDeleteGroup() throws HttpResponseException {
+        var user = new User(TEST_EMAIL);
+
+        var group = new Group("group");
+        group.setId(1L);
+        var request = new GroupRequest(group, null, user, JOIN, REQUESTED, null);
+
+        when(groupRepository.findById(1L)).thenReturn(Optional.of(group));
+        when(groupRequestRepository.findAllByGroup(group)).thenReturn(List.of(request));
+
+        getGroupService().deleteGroup(1L);
+
+        verify(groupRequestRepository, times(1)).deleteAll(List.of(request));
+        verify(groupRepository, times(1)).delete(group);
     }
 
     GroupService getGroupService() { return new GroupService(groupRepository, groupRequestRepository, roleRepository); }
