@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static fi.bizhop.kiekkohamsteri.TestObjects.*;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
@@ -55,11 +56,11 @@ public class DiscServiceTest {
     void givenUserIsDiscOwner_whenDeletingDisc_thenDeleteDisc() throws AuthorizationException {
         var disc = getTestDiscFor(TEST_USER);
 
-        when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
+        when(discRepo.findByUuid(TEST_UUID)).thenReturn(Optional.of(disc));
 
-        getDiscService().deleteDisc(123L, TEST_USER);
+        getDiscService().deleteDisc(TEST_UUID, TEST_USER);
 
-        verify(discRepo, times(1)).deleteById(anyLong());
+        verify(discRepo, times(1)).deleteById(any());
     }
 
     @Test
@@ -68,10 +69,10 @@ public class DiscServiceTest {
                 .filter(d -> OTHER_EMAIL.equals(d.getOwner().getEmail()))
                 .findFirst();
 
-        when(discRepo.findById(123L)).thenReturn(disc);
+        when(discRepo.findByUuid(TEST_UUID)).thenReturn(disc);
 
         try {
-            getDiscService().deleteDisc(123L, TEST_USER);
+            getDiscService().deleteDisc(TEST_UUID, TEST_USER);
 
             fail(SHOULD_THROW_EXCEPTION);
         } catch (AuthorizationException ignored) {}
@@ -83,12 +84,12 @@ public class DiscServiceTest {
     void givenUserIsNotDiscOwner_whenUpdatingDisc_thenThrowAuthException() {
         var disc = getTestDiscFor(OTHER_USER);
 
-        when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
+        when(discRepo.findByUuid(TEST_UUID)).thenReturn(Optional.of(disc));
 
         var dto = DiscInputDto.builder().build();
 
         try {
-            getDiscService().updateDisc(dto, 123L, TEST_USER, null, null, null);
+            getDiscService().updateDisc(dto, TEST_UUID, TEST_USER, null, null, null);
 
             fail(SHOULD_THROW_EXCEPTION);
         } catch (AuthorizationException ignored) {}
@@ -100,7 +101,7 @@ public class DiscServiceTest {
     void givenValidDto_whenUpdatingDisc_thenUpdateDisc() throws AuthorizationException {
         var disc = getTestDiscFor(TEST_USER);
 
-        when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
+        when(discRepo.findByUuid(TEST_UUID)).thenReturn(Optional.of(disc));
 
         var dto = DiscInputDto.builder()
                 .description("text")
@@ -108,7 +109,7 @@ public class DiscServiceTest {
                 .image("image")
                 .build();
 
-        getDiscService().updateDisc(dto, 123L, TEST_USER, null, null, null);
+        getDiscService().updateDisc(dto, TEST_UUID, TEST_USER, null, null, null);
 
         verify(discRepo, times(1)).save(discCaptor.capture());
 
@@ -122,7 +123,7 @@ public class DiscServiceTest {
     void givenValidDtoOnV2_whenUpdatingDisc_thenUpdateDisc() throws AuthorizationException {
         var disc = getTestDiscFor(TEST_USER);
 
-        when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
+        when(discRepo.findByUuid(TEST_UUID)).thenReturn(Optional.of(disc));
 
         var dto = fi.bizhop.kiekkohamsteri.dto.v2.in.DiscInputDto.builder()
                 .description("text")
@@ -130,7 +131,7 @@ public class DiscServiceTest {
                 .image("image")
                 .build();
 
-        getDiscService().updateDisc(dto, 123L, TEST_USER, null, null, null);
+        getDiscService().updateDisc(dto, TEST_UUID, TEST_USER, null, null, null);
 
         verify(discRepo, times(1)).save(discCaptor.capture());
 
@@ -146,11 +147,11 @@ public class DiscServiceTest {
         disc.setItb(true);
         disc.setForSale(true);
 
-        when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
+        when(discRepo.findByUuid(TEST_UUID)).thenReturn(Optional.of(disc));
 
         var dto = DiscInputDto.builder().lost(true).build();
 
-        getDiscService().updateDisc(dto, 123L, TEST_USER, null, null, null);
+        getDiscService().updateDisc(dto, TEST_UUID, TEST_USER, null, null, null);
 
         verify(discRepo, times(1)).save(discCaptor.capture());
 
@@ -164,9 +165,9 @@ public class DiscServiceTest {
     void givenUserIsDiscOwner_whenGetDisc_thenReturnDisc() throws AuthorizationException {
         var disc = getDiscsByUserV2(TEST_USER).get(0);
 
-        when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
+        when(discRepo.findByUuid(TEST_UUID)).thenReturn(Optional.of(disc));
 
-        var response = getDiscService().getDisc(TEST_USER, 123L);
+        var response = getDiscService().getDisc(TEST_USER, TEST_UUID);
 
         assertEquals(disc, response);
     }
@@ -175,10 +176,10 @@ public class DiscServiceTest {
     void givenUserIsNotDiscOwner_whenGetDisc_thenThrowAuthException() {
         var disc = getDiscsByUserV2(OTHER_USER).get(0);
 
-        when(discRepo.findById(anyLong())).thenReturn(Optional.of(disc));
+        when(discRepo.findByUuid(anyString())).thenReturn(Optional.of(disc));
 
         try {
-            getDiscService().getDisc(TEST_USER, 0L);
+            getDiscService().getDisc(TEST_USER, "anything");
 
             fail(SHOULD_THROW_EXCEPTION);
         } catch (AuthorizationException ignored) {}
@@ -189,9 +190,9 @@ public class DiscServiceTest {
         var disc = getTestDiscFor(OTHER_USER);
         disc.setPublicDisc(true);
 
-        when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
+        when(discRepo.findByUuid(TEST_UUID)).thenReturn(Optional.of(disc));
 
-        var response = getDiscService().getDiscIfPublicOrOwnV2(TEST_USER, 123L);
+        var response = getDiscService().getDiscIfPublicOrOwnV2(TEST_USER, TEST_UUID);
 
         assertEquals(disc, response);
     }
@@ -201,28 +202,34 @@ public class DiscServiceTest {
         var disc = getTestDiscFor(OTHER_USER);
         disc.setPublicDisc(false);
 
-        when(discRepo.findById(123L)).thenReturn(Optional.of(disc));
+        when(discRepo.findByUuid(TEST_UUID)).thenReturn(Optional.of(disc));
 
         try {
-            getDiscService().getDiscIfPublicOrOwnV2(TEST_USER, 123L);
+            getDiscService().getDiscIfPublicOrOwnV2(TEST_USER, TEST_UUID);
 
             fail(SHOULD_THROW_EXCEPTION);
-        } catch (HttpResponseException hre) {
+        }
+        catch (HttpResponseException e) {
             fail(WRONG_EXCEPTION);
-        } catch (AuthorizationException ignored) {}
+        }
+        catch (AuthorizationException ignored) {}
     }
 
     @Test
     void givenDiscNotFound_whenGetOtherUsersDisc_thenThrowNotFoundException() {
-        when(discRepo.findById(123L)).thenReturn(Optional.empty());
+        when(discRepo.findByUuid(TEST_UUID)).thenReturn(Optional.empty());
 
         try {
-            getDiscService().getDiscIfPublicOrOwnV2(TEST_USER, 123L);
+            getDiscService().getDiscIfPublicOrOwnV2(TEST_USER, TEST_UUID);
 
             fail(SHOULD_THROW_EXCEPTION);
-        } catch (AuthorizationException | HttpResponseException e) {
+        } catch (AuthorizationException e) {
             fail(WRONG_EXCEPTION);
-        } catch (NoSuchElementException ignored) {}
+        } catch (HttpResponseException e) {
+            if(e.getStatusCode() != SC_NOT_FOUND) {
+                fail("Unexpected status code");
+            }
+        }
     }
 
     @Test

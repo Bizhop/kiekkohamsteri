@@ -173,17 +173,22 @@ public class DiscController extends BaseControllerV2 {
     }
 
     @RequestMapping(value = "/discs/{uuid}", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody DiscOutputDto getDisc(@RequestAttribute("user") User owner, @PathVariable String id, HttpServletResponse response) {
+    public @ResponseBody DiscOutputDto getDisc(@RequestAttribute("user") User owner, @PathVariable String uuid, HttpServletResponse response) {
         try {
             response.setStatus(SC_OK);
-            return DiscOutputDto.fromDb(discService.getDiscIfPublicOrOwnV2(owner, id));
+            return DiscOutputDto.fromDb(discService.getDiscIfPublicOrOwnV2(owner, uuid));
+        }
+        catch (HttpResponseException e) {
+            LOG.error(e.getMessage(), e);
+            response.setStatus(e.getStatusCode());
+            return null;
         }
         catch (AuthorizationException ae) {
             response.setStatus(SC_FORBIDDEN);
             return null;
         }
         catch (NoSuchElementException e) {
-            LOG.error("Disc not found, id={}", id);
+            LOG.error("Disc not found, uuid={}", uuid);
             response.setStatus(SC_NOT_FOUND);
             return null;
         }

@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 
 import static fi.bizhop.kiekkohamsteri.search.SearchOperation.EQUAL;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -118,16 +119,16 @@ public class DiscService {
 		}
 	}
 
-	public Disc getDiscIfPublicOrOwnV2(User owner, String uuid) throws AuthorizationException {
-		var disc = discRepo.findByUuid(uuid).orElseThrow();
+	public Disc getDiscIfPublicOrOwnV2(User owner, String uuid) throws AuthorizationException, HttpResponseException {
+		var disc = discRepo.findByUuid(uuid).orElseThrow(() -> new HttpResponseException(SC_NOT_FOUND, "Disc not found"));
 		return checkIfPublicOrOwnV2(owner, disc);
 	}
 
 	@Deprecated
 	//DEPRECATED: use uuid version instead
 	//TODO: fix tests
-	public Disc getDiscIfPublicOrOwnV2(User owner, Long id) throws AuthorizationException {
-		var disc = discRepo.findById(id).orElseThrow();
+	public Disc getDiscIfPublicOrOwnV2(User owner, Long id) throws AuthorizationException, HttpResponseException {
+		var disc = discRepo.findById(id).orElseThrow(() -> new HttpResponseException(SC_NOT_FOUND, "Disc not found"));
 		return checkIfPublicOrOwnV2(owner, disc);
 	}
 

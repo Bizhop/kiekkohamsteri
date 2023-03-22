@@ -115,7 +115,6 @@ public class Disc extends TimestampBase {
 
 	public void generateAndSetUuid() {
 		var newUuid = Utils.generateUuid(String.format("%s-%d", owner.getEmail(), this.id));
-		System.out.printf("New uuid generated for disc %d, %s%n", this.id, newUuid);
 		this.uuid = newUuid;
 	}
 }
