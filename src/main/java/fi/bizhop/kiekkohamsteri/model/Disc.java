@@ -1,5 +1,6 @@
 package fi.bizhop.kiekkohamsteri.model;
 
+import fi.bizhop.kiekkohamsteri.util.Utils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -85,6 +86,9 @@ public class Disc extends TimestampBase {
 
 	@Column(nullable = false)
 	private Boolean lost;
+
+	@Column(length = 36)
+	private String uuid;
 	
 	public Disc(User user, Mold defaultMold, Plastic defaultPlastic, Color defaultColor) {
 		this.owner = user;
@@ -106,5 +110,12 @@ public class Disc extends TimestampBase {
 		this.itb = false;
 		this.publicDisc = false;
 		this.lost = false;
+		this.uuid = Utils.generateUuid();
+	}
+
+	public void generateAndSetUuid() {
+		var newUuid = Utils.generateUuid(String.format("%s-%d", owner.getEmail(), this.id));
+		System.out.printf("New uuid generated for disc %d, %s%n", this.id, newUuid);
+		this.uuid = newUuid;
 	}
 }

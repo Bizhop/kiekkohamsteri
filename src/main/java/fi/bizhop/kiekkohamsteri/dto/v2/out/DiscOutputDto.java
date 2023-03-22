@@ -11,7 +11,7 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DiscOutputDto {
-    Long id;
+    String uuid;
     UserOutputDto owner;
     MoldOutputDto mold;
     PlasticOutputDto plastic;
@@ -35,7 +35,7 @@ public class DiscOutputDto {
     public static DiscOutputDto fromDb(Disc input) {
         if(input == null) return null;
         return DiscOutputDto.builder()
-                .id(input.getId())
+                .uuid(input.getUuid())
                 .owner(UserOutputDto.fromDbCompact(input.getOwner()))
                 .mold(MoldOutputDto.fromDb(input.getMold()))
                 .plastic(PlasticOutputDto.fromDb(input.getPlastic()))

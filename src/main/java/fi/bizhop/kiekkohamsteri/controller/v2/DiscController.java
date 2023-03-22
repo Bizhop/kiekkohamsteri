@@ -113,15 +113,15 @@ public class DiscController extends BaseControllerV2 {
         }
     }
 
-    @RequestMapping(value = "/discs/{id}/update-image", method = RequestMethod.PATCH, produces = "application/json", consumes = "application/json")
-    public @ResponseBody DiscOutputDto updateImage(@RequestAttribute("user") User owner, @PathVariable Long id, @RequestBody UploadDto dto, HttpServletResponse response) {
+    @RequestMapping(value = "/discs/{uuid}/update-image", method = RequestMethod.PATCH, produces = "application/json", consumes = "application/json")
+    public @ResponseBody DiscOutputDto updateImage(@RequestAttribute("user") User owner, @PathVariable String uuid, @RequestBody UploadDto dto, HttpServletResponse response) {
         if(invalidUploadDto(dto)) {
             response.setStatus(SC_BAD_REQUEST);
             return null;
         }
 
         try {
-            var disc = discService.getDisc(owner, id);
+            var disc = discService.getDisc(owner, uuid);
             var image = disc.getImage();
             //if image name already has more than one "-", it has been updated previously
             // then replace timestamp with new one
@@ -146,20 +146,20 @@ public class DiscController extends BaseControllerV2 {
             return null;
         }
         catch (NoSuchElementException e) {
-            LOG.error("Disc not found, id={}", id);
+            LOG.error("Disc not found, uuid={}", uuid);
             response.setStatus(SC_NOT_FOUND);
             return null;
         }
     }
 
-    @RequestMapping(value = "/discs/{id}", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
-    public @ResponseBody DiscOutputDto updateDisc(@RequestAttribute("user") User owner, @PathVariable Long id, @RequestBody DiscInputDto dto, HttpServletResponse response) {
+    @RequestMapping(value = "/discs/{uuid}", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
+    public @ResponseBody DiscOutputDto updateDisc(@RequestAttribute("user") User owner, @PathVariable String uuid, @RequestBody DiscInputDto dto, HttpServletResponse response) {
         try {
             var newMold = moldService.getMold(dto.getMoldId());
             var newPlastic = plasticService.getPlastic(dto.getPlasticId());
             var newColor = colorService.getColor(dto.getColorId());
             response.setStatus(SC_OK);
-            return DiscOutputDto.fromDb(discService.updateDisc(dto, id, owner, newMold, newPlastic, newColor));
+            return DiscOutputDto.fromDb(discService.updateDisc(dto, uuid, owner, newMold, newPlastic, newColor));
         }
         catch(AuthorizationException ae) {
             response.setStatus(SC_FORBIDDEN);
@@ -172,19 +172,14 @@ public class DiscController extends BaseControllerV2 {
         }
     }
 
-    @RequestMapping(value = "/discs/{id}", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody DiscOutputDto getDisc(@RequestAttribute("user") User owner, @PathVariable Long id, HttpServletResponse response) {
+    @RequestMapping(value = "/discs/{uuid}", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody DiscOutputDto getDisc(@RequestAttribute("user") User owner, @PathVariable String id, HttpServletResponse response) {
         try {
             response.setStatus(SC_OK);
             return DiscOutputDto.fromDb(discService.getDiscIfPublicOrOwnV2(owner, id));
         }
         catch (AuthorizationException ae) {
             response.setStatus(SC_FORBIDDEN);
-            return null;
-        }
-        catch (HttpResponseException e) {
-            LOG.error("{} trying to get disc id={}, not found", owner.getEmail(), id);
-            response.setStatus(e.getStatusCode());
             return null;
         }
         catch (NoSuchElementException e) {
@@ -194,10 +189,10 @@ public class DiscController extends BaseControllerV2 {
         }
     }
 
-    @RequestMapping(value = "/discs/{id}", method = RequestMethod.DELETE)
-    public void deleteDisc(@RequestAttribute("user") User owner, @PathVariable Long id, HttpServletResponse response) {
+    @RequestMapping(value = "/discs/{uuid}", method = RequestMethod.DELETE)
+    public void deleteDisc(@RequestAttribute("user") User owner, @PathVariable String uuid, HttpServletResponse response) {
         try {
-            discService.deleteDisc(id, owner);
+            discService.deleteDisc(uuid, owner);
             response.setStatus(SC_NO_CONTENT);
         }
         catch(AuthorizationException ae) {
@@ -205,10 +200,10 @@ public class DiscController extends BaseControllerV2 {
         }
     }
 
-    @RequestMapping(value = "/discs/{id}/buy", method = RequestMethod.POST, produces = "application/json")
-    public @ResponseBody BuyOutputDto buyDisc(@RequestAttribute("user") User user, @PathVariable Long id, HttpServletResponse response) {
+    @RequestMapping(value = "/discs/{uuid}/buy", method = RequestMethod.POST, produces = "application/json")
+    public @ResponseBody BuyOutputDto buyDisc(@RequestAttribute("user") User user, @PathVariable String uuid, HttpServletResponse response) {
         try {
-            var disc = discService.getDisc(id);
+            var disc = discService.getDisc(uuid);
 
             response.setStatus(SC_OK);
             var buy = buyService.buyDisc(user, disc);
@@ -221,10 +216,10 @@ public class DiscController extends BaseControllerV2 {
         }
     }
 
-    @RequestMapping(value = "/discs/{id}/found", method = RequestMethod.PATCH)
-    public void markFound(@RequestAttribute("user") User user, @PathVariable Long id, HttpServletResponse response) {
+    @RequestMapping(value = "/discs/{uuid}/found", method = RequestMethod.PATCH)
+    public void markFound(@RequestAttribute("user") User user, @PathVariable String uuid, HttpServletResponse response) {
         try {
-            discService.handleFoundDisc(user, id);
+            discService.handleFoundDisc(user, uuid);
             response.setStatus(SC_NO_CONTENT);
         } catch (HttpResponseException e) {
             LOG.error(e.getMessage());
