@@ -19,3 +19,10 @@ For quick build and run use `./buildAndRun.sh`
 - `CLOUDINARY_URL`
   - for saving images
   - see [cloudinary.com](https://cloudinary.com/) for more info
+
+# Api documentation
+springdoc-openapi is used for generating API documentation
+## Swagger UI
+http://localhost:8080/swagger-ui/index.html
+## openapi yaml
+http://localhost:8080/v3/api-docs.yaml

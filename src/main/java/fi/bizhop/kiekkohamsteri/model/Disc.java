@@ -1,5 +1,6 @@
 package fi.bizhop.kiekkohamsteri.model;
 
+import fi.bizhop.kiekkohamsteri.util.Utils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "kiekot")
@@ -85,6 +87,9 @@ public class Disc extends TimestampBase {
 
 	@Column(nullable = false)
 	private Boolean lost;
+
+	@Column(length = 36)
+	private String uuid;
 	
 	public Disc(User user, Mold defaultMold, Plastic defaultPlastic, Color defaultColor) {
 		this.owner = user;
@@ -106,5 +111,11 @@ public class Disc extends TimestampBase {
 		this.itb = false;
 		this.publicDisc = false;
 		this.lost = false;
+		this.uuid = Utils.generateUuid();
+	}
+
+	public void generateAndSetUuid() {
+		var newUuid = Utils.generateUuid(String.format("%s-%d", owner.getEmail(), this.id));
+		this.uuid = newUuid;
 	}
 }

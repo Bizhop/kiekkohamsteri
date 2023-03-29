@@ -3,6 +3,7 @@ package fi.bizhop.kiekkohamsteri.controller.v2;
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.dto.v2.in.*;
+import fi.bizhop.kiekkohamsteri.dto.v2.out.DiscOutputDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.*;
@@ -283,9 +284,9 @@ public class DiscControllerTest extends SpringContextTestBase {
                 .build();
 
         whenMoldPlasticAndColor(0, 0, 0);
-        when(discService.updateDisc(inputDto, 123L, TEST_USER, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0))).thenReturn(DISCS.get(0));
+        when(discService.updateDisc(inputDto, TEST_UUID, TEST_USER, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0))).thenReturn(DISCS.get(0));
 
-        var response = restTemplate.exchange(createUrl("123"), PUT, new HttpEntity<>(inputDto), String.class);
+        var response = restTemplate.exchange(createUrl(TEST_UUID), PUT, new HttpEntity<>(inputDto), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
         assertEqualsJson(adder.create("myDisc.json"), response.getBody());
@@ -301,9 +302,9 @@ public class DiscControllerTest extends SpringContextTestBase {
                 .colorId(1L)
                 .build();
         whenMoldPlasticAndColor(1, 1, 1);
-        when(discService.updateDisc(inputDto, 456L, TEST_USER, MOLDS.get(1), PLASTICS.get(1), COLORS.get(1))).thenThrow(new AuthorizationException());
+        when(discService.updateDisc(inputDto, TEST_UUID, TEST_USER, MOLDS.get(1), PLASTICS.get(1), COLORS.get(1))).thenThrow(new AuthorizationException());
 
-        var response = restTemplate.exchange(createUrl("456"), PUT, new HttpEntity<>(inputDto), String.class);
+        var response = restTemplate.exchange(createUrl(TEST_UUID), PUT, new HttpEntity<>(inputDto), String.class);
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
         assertNull(response.getBody());
@@ -319,9 +320,9 @@ public class DiscControllerTest extends SpringContextTestBase {
                 .colorId(0L)
                 .build();
         whenMoldPlasticAndColor(0, 0, 0);
-        when(discService.updateDisc(inputDto, 123L, TEST_USER, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0))).thenThrow(new RuntimeException());
+        when(discService.updateDisc(inputDto, TEST_UUID, TEST_USER, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0))).thenThrow(new RuntimeException());
 
-        var response = restTemplate.exchange(createUrl("123"), PUT, new HttpEntity<>(inputDto), String.class);
+        var response = restTemplate.exchange(createUrl(TEST_UUID), PUT, new HttpEntity<>(inputDto), String.class);
 
         assertEquals(SC_INTERNAL_SERVER_ERROR, response.getStatusCodeValue());
         assertNull(response.getBody());
@@ -330,9 +331,9 @@ public class DiscControllerTest extends SpringContextTestBase {
     @Test
     void givenYourDisc_whenGetDisc_thenGetDisc() throws AuthorizationException, HttpResponseException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
-        when(discService.getDiscIfPublicOrOwnV2(TEST_USER, 123L)).thenReturn(DISCS.get(0));
+        when(discService.getDiscIfPublicOrOwnV2(TEST_USER, TEST_UUID)).thenReturn(DISCS.get(0));
 
-        var response = restTemplate.getForEntity(createUrl("123"), String.class);
+        var response = restTemplate.getForEntity(createUrl(TEST_UUID), String.class);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
         assertEqualsJson(adder.create("myDisc.json"), response.getBody());
@@ -341,9 +342,9 @@ public class DiscControllerTest extends SpringContextTestBase {
     @Test
     void givenNotYourDiscAndNotPublic_whenGetDisc_thenRespondForbidden() throws AuthorizationException, HttpResponseException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
-        when(discService.getDiscIfPublicOrOwnV2(TEST_USER, 456L)).thenThrow(new AuthorizationException());
+        when(discService.getDiscIfPublicOrOwnV2(TEST_USER, TEST_UUID)).thenThrow(new AuthorizationException());
 
-        var response = restTemplate.getForEntity(createUrl("456"), String.class);
+        var response = restTemplate.getForEntity(createUrl(TEST_UUID), String.class);
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
         assertNull(response.getBody());
@@ -352,9 +353,9 @@ public class DiscControllerTest extends SpringContextTestBase {
     @Test
     void givenDiscNotFound_whenGetDisc_thenRespondNotFound() throws AuthorizationException, HttpResponseException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
-        when(discService.getDiscIfPublicOrOwnV2(TEST_USER, 789L)).thenThrow(new HttpResponseException(SC_NOT_FOUND, "Disc not found"));
+        when(discService.getDiscIfPublicOrOwnV2(TEST_USER, TEST_UUID)).thenThrow(new HttpResponseException(SC_NOT_FOUND, "Disc not found"));
 
-        var response = restTemplate.getForEntity(createUrl("789"), String.class);
+        var response = restTemplate.getForEntity(createUrl(TEST_UUID), String.class);
 
         assertEquals(SC_NOT_FOUND, response.getStatusCodeValue());
         assertNull(response.getBody());
@@ -374,7 +375,7 @@ public class DiscControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenImageUploadSuccess_whenCreateDisc_thenSaveDiscAndUpdateImageReference() throws IOException {
+    void givenValidUser_whenCreateDisc_thenSaveDiscWithNoImage() {
         var user = new User(TEST_EMAIL);
         when(authService.getUser(any())).thenReturn(user);
         whenDefaultMoldPlasticAndColor();
@@ -382,8 +383,6 @@ public class DiscControllerTest extends SpringContextTestBase {
         var disc = getTestDiscFor(user);
         var discId = 123L;
         disc.setId(discId);
-
-        var image = String.format("%s-%d", user.getUsername(), discId);
 
         when(discService.newDisc(user, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0))).thenReturn(disc);
         when(discService.saveDisc(any(Disc.class))).then(returnsFirstArg());
@@ -393,51 +392,11 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.postForEntity(createUrl(""), dto, String.class);
 
         verify(discService, times(1)).newDisc(user, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0));
-        verify(uploadService, times(1)).upload(dto, image);
         verify(discService, times(1)).saveDisc(any(Disc.class));
 
         assertEquals(SC_OK, response.getStatusCodeValue());
 
         assertEqualsJson(adder.create("newDisc.json"), response.getBody());
-    }
-
-    @Test
-    void givenImageUploadFails_whenCreateDisc_thenDiscIsDeleted() throws IOException {
-        var user = new User(TEST_EMAIL);
-        when(authService.getUser(any())).thenReturn(user);
-        whenDefaultMoldPlasticAndColor();
-
-        var disc = getTestDiscFor(user);
-        var discId = 123L;
-        disc.setId(discId);
-
-        var image = String.format("%s-%d", user.getUsername(), discId);
-
-        when(discService.newDisc(user, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0))).thenReturn(disc);
-
-        var dto = uploadDto().build();
-        doThrow(new IOException()).when(uploadService).upload(dto, image);
-
-        var response = restTemplate.postForEntity(createUrl(""), dto, String.class);
-
-        verify(discService, times(1)).newDisc(user, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0));
-        verify(uploadService, times(1)).upload(dto, image);
-        verify(discService, times(1)).deleteDiscById(discId);
-
-        assertEquals(SC_INTERNAL_SERVER_ERROR, response.getStatusCodeValue());
-        assertNull(response.getBody());
-    }
-
-    @Test
-    void givenNullImageData_whenCreateDisc_thenRespondBadRequest() {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-
-        var dto = UploadDto.builder().build();
-
-        var response = restTemplate.postForEntity(createUrl(""), dto, String.class);
-
-        assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -447,23 +406,25 @@ public class DiscControllerTest extends SpringContextTestBase {
         var disc = getTestDiscFor(TEST_USER);
         var discId = 123L;
         disc.setId(discId);
-        disc.setImage("Test-123");
 
-        when(discService.getDisc(TEST_USER, 123L)).thenReturn(disc);
+        when(discService.getDisc(TEST_USER, TEST_UUID)).thenReturn(disc);
         when(clock.instant()).thenReturn(TEST_TIMESTAMP);
+        when(discService.saveDisc(any(Disc.class))).then(returnsFirstArg());
 
         var dto = uploadDto().build();
-        var newImage = String.format("Test-123-%d", TEST_TIMESTAMP.toEpochMilli());
+        var newImage = String.format("%s-%d-%d", TEST_USER.getUsername(), discId, TEST_TIMESTAMP.toEpochMilli());
 
-        var response = restTemplate.exchange(createUrl("123/update-image"), PATCH, new HttpEntity<>(dto), Object.class);
+        var response = restTemplate.exchange(createUrl(TEST_UUID + "/update-image"), PATCH, new HttpEntity<>(dto), Object.class);
 
-        verify(discService, times(1)).getDisc(TEST_USER, 123L);
+        verify(discService, times(1)).getDisc(TEST_USER, TEST_UUID);
         verify(clock, times(1)).instant();
         verify(uploadService, times(1)).upload(dto, newImage);
         verify(discService, times(1)).saveDisc(any(Disc.class));
 
-        assertEquals(SC_NO_CONTENT, response.getStatusCodeValue());
-        assertNull(response.getBody());
+        assertEquals(SC_OK, response.getStatusCodeValue());
+
+        System.out.println(response.getBody());
+        assertEqualsJson(adder.create("imageUpdatedDisc.json"), response.getBody());
     }
 
     @Test
@@ -473,18 +434,17 @@ public class DiscControllerTest extends SpringContextTestBase {
         var disc = getTestDiscFor(TEST_USER);
         var discId = 123L;
         disc.setId(discId);
-        disc.setImage("Test-123");
 
-        when(discService.getDisc(TEST_USER, 123L)).thenReturn(disc);
+        when(discService.getDisc(TEST_USER, TEST_UUID)).thenReturn(disc);
         when(clock.instant()).thenReturn(TEST_TIMESTAMP);
 
         var dto = uploadDto().build();
-        var newImage = String.format("Test-123-%d", TEST_TIMESTAMP.toEpochMilli());
+        var newImage = String.format("%s-%d-%d", TEST_USER.getUsername(), discId, TEST_TIMESTAMP.toEpochMilli());
         doThrow(new IOException()).when(uploadService).upload(dto, newImage);
 
-        var response = restTemplate.exchange(createUrl("123/update-image"), PATCH, new HttpEntity<>(dto), Object.class);
+        var response = restTemplate.exchange(createUrl(TEST_UUID + "/update-image"), PATCH, new HttpEntity<>(dto), Object.class);
 
-        verify(discService, times(1)).getDisc(TEST_USER, 123L);
+        verify(discService, times(1)).getDisc(TEST_USER, TEST_UUID);
         verify(clock, times(1)).instant();
         verify(uploadService, times(1)).upload(dto, newImage);
         verify(discService, never()).saveDisc(any());
@@ -498,11 +458,11 @@ public class DiscControllerTest extends SpringContextTestBase {
         var user = new User(TEST_EMAIL);
         when(authService.getUser(any())).thenReturn(user);
 
-        when(discService.getDisc(TEST_USER, 456L)).thenThrow(new AuthorizationException());
+        when(discService.getDisc(TEST_USER, TEST_UUID)).thenThrow(new AuthorizationException());
 
         var dto = uploadDto().build();
 
-        var response = restTemplate.exchange(createUrl("456/update-image"), PATCH, new HttpEntity<>(dto), Object.class);
+        var response = restTemplate.exchange(createUrl(TEST_UUID + "/update-image"), PATCH, new HttpEntity<>(dto), Object.class);
 
         verify(clock, never()).instant();
         verify(uploadService, never()).upload(any(), anyString());
@@ -529,9 +489,9 @@ public class DiscControllerTest extends SpringContextTestBase {
         var user = new User(TEST_EMAIL);
         when(authService.getUser(any())).thenReturn(user);
 
-        var response = restTemplate.exchange(createUrl("123"), DELETE, null, Object.class);
+        var response = restTemplate.exchange(createUrl(TEST_UUID), DELETE, null, Object.class);
 
-        verify(discService, times(1)).deleteDisc(123L, user);
+        verify(discService, times(1)).deleteDisc(TEST_UUID, user);
 
         assertEquals(SC_NO_CONTENT, response.getStatusCodeValue());
         assertNull(response.getBody());
@@ -540,11 +500,11 @@ public class DiscControllerTest extends SpringContextTestBase {
     @Test
     void givenNotYourDiscOrDiscNotFound_whenDeleteDisc_thenRespondUnauthorized() throws AuthorizationException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
-        doThrow(new AuthorizationException()).when(discService).deleteDisc(123L, TEST_USER);
+        doThrow(new AuthorizationException()).when(discService).deleteDisc(TEST_UUID, TEST_USER);
 
-        var response = restTemplate.exchange(createUrl("123"), DELETE, null, Object.class);
+        var response = restTemplate.exchange(createUrl(TEST_UUID), DELETE, null, Object.class);
 
-        verify(discService, times(1)).deleteDisc(123L, TEST_USER);
+        verify(discService, times(1)).deleteDisc(TEST_UUID, TEST_USER);
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
         assertNull(response.getBody());
@@ -554,14 +514,14 @@ public class DiscControllerTest extends SpringContextTestBase {
     void givenValidRequest_whenBuyDisc_thenBuyDisc() throws HttpResponseException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
         var disc = getTestDiscFor(OTHER_USER);
-        when(discService.getDisc(123L)).thenReturn(disc);
+        when(discService.getDisc(TEST_UUID)).thenReturn(disc);
 
         var buys = new Buy(disc, disc.getOwner(), TEST_USER, Buy.Status.REQUESTED);
         when(buyService.buyDisc(TEST_USER, disc)).thenReturn(buys);
 
-        var response = restTemplate.postForEntity(createUrl("123/buy"), null, String.class);
+        var response = restTemplate.postForEntity(createUrl(TEST_UUID + "/buy"), null, String.class);
 
-        verify(discService, times(1)).getDisc(123L);
+        verify(discService, times(1)).getDisc(TEST_UUID);
         verify(buyService, times(1)).buyDisc(TEST_USER, disc);
 
         assertEquals(SC_OK, response.getStatusCodeValue());
@@ -571,12 +531,12 @@ public class DiscControllerTest extends SpringContextTestBase {
     @Test
     void givenDiscNotFoundOrNotForSale_whenBuyDisc_thenRespondForbidden() throws HttpResponseException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
-        when(discService.getDisc(456L)).thenReturn(null);
+        when(discService.getDisc(TEST_UUID)).thenReturn(null);
         doThrow(new HttpResponseException(SC_FORBIDDEN, "Not for sale")).when(buyService).buyDisc(TEST_USER, null);
 
-        var response = restTemplate.postForEntity(createUrl("456/buy"), null, String.class);
+        var response = restTemplate.postForEntity(createUrl(TEST_UUID + "/buy"), null, String.class);
 
-        verify(discService, times(1)).getDisc(456L);
+        verify(discService, times(1)).getDisc(TEST_UUID);
         verify(buyService, times(1)).buyDisc(TEST_USER, null);
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
@@ -587,12 +547,12 @@ public class DiscControllerTest extends SpringContextTestBase {
     void givenAlreadyBuyingDisc_whenBuyDisc_thenRespondBadRequest() throws HttpResponseException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
         var disc = getTestDiscFor(OTHER_USER);
-        when(discService.getDisc(123L)).thenReturn(disc);
+        when(discService.getDisc(TEST_UUID)).thenReturn(disc);
         when(buyService.buyDisc(TEST_USER, disc)).thenThrow(new HttpResponseException(SC_BAD_REQUEST, "You are already buying this disc"));
 
-        var response = restTemplate.postForEntity(createUrl("123/buy"), null, String.class);
+        var response = restTemplate.postForEntity(createUrl(TEST_UUID + "/buy"), null, String.class);
 
-        verify(discService, times(1)).getDisc(123L);
+        verify(discService, times(1)).getDisc(TEST_UUID);
         verify(buyService, times(1)).buyDisc(TEST_USER, disc);
 
         assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
@@ -603,12 +563,12 @@ public class DiscControllerTest extends SpringContextTestBase {
     void givenYourOwnDisc_whenBuyDisc_thenRespondBadRequest() throws HttpResponseException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
         var disc = getTestDiscFor(TEST_USER);
-        when(discService.getDisc(123L)).thenReturn(disc);
+        when(discService.getDisc(TEST_UUID)).thenReturn(disc);
         when(buyService.buyDisc(TEST_USER, disc)).thenThrow(new HttpResponseException(SC_BAD_REQUEST, "You can't buy your own disc"));
 
-        var response = restTemplate.postForEntity(createUrl("123/buy"), null, String.class);
+        var response = restTemplate.postForEntity(createUrl(TEST_UUID + "/buy"), null, String.class);
 
-        verify(discService, times(1)).getDisc(123L);
+        verify(discService, times(1)).getDisc(TEST_UUID);
         verify(buyService, times(1)).buyDisc(TEST_USER, disc);
 
         assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
@@ -619,9 +579,9 @@ public class DiscControllerTest extends SpringContextTestBase {
     void givenValidRequest_whenMarkFound_thenHandleFoundDisc() throws HttpResponseException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
 
-        var response = restTemplate.exchange(createUrl("123/found"), PATCH, null, Object.class);
+        var response = restTemplate.exchange(createUrl(TEST_UUID + "/found"), PATCH, null, Object.class);
 
-        verify(discService, times(1)).handleFoundDisc(TEST_USER, 123L);
+        verify(discService, times(1)).handleFoundDisc(TEST_USER, TEST_UUID);
 
         assertEquals(SC_NO_CONTENT, response.getStatusCodeValue());
         assertNull(response.getBody());
@@ -630,9 +590,9 @@ public class DiscControllerTest extends SpringContextTestBase {
     @Test
     void givenNotYourDiscOrDiscNotExisting_whenMarkFound_thenRespondForbidden() throws HttpResponseException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
-        doThrow(new HttpResponseException(SC_FORBIDDEN, "User is not disc owner")).when(discService).handleFoundDisc(TEST_USER, 123L);
+        doThrow(new HttpResponseException(SC_FORBIDDEN, "User is not disc owner")).when(discService).handleFoundDisc(TEST_USER, TEST_UUID);
 
-        var response = restTemplate.exchange(createUrl("123/found"), PATCH, null, Object.class);
+        var response = restTemplate.exchange(createUrl(TEST_UUID + "/found"), PATCH, null, Object.class);
 
         assertEquals(SC_FORBIDDEN, response.getStatusCodeValue());
         assertNull(response.getBody());
@@ -641,9 +601,9 @@ public class DiscControllerTest extends SpringContextTestBase {
     @Test
     void givenDiscIsNotLost_whenMarkFound_thenRespondBadRequest() throws HttpResponseException {
         when(authService.getUser(any())).thenReturn(TEST_USER);
-        doThrow(new HttpResponseException(SC_BAD_REQUEST, "Disc is not lost")).when(discService).handleFoundDisc(TEST_USER, 123L);
+        doThrow(new HttpResponseException(SC_BAD_REQUEST, "Disc is not lost")).when(discService).handleFoundDisc(TEST_USER, TEST_UUID);
 
-        var response = restTemplate.exchange(createUrl("123/found"), PATCH, null, Object.class);
+        var response = restTemplate.exchange(createUrl(TEST_UUID + "/found"), PATCH, null, Object.class);
 
         assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
         assertNull(response.getBody());

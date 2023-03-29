@@ -14,6 +14,7 @@ import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_ADMIN;
 import static fi.bizhop.kiekkohamsteri.util.Utils.USER_ROLE_GROUP_ADMIN;
 
 public class TestObjects {
+    public static final String TEST_UUID = "146b5a08-0729-4128-a131-f6e8365899f3";
     public static final Instant TEST_TIMESTAMP = Instant.ofEpochMilli(1670917528851L);
     public static final String SHOULD_THROW_EXCEPTION = "Previous call should throw Exception";
     public static final String WRONG_EXCEPTION = "Expected different exception";
@@ -172,7 +173,9 @@ public class TestObjects {
     }
 
     public static Disc getTestDiscFor(User owner) {
-        return new Disc(owner, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0));
+        var disc = new Disc(owner, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0));
+        disc.setUuid(TEST_UUID);
+        return disc;
     }
 
     // HELPER METHODS

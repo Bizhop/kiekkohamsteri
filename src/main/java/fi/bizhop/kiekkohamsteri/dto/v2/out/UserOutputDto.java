@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,11 +16,17 @@ import java.util.stream.Collectors;
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserOutputDto {
+    @NotNull
     Long id;
+    @NotNull
     String username;
+    @NotNull
     String email;
+    @NotNull
     String firstName;
+    @NotNull
     String lastName;
+    @NotNull
     Integer pdgaNumber;
     String jwt;
     Set<RoleDto> roles;
@@ -49,6 +56,7 @@ public class UserOutputDto {
     public static UserOutputDto fromDbCompact(User input) {
         if(input == null) return null;
         return UserOutputDto.builder()
+                .id(input.getId())
                 .username(input.getUsername())
                 .email(input.getEmail())
                 .firstName(input.getFirstName())

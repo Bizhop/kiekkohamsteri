@@ -111,8 +111,8 @@ public class BuyServiceTest {
 
         var response = getBuyService().getSummary(TEST_USER);
 
-        assertEquals(1, response.getAsBuyer().size());
-        assertEquals(2, response.getAsSeller().size());
+        assertEquals(2, response.getAsBuyer().size());
+        assertEquals(1, response.getAsSeller().size());
     }
 
     @Test

@@ -14,13 +14,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static fi.bizhop.kiekkohamsteri.search.SearchOperation.EQUAL;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -33,19 +34,45 @@ public class DiscService {
 		return discRepo.save(disc);
 	}
 
+	public void deleteDisc(String uuid, User owner) throws AuthorizationException {
+		var disc = discRepo.findByUuid(uuid).orElse(null);
+
+		checkAndDeleteDisc(disc, owner);
+	}
+
+	@Deprecated
+	//DEPRECATED: use version with uuid instead of id
+	//TODO: fix tests
 	public void deleteDisc(Long id, User owner) throws AuthorizationException {
 		var disc = discRepo.findById(id).orElse(null);
 
+		checkAndDeleteDisc(disc, owner);
+	}
+
+	private void checkAndDeleteDisc(Disc disc, User owner) throws AuthorizationException{
 		if(disc == null || !disc.getOwner().equals(owner)) {
 			throw new AuthorizationException();
 		}
 
-		discRepo.deleteById(id);
+		discRepo.deleteById(disc.getId());
 	}
 
+	@Deprecated
+	//DEPRECATED: use version with uuid instead of id
+	//TODO: fix tests
 	public Disc updateDisc(DiscInputDto dto, Long id, User owner, Mold newMold, Plastic newPlastic, Color newColor) throws AuthorizationException {
 		var disc = discRepo.findById(id).orElse(null);
 
+		return updateDisc(dto, disc, owner, newMold, newPlastic, newColor);
+	}
+
+	public Disc updateDisc(DiscInputDto dto, String uuid, User owner, Mold newMold, Plastic newPlastic, Color newColor) throws AuthorizationException {
+		var disc = discRepo.findByUuid(uuid).orElse(null);
+
+		return updateDisc(dto, disc, owner, newMold, newPlastic, newColor);
+	}
+
+	private Disc updateDisc(DiscInputDto dto, Disc disc, User owner, Mold newMold, Plastic newPlastic, Color newColor) throws AuthorizationException {
 		if(disc == null || !disc.getOwner().equals(owner)) {
 			throw new AuthorizationException();
 		}
@@ -71,16 +98,41 @@ public class DiscService {
 		return discRepo.save(disc);
 	}
 
+	@Deprecated
+	//DEPRECATED: use uuid version instead
+	//TODO: fix tests
 	public Disc getDisc(User owner, Long id) throws AuthorizationException {
 		var disc = discRepo.findById(id).orElseThrow();
-		if(owner.equals(disc.getOwner()))
-			return disc;
-		else
-			throw new AuthorizationException();
+		return checkDiscOwner(owner, disc);
 	}
 
+	public Disc getDisc(User owner, String uuid) throws AuthorizationException {
+		var disc = discRepo.findByUuid(uuid).orElseThrow();
+		return checkDiscOwner(owner, disc);
+	}
+
+	private Disc checkDiscOwner(User owner, @Nonnull Disc disc) throws AuthorizationException {
+		if(owner.equals(disc.getOwner())) {
+			return disc;
+		} else {
+			throw new AuthorizationException();
+		}
+	}
+
+	public Disc getDiscIfPublicOrOwnV2(User owner, String uuid) throws AuthorizationException, HttpResponseException {
+		var disc = discRepo.findByUuid(uuid).orElseThrow(() -> new HttpResponseException(SC_NOT_FOUND, "Disc not found"));
+		return checkIfPublicOrOwnV2(owner, disc);
+	}
+
+	@Deprecated
+	//DEPRECATED: use uuid version instead
+	//TODO: fix tests
 	public Disc getDiscIfPublicOrOwnV2(User owner, Long id) throws AuthorizationException, HttpResponseException {
-		var disc = discRepo.findById(id).orElseThrow();
+		var disc = discRepo.findById(id).orElseThrow(() -> new HttpResponseException(SC_NOT_FOUND, "Disc not found"));
+		return checkIfPublicOrOwnV2(owner, disc);
+	}
+
+	private Disc checkIfPublicOrOwnV2(User owner, Disc disc) throws AuthorizationException {
 		if(owner.equals(disc.getOwner()) ||	Boolean.TRUE.equals(disc.getPublicDisc())) {
 			return disc;
 		}
@@ -89,8 +141,20 @@ public class DiscService {
 		}
 	}
 
+	@Deprecated
+	//DEPRECATED: use uuid version instead
+	//TODO: fix tests
 	public void handleFoundDisc(User user, Long id) throws HttpResponseException {
 		var disc = discRepo.findById(id).orElse(null);
+		handleFoundDisc(user, disc);
+	}
+
+	public void handleFoundDisc(User user, String uuid) throws HttpResponseException {
+		var disc = discRepo.findByUuid(uuid).orElse(null);
+		handleFoundDisc(user, disc);
+	}
+
+	private void handleFoundDisc(User user, Disc disc) throws HttpResponseException {
 		if(disc == null || !disc.getOwner().equals(user)) {
 			throw new HttpResponseException(HttpServletResponse.SC_FORBIDDEN, "User is not disc owner");
 		}
@@ -139,6 +203,10 @@ public class DiscService {
 
 	public Disc getDisc(Long id) {
 		return discRepo.findById(id).orElse(null);
+	}
+
+	public Disc getDisc(String uuid) {
+		return discRepo.findByUuid(uuid).orElse(null);
 	}
 
 	public Disc saveDisc(Disc disc) {

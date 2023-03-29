@@ -9,7 +9,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
+import javax.annotation.Nonnull;
 import java.beans.PropertyDescriptor;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
@@ -85,6 +87,14 @@ public class Utils {
 		if(user == null || user.getGroups() == null || groupId == null) return false;
 		return user.getGroups().stream()
 				.anyMatch(group -> groupId.equals(group.getId()));
+	}
+
+	public static String generateUuid() {
+		return UUID.randomUUID().toString();
+	}
+
+	public static String generateUuid(@Nonnull String input) {
+		return UUID.nameUUIDFromBytes(input.getBytes(StandardCharsets.UTF_8)).toString();
 	}
 
 	@AllArgsConstructor

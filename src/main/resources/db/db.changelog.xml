@@ -545,4 +545,12 @@
 	<changeSet id="makeUsernameUnique" author="Ville">
 		<addUniqueConstraint tableName="members" columnNames="username" />
 	</changeSet>
+	<changeSet id="addUUIDforDiscs" author="Ville">
+		<addColumn tableName="kiekot">
+			<column name="uuid" type="VARCHAR(36)" />
+		</addColumn>
+		<createIndex indexName="discs_by_uuid" tableName="kiekot" unique="true">
+			<column name="uuid" />
+		</createIndex>
+	</changeSet>
 </databaseChangeLog>

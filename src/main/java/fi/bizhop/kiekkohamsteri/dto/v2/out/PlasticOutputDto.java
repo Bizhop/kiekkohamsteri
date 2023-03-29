@@ -5,12 +5,17 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.constraints.NotNull;
+
 @Value
 @Builder
 @Jacksonized
 public class PlasticOutputDto {
+    @NotNull
     Long id;
+    @NotNull
     ManufacturerOutputDto manufacturer;
+    @NotNull
     String name;
 
     public static PlasticOutputDto fromDb(Plastic input) {
