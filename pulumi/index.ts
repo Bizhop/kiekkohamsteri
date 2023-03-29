@@ -194,6 +194,10 @@ pulumi
             name: "SPRING_DATASOURCE_URL",
             value: `jdbc:postgresql://${db.endpoint}/${db.name}?user=${db.username}&password=${db.password}`,
           },
+          {
+            name: "SPRING_PROFILES_ACTIVE",
+            value: "migrations"
+          }
         ],
         essential: true,
         image: "806232589401.dkr.ecr.eu-north-1.amazonaws.com/" + defaultResourceName,

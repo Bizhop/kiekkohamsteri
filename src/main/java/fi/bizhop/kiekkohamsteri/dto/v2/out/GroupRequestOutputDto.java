@@ -7,15 +7,23 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.constraints.NotNull;
+
 @Value
 @Builder
 @Jacksonized
 public class GroupRequestOutputDto {
+    @NotNull
     Long id;
+    @NotNull
     GroupDto group;
+    @NotNull
     UserOutputDto source;
+    @NotNull
     UserOutputDto target;
+    @NotNull
     Type type;
+    @NotNull
     Status status;
     String info;
 

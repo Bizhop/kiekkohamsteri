@@ -84,33 +84,16 @@ public class DiscController extends BaseControllerV2 {
     }
 
     @RequestMapping(value = "/discs", method = RequestMethod.POST, produces = "application/json")
-    public @ResponseBody DiscOutputDto createDisc(@RequestAttribute("user") User owner, @RequestBody UploadDto dto, HttpServletResponse response) {
-        if(invalidUploadDto(dto)) {
-            response.setStatus(SC_BAD_REQUEST);
-            return null;
-        }
-
+    public @ResponseBody DiscOutputDto createDisc(@RequestAttribute("user") User owner, HttpServletResponse response) {
         var disc = discService.newDisc(
                 owner,
                 moldService.getDefaultMold(),
                 plasticService.getDefaultPlastic(),
                 colorService.getDefaultColor());
 
-        var image = String.format("%s-%d", owner.getUsername(), disc.getId());
-        try {
-            uploadService.upload(dto, image);
-            response.setStatus(SC_OK);
-            disc.setImage(image);
-            return DiscOutputDto.fromDb(discService.saveDisc(disc));
-        }
-        catch (IOException e) {
-            LOG.error("Cloudinary error uploading image", e);
-
-            //if image upload fails, delete the created disc
-            discService.deleteDiscById(disc.getId());
-            response.setStatus(SC_INTERNAL_SERVER_ERROR);
-            return null;
-        }
+        disc.setImage("No-Image");
+        response.setStatus(SC_OK);
+        return DiscOutputDto.fromDb(discService.saveDisc(disc));
     }
 
     @RequestMapping(value = "/discs/{uuid}/update-image", method = RequestMethod.PATCH, produces = "application/json", consumes = "application/json")
@@ -122,17 +105,11 @@ public class DiscController extends BaseControllerV2 {
 
         try {
             var disc = discService.getDisc(owner, uuid);
-            var image = disc.getImage();
-            //if image name already has more than one "-", it has been updated previously
-            // then replace timestamp with new one
-            var timestamp = clock.instant().toEpochMilli();
-            var newImage = StringUtils.countOccurrencesOf(image, "-") > 1
-                    ? image.substring(0, image.lastIndexOf("-")) + "-" + timestamp
-                    : image + "-" + timestamp;
+            var newImage = String.format("%s-%d-%d", owner.getUsername(), disc.getId(), clock.instant().toEpochMilli());
 
             uploadService.upload(dto, newImage);
             disc.setImage(newImage);
-            response.setStatus(SC_NO_CONTENT);
+            response.setStatus(SC_OK);
             return DiscOutputDto.fromDb(discService.saveDisc(disc));
         }
         catch (AuthorizationException e) {

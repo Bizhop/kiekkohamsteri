@@ -1,7 +1,7 @@
 {
   "uuid": "146b5a08-0729-4128-a131-f6e8365899f3",
   "owner": {
-    "username": "New User",
+    "username": "User",
     "email": "test@example.com"
   },
   "mold": {
@@ -28,7 +28,7 @@
     "id": 0,
     "name": "Valkoinen"
   },
-  "image": "No-Image",
+  "image": "User-123-1670917528851",
   "weight": 175,
   "condition": 10,
   "glow": false,

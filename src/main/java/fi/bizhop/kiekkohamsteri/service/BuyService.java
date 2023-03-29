@@ -40,8 +40,8 @@ public class BuyService {
 		var asSeller = buyRepo.findByStatusAndSeller(REQUESTED, user);
 		var asBuyer = buyRepo.findByStatusAndBuyer(REQUESTED, user);
 		return BuySummaryDto.builder()
-				.asBuyer(asSeller.stream().map(BuyOutputDto::fromDb).collect(Collectors.toList()))
-				.asSeller(asBuyer.stream().map(BuyOutputDto::fromDb).collect(Collectors.toList()))
+				.asBuyer(asBuyer.stream().map(BuyOutputDto::fromDb).collect(Collectors.toList()))
+				.asSeller(asSeller.stream().map(BuyOutputDto::fromDb).collect(Collectors.toList()))
 				.build();
 	}
 

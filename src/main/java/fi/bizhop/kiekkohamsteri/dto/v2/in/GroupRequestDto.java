@@ -5,11 +5,15 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.constraints.NotNull;
+
 @Value
 @Builder
 @Jacksonized
 public class GroupRequestDto {
+    @NotNull
     Long targetUserId;
+    @NotNull
     Type type;
     String info;
 }

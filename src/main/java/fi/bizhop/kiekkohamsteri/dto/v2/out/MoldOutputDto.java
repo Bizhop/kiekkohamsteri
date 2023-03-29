@@ -5,16 +5,25 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.constraints.NotNull;
+
 @Value
 @Builder
 @Jacksonized
 public class MoldOutputDto {
+    @NotNull
     Long id;
+    @NotNull
     ManufacturerOutputDto manufacturer;
+    @NotNull
     String name;
+    @NotNull
     Double speed;
+    @NotNull
     Double glide;
+    @NotNull
     Double stability;
+    @NotNull
     Double fade;
 
     public static MoldOutputDto fromDb(Mold input) {

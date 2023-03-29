@@ -5,11 +5,15 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.constraints.NotNull;
+
 @Value
 @Builder
 @Jacksonized
 public class ManufacturerOutputDto {
+    @NotNull
     Long id;
+    @NotNull
     String name;
 
     public static ManufacturerOutputDto fromDb(Manufacturer input) {

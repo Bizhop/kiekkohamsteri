@@ -3,6 +3,7 @@ package fi.bizhop.kiekkohamsteri.controller.v2;
 import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.dto.v2.in.*;
+import fi.bizhop.kiekkohamsteri.dto.v2.out.DiscOutputDto;
 import fi.bizhop.kiekkohamsteri.exception.AuthorizationException;
 import fi.bizhop.kiekkohamsteri.exception.HttpResponseException;
 import fi.bizhop.kiekkohamsteri.model.*;
@@ -374,7 +375,7 @@ public class DiscControllerTest extends SpringContextTestBase {
     }
 
     @Test
-    void givenImageUploadSuccess_whenCreateDisc_thenSaveDiscAndUpdateImageReference() throws IOException {
+    void givenValidUser_whenCreateDisc_thenSaveDiscWithNoImage() {
         var user = new User(TEST_EMAIL);
         when(authService.getUser(any())).thenReturn(user);
         whenDefaultMoldPlasticAndColor();
@@ -382,8 +383,6 @@ public class DiscControllerTest extends SpringContextTestBase {
         var disc = getTestDiscFor(user);
         var discId = 123L;
         disc.setId(discId);
-
-        var image = String.format("%s-%d", user.getUsername(), discId);
 
         when(discService.newDisc(user, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0))).thenReturn(disc);
         when(discService.saveDisc(any(Disc.class))).then(returnsFirstArg());
@@ -393,51 +392,11 @@ public class DiscControllerTest extends SpringContextTestBase {
         var response = restTemplate.postForEntity(createUrl(""), dto, String.class);
 
         verify(discService, times(1)).newDisc(user, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0));
-        verify(uploadService, times(1)).upload(dto, image);
         verify(discService, times(1)).saveDisc(any(Disc.class));
 
         assertEquals(SC_OK, response.getStatusCodeValue());
 
         assertEqualsJson(adder.create("newDisc.json"), response.getBody());
-    }
-
-    @Test
-    void givenImageUploadFails_whenCreateDisc_thenDiscIsDeleted() throws IOException {
-        var user = new User(TEST_EMAIL);
-        when(authService.getUser(any())).thenReturn(user);
-        whenDefaultMoldPlasticAndColor();
-
-        var disc = getTestDiscFor(user);
-        var discId = 123L;
-        disc.setId(discId);
-
-        var image = String.format("%s-%d", user.getUsername(), discId);
-
-        when(discService.newDisc(user, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0))).thenReturn(disc);
-
-        var dto = uploadDto().build();
-        doThrow(new IOException()).when(uploadService).upload(dto, image);
-
-        var response = restTemplate.postForEntity(createUrl(""), dto, String.class);
-
-        verify(discService, times(1)).newDisc(user, MOLDS.get(0), PLASTICS.get(0), COLORS.get(0));
-        verify(uploadService, times(1)).upload(dto, image);
-        verify(discService, times(1)).deleteDiscById(discId);
-
-        assertEquals(SC_INTERNAL_SERVER_ERROR, response.getStatusCodeValue());
-        assertNull(response.getBody());
-    }
-
-    @Test
-    void givenNullImageData_whenCreateDisc_thenRespondBadRequest() {
-        when(authService.getUser(any())).thenReturn(TEST_USER);
-
-        var dto = UploadDto.builder().build();
-
-        var response = restTemplate.postForEntity(createUrl(""), dto, String.class);
-
-        assertEquals(SC_BAD_REQUEST, response.getStatusCodeValue());
-        assertNull(response.getBody());
     }
 
     @Test
@@ -447,13 +406,13 @@ public class DiscControllerTest extends SpringContextTestBase {
         var disc = getTestDiscFor(TEST_USER);
         var discId = 123L;
         disc.setId(discId);
-        disc.setImage("Test-123");
 
         when(discService.getDisc(TEST_USER, TEST_UUID)).thenReturn(disc);
         when(clock.instant()).thenReturn(TEST_TIMESTAMP);
+        when(discService.saveDisc(any(Disc.class))).then(returnsFirstArg());
 
         var dto = uploadDto().build();
-        var newImage = String.format("Test-123-%d", TEST_TIMESTAMP.toEpochMilli());
+        var newImage = String.format("%s-%d-%d", TEST_USER.getUsername(), discId, TEST_TIMESTAMP.toEpochMilli());
 
         var response = restTemplate.exchange(createUrl(TEST_UUID + "/update-image"), PATCH, new HttpEntity<>(dto), Object.class);
 
@@ -462,8 +421,10 @@ public class DiscControllerTest extends SpringContextTestBase {
         verify(uploadService, times(1)).upload(dto, newImage);
         verify(discService, times(1)).saveDisc(any(Disc.class));
 
-        assertEquals(SC_NO_CONTENT, response.getStatusCodeValue());
-        assertNull(response.getBody());
+        assertEquals(SC_OK, response.getStatusCodeValue());
+
+        System.out.println(response.getBody());
+        assertEqualsJson(adder.create("imageUpdatedDisc.json"), response.getBody());
     }
 
     @Test
@@ -473,13 +434,12 @@ public class DiscControllerTest extends SpringContextTestBase {
         var disc = getTestDiscFor(TEST_USER);
         var discId = 123L;
         disc.setId(discId);
-        disc.setImage("Test-123");
 
         when(discService.getDisc(TEST_USER, TEST_UUID)).thenReturn(disc);
         when(clock.instant()).thenReturn(TEST_TIMESTAMP);
 
         var dto = uploadDto().build();
-        var newImage = String.format("Test-123-%d", TEST_TIMESTAMP.toEpochMilli());
+        var newImage = String.format("%s-%d-%d", TEST_USER.getUsername(), discId, TEST_TIMESTAMP.toEpochMilli());
         doThrow(new IOException()).when(uploadService).upload(dto, newImage);
 
         var response = restTemplate.exchange(createUrl(TEST_UUID + "/update-image"), PATCH, new HttpEntity<>(dto), Object.class);
