@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Date;
@@ -92,6 +93,17 @@ public class UserRepositoryTest extends SpringContextTestBase {
 
         assertEquals(1, result.size());
         var user = result.get(0);
+        assertEquals(TEST_EMAIL, user.getEmail());
+    }
+
+    @Test
+    void findAllByGroupsPageableTest() {
+        var group = groupRepository.findById(group1.getId()).orElseThrow();
+
+        var result = userRepository.findAllByGroups(group, Pageable.unpaged());
+
+        assertEquals(1, result.getContent().size());
+        var user = result.getContent().get(0);
         assertEquals(TEST_EMAIL, user.getEmail());
     }
 

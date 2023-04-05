@@ -4,7 +4,6 @@ import fi.bizhop.kiekkohamsteri.BaseAdder;
 import fi.bizhop.kiekkohamsteri.SpringContextTestBase;
 import fi.bizhop.kiekkohamsteri.dto.v2.in.UserUpdateDto;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
-import fi.bizhop.kiekkohamsteri.service.DiscService;
 import fi.bizhop.kiekkohamsteri.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpEntity;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -40,7 +40,6 @@ public class UserControllerTest extends SpringContextTestBase {
 
     @MockBean AuthService authService;
     @MockBean UserService userService;
-    @MockBean DiscService discService;
 
     BaseAdder adder = new BaseAdder("user/v2", CONTROLLER);
 
@@ -69,11 +68,11 @@ public class UserControllerTest extends SpringContextTestBase {
     @Test
     void givenAdminUser_whenGetUsers_thenGetUsers() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
-        when(userService.getUsers()).thenReturn(USERS);
+        when(userService.getUsersPaging(any())).thenReturn(new PageImpl<>(USERS));
 
         var response = restTemplate.getForEntity(createUrl(""), String.class);
 
-        verify(userService, times(1)).getUsers();
+        verify(userService, times(1)).getUsersPaging(any());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
         assertEqualsJson(adder.create("testUsers.json"), response.getBody());
@@ -83,11 +82,11 @@ public class UserControllerTest extends SpringContextTestBase {
     @MethodSource("adminUsers")
     void givenAdminUser_whenGetGroupUsers_thenGetGroupUsers() {
         when(authService.getUser(any())).thenReturn(ADMIN_USER);
-        when(userService.getUsersByGroupId(1L)).thenReturn(GROUP_USERS);
+        when(userService.getUsersByGroupIdPaging(eq(1L), any())).thenReturn(new PageImpl<>(GROUP_USERS));
 
         var response = restTemplate.getForEntity(createUrl("?groupId=1"), String.class);
 
-        verify(userService, times(1)).getUsersByGroupId(1L);
+        verify(userService, times(1)).getUsersByGroupIdPaging(eq(1L), any());
 
         assertEquals(SC_OK, response.getStatusCodeValue());
         assertEqualsJson(adder.create("groupUsers.json"), response.getBody());

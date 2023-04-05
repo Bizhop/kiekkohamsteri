@@ -6,14 +6,21 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.constraints.NotNull;
+
 @Value
 @Builder
 @Jacksonized
 public class BuyOutputDto {
+    @NotNull
     Long id;
+    @NotNull
     DiscOutputDto disc;
+    @NotNull
     UserOutputDto seller;
+    @NotNull
     UserOutputDto buyer;
+    @NotNull
     Status status;
 
     public static BuyOutputDto fromDb(Buy input) {

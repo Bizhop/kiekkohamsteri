@@ -9,6 +9,8 @@ import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,6 +55,12 @@ public class UserService {
 		return userRepository.findAllByGroups(group);
 	}
 
+	public Page<User> getUsersByGroupIdPaging(Long groupId, Pageable pageable) {
+		var group = groupRepository.findById(groupId).orElseThrow();
+
+		return userRepository.findAllByGroups(group, pageable);
+	}
+
 	// HELPER METHODS
 
 	private void removeFromGroup(User user, Long removeFromGroup) {
@@ -92,6 +100,10 @@ public class UserService {
 
 	public List<User> getUsers() {
 		return userRepository.findAllByOrderById();
+	}
+
+	public Page<User> getUsersPaging(Pageable pageable) {
+		return userRepository.findAll(pageable);
 	}
 
 	public void saveUser(User user) {

@@ -1,34 +1,36 @@
-[
-  {
-    "username": "User",
-    "email": "test@example.com",
-    "firstName": "New",
-    "lastName": "User",
-    "pdgaNumber": 0,
-    "groups": [
-      {
-        "id": 1,
-        "name": "group 1"
-      }
-    ]
-  },
-  {
-    "username": "Group admin",
-    "email": "group-admin@example.com",
-    "firstName": "New",
-    "lastName": "User",
-    "pdgaNumber": 0,
-    "roles": [
-      {
-        "name": "GROUP_ADMIN",
-        "groupId": 1
-      }
-    ],
-    "groups": [
-      {
-        "id": 1,
-        "name": "group 1"
-      }
-    ]
-  }
-]
+{
+  "content": [
+    {
+      "username": "User",
+      "email": "test@example.com",
+      "firstName": "New",
+      "lastName": "User",
+      "pdgaNumber": 0,
+      "groups": [
+        {
+          "id": 1,
+          "name": "group 1"
+        }
+      ]
+    },
+    {
+      "username": "Group admin",
+      "email": "group-admin@example.com",
+      "firstName": "New",
+      "lastName": "User",
+      "pdgaNumber": 0,
+      "roles": [
+        {
+          "name": "GROUP_ADMIN",
+          "groupId": 1
+        }
+      ],
+      "groups": [
+        {
+          "id": 1,
+          "name": "group 1"
+        }
+      ]
+    }
+  ]
+}
