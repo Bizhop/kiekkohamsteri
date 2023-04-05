@@ -7,12 +7,13 @@ import fi.bizhop.kiekkohamsteri.model.User;
 import fi.bizhop.kiekkohamsteri.service.AuthService;
 import fi.bizhop.kiekkohamsteri.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static fi.bizhop.kiekkohamsteri.util.Utils.userBelongsToGroup;
 import static fi.bizhop.kiekkohamsteri.util.Utils.userIsAdmin;
@@ -27,20 +28,19 @@ public class UserController extends BaseControllerV2 {
     final UserService userService;
 
     @RequestMapping(value = "/user", method = GET, produces = "application/json")
-    public @ResponseBody List<UserOutputDto> getUsers(
+    public @ResponseBody Page<UserOutputDto> getUsers(
             @RequestAttribute("user") User user,
             @RequestParam(required = false) Long groupId,
-            HttpServletResponse response) {
+            HttpServletResponse response,
+            @ParameterObject Pageable pageable) {
         if(groupId == null) {
             if(!userIsAdmin(user)) {
                 response.setStatus(SC_FORBIDDEN);
                 return null;
             }
             response.setStatus(SC_OK);
-            return userService.getUsers()
-                    .stream()
-                    .map(UserOutputDto::fromDb)
-                    .collect(Collectors.toList());
+            return userService.getUsersPaging(pageable)
+                    .map(UserOutputDto::fromDb);
         }
 
         if(!userBelongsToGroup(user, groupId) && !userIsAdmin(user)) {
@@ -49,10 +49,8 @@ public class UserController extends BaseControllerV2 {
         }
 
         response.setStatus(SC_OK);
-        return userService.getUsersByGroupId(groupId)
-                .stream()
-                .map(UserOutputDto::fromDb)
-                .collect(Collectors.toList());
+        return userService.getUsersByGroupIdPaging(groupId, pageable)
+                .map(UserOutputDto::fromDb);
     }
 
     @RequestMapping(value = "/user/{id}", method = GET, produces = "application/json")
