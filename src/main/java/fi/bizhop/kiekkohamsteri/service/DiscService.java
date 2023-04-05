@@ -40,30 +40,12 @@ public class DiscService {
 		checkAndDeleteDisc(disc, owner);
 	}
 
-	@Deprecated
-	//DEPRECATED: use version with uuid instead of id
-	//TODO: fix tests
-	public void deleteDisc(Long id, User owner) throws AuthorizationException {
-		var disc = discRepo.findById(id).orElse(null);
-
-		checkAndDeleteDisc(disc, owner);
-	}
-
 	private void checkAndDeleteDisc(Disc disc, User owner) throws AuthorizationException{
 		if(disc == null || !disc.getOwner().equals(owner)) {
 			throw new AuthorizationException();
 		}
 
 		discRepo.deleteById(disc.getId());
-	}
-
-	@Deprecated
-	//DEPRECATED: use version with uuid instead of id
-	//TODO: fix tests
-	public Disc updateDisc(DiscInputDto dto, Long id, User owner, Mold newMold, Plastic newPlastic, Color newColor) throws AuthorizationException {
-		var disc = discRepo.findById(id).orElse(null);
-
-		return updateDisc(dto, disc, owner, newMold, newPlastic, newColor);
 	}
 
 	public Disc updateDisc(DiscInputDto dto, String uuid, User owner, Mold newMold, Plastic newPlastic, Color newColor) throws AuthorizationException {
@@ -98,14 +80,6 @@ public class DiscService {
 		return discRepo.save(disc);
 	}
 
-	@Deprecated
-	//DEPRECATED: use uuid version instead
-	//TODO: fix tests
-	public Disc getDisc(User owner, Long id) throws AuthorizationException {
-		var disc = discRepo.findById(id).orElseThrow();
-		return checkDiscOwner(owner, disc);
-	}
-
 	public Disc getDisc(User owner, String uuid) throws AuthorizationException {
 		var disc = discRepo.findByUuid(uuid).orElseThrow();
 		return checkDiscOwner(owner, disc);
@@ -124,14 +98,6 @@ public class DiscService {
 		return checkIfPublicOrOwnV2(owner, disc);
 	}
 
-	@Deprecated
-	//DEPRECATED: use uuid version instead
-	//TODO: fix tests
-	public Disc getDiscIfPublicOrOwnV2(User owner, Long id) throws AuthorizationException, HttpResponseException {
-		var disc = discRepo.findById(id).orElseThrow(() -> new HttpResponseException(SC_NOT_FOUND, "Disc not found"));
-		return checkIfPublicOrOwnV2(owner, disc);
-	}
-
 	private Disc checkIfPublicOrOwnV2(User owner, Disc disc) throws AuthorizationException {
 		if(owner.equals(disc.getOwner()) ||	Boolean.TRUE.equals(disc.getPublicDisc())) {
 			return disc;
@@ -139,14 +105,6 @@ public class DiscService {
 		else {
 			throw new AuthorizationException();
 		}
-	}
-
-	@Deprecated
-	//DEPRECATED: use uuid version instead
-	//TODO: fix tests
-	public void handleFoundDisc(User user, Long id) throws HttpResponseException {
-		var disc = discRepo.findById(id).orElse(null);
-		handleFoundDisc(user, disc);
 	}
 
 	public void handleFoundDisc(User user, String uuid) throws HttpResponseException {
@@ -199,10 +157,6 @@ public class DiscService {
 	//Forced method without owner check. Use with care.
 	public void deleteDiscById(Long id) {
 		discRepo.deleteById(id);
-	}
-
-	public Disc getDisc(Long id) {
-		return discRepo.findById(id).orElse(null);
 	}
 
 	public Disc getDisc(String uuid) {
